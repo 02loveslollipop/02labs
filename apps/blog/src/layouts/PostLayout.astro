@@ -1,0 +1,49 @@
+---
+import BaseLayout from "./BaseLayout.astro";
+
+export interface Props {
+	title: string;
+	description: string;
+	pubDate: Date;
+	updatedDate?: Date;
+	tags?: string[];
+	jsonLd?: string;
+}
+
+const { title, description, pubDate, updatedDate, tags, jsonLd } = Astro.props;
+const published = pubDate.toISOString().slice(0, 10);
+const updated = updatedDate ? updatedDate.toISOString().slice(0, 10) : null;
+---
+
+<BaseLayout title={title} description={description} ogType="article" jsonLd={jsonLd}>
+	<header class="header">
+		<div class="header__inner">
+			<a class="brand" href="/">02Labs Blog</a>
+			<nav class="header__links" aria-label="Site">
+				<a href="/rss.xml">RSS</a>
+				<a href="https://02labs.me/" rel="noopener noreferrer">Main site</a>
+			</nav>
+		</div>
+	</header>
+
+	<main class="wrap">
+		<article class="paper article">
+			<h1>{title}</h1>
+			<p class="lede">{description}</p>
+
+			<div class="meta">
+				<span>Published {published}</span>
+				{updated ? <span> · Updated {updated}</span> : null}
+				{Array.isArray(tags) && tags.length > 0 ? <span> · {tags.join(", ")}</span> : null}
+			</div>
+
+			<div style="height: 18px" aria-hidden="true"></div>
+			<slot />
+
+			<p class="footer">
+				<a href="/">Back to all posts</a>
+			</p>
+		</article>
+	</main>
+</BaseLayout>
+

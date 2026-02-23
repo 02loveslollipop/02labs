@@ -1,0 +1,63 @@
+---
+import type { Project } from "./ProjectCard.astro";
+
+export interface Props {
+	project: Project;
+}
+
+const { project } = Astro.props;
+---
+
+<div class="project-detail">
+	<div class="project-detail__grid" data-has-image={project.image ? "true" : undefined}>
+		{project.image ? (
+			<div class="project-detail__media">
+				<img
+					class="project-detail__img"
+					src={project.image.src}
+					alt={project.image.alt}
+					loading="lazy"
+					decoding="async"
+				/>
+			</div>
+		) : null}
+
+		<div class="project-detail__body">
+			<h3>{project.title}</h3>
+			<p>{project.description}</p>
+
+			{Array.isArray(project.highlights) && project.highlights.length > 0 ? (
+				<ul class="highlights">
+					{project.highlights.map((item) => (
+						<li>{item}</li>
+					))}
+				</ul>
+			) : null}
+
+			<div class="chips" aria-label="Stack">
+				{project.stack.map((item) => (
+					<span class="chip">{item}</span>
+				))}
+			</div>
+
+			<div class="btn-row">
+				<a class="btn" href={project.links.repo} target="_blank" rel="noopener noreferrer">
+					GitHub repo
+				</a>
+				{project.links.cta ? (
+					<a class="btn" href={project.links.cta.href} target="_blank" rel="noopener noreferrer">
+						{project.links.cta.label}
+					</a>
+				) : null}
+				{project.links.live ? (
+					<a class="btn" href={project.links.live} target="_blank" rel="noopener noreferrer">
+						Live
+					</a>
+				) : null}
+				<a class="btn" href="/#featured">
+					Back to featured
+				</a>
+			</div>
+		</div>
+	</div>
+</div>

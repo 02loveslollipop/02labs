@@ -1,0 +1,41 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { getCollection } from "astro:content";
+import { getPostSlug } from "../lib/posts";
+
+const entries = await getCollection("blog");
+const posts = entries
+	.filter((p) => !p.data.draft)
+	.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+---
+
+<BaseLayout title="02Labs Blog" description="Writeups, notes, and deep dives." ogType="website">
+	<header class="header">
+		<div class="header__inner">
+			<a class="brand" href="/">02Labs Blog</a>
+			<nav class="header__links" aria-label="Site">
+				<a href="/rss.xml">RSS</a>
+				<a href="https://02labs.me/" rel="noopener noreferrer">Main site</a>
+			</nav>
+		</div>
+	</header>
+
+	<main class="wrap">
+		<section class="paper" aria-label="Posts">
+			<div class="post-list">
+				{posts.map((post) => (
+					<a class="post-item" href={`/posts/${getPostSlug(post)}/`}>
+						<h2>{post.data.title}</h2>
+						<p>{post.data.description}</p>
+						<div class="meta">
+							<span>{post.data.pubDate.toISOString().slice(0, 10)}</span>
+							{Array.isArray(post.data.tags) && post.data.tags.length > 0 ? (
+								<span> · {post.data.tags.join(", ")}</span>
+							) : null}
+						</div>
+					</a>
+				))}
+			</div>
+		</section>
+	</main>
+</BaseLayout>

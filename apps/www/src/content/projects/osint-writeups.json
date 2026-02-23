@@ -1,0 +1,19 @@
+{
+  "slug": "osint-writeups",
+  "title": "OSINT Writeups",
+  "summary": "Reproducible OSINT investigations with clean methodology, citations, and tooling notes.",
+  "description": "A growing set of OSINT and CTF-style writeups that prioritize repeatable steps: data extraction, timeline reconstruction, cross-source verification, and careful uncertainty handling.",
+  "featured": true,
+  "order": 2,
+  "stack": ["Markdown", "Research", "Tooling"],
+  "highlights": ["Clear step-by-step narrative", "Artifacts and commands included", "Designed for search + long-term reference"],
+  "links": {
+    "repo": "https://github.com/02loveslollipop/osint-writeups",
+    "detailsLabel": "View details"
+  },
+  "card": {
+    "badge": "Featured",
+    "layout": "minimal"
+  }
+}
+

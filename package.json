@@ -1,0 +1,18 @@
+{
+  "name": "02labs",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev:www": "npm -w apps/www run dev",
+    "dev:blog": "npm -w apps/blog run dev",
+    "build:www": "npm -w apps/www run build",
+    "build:blog": "npm -w apps/blog run build",
+    "preview:www": "npm -w apps/www run preview",
+    "preview:blog": "npm -w apps/blog run preview",
+    "check:www": "npm -w apps/www run astro check",
+    "check:blog": "npm -w apps/blog run astro check"
+  }
+}

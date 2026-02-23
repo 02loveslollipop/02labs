@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://02labs.me/sitemap-index.xml
+

@@ -1,0 +1,90 @@
+---
+export type ProjectCardLayout = "minimal" | "dense";
+
+export interface ProjectImage {
+	src: string;
+	alt: string;
+}
+
+export interface ProjectLinkSet {
+	repo: string;
+	live?: string;
+	detailsLabel?: string;
+	cta?: {
+		href: string;
+		label: string;
+	};
+}
+
+export interface ProjectCardMeta {
+	badge?: string;
+	layout?: ProjectCardLayout;
+}
+
+export interface Project {
+	slug: string;
+	title: string;
+	summary: string;
+	featured: boolean;
+	order: number;
+	stack: string[];
+	highlights?: string[];
+	description: string;
+	image?: ProjectImage;
+	links: ProjectLinkSet;
+	card?: ProjectCardMeta;
+}
+
+export interface Props {
+	project: Project;
+	detailsHref: string;
+}
+
+const { project, detailsHref } = Astro.props;
+const badge = project.card?.badge ?? "Featured";
+const repoHref = project.links.repo;
+const detailsLabel = project.links.detailsLabel ?? "View details";
+const secondaryHref = project.links.cta?.href ?? detailsHref;
+const secondaryLabel = project.links.cta?.label ?? detailsLabel;
+const secondaryIsExternal = Boolean(project.links.cta);
+---
+
+<article class="project-card" data-layout={project.card?.layout ?? "minimal"}>
+	<div class="project-card__top" data-has-image={project.image ? "true" : undefined}>
+		{project.image ? (
+			<img
+				class="project-card__img"
+				src={project.image.src}
+				alt={project.image.alt}
+				loading="lazy"
+				decoding="async"
+			/>
+		) : null}
+
+		<div class="project-card__text">
+			<div class="project-card__badge">{badge}</div>
+			<h3 class="project-card__title">{project.title}</h3>
+			<p class="project-card__summary">{project.summary}</p>
+		</div>
+	</div>
+
+	<div class="chips" aria-label="Stack">
+		{project.stack.slice(0, 4).map((item) => (
+			<span class="chip">{item}</span>
+		))}
+	</div>
+
+	<div class="btn-row">
+		<a class="btn" href={repoHref} target="_blank" rel="noopener noreferrer">
+			GitHub repo
+		</a>
+		<a
+			class="btn"
+			href={secondaryHref}
+			target={secondaryIsExternal ? "_blank" : undefined}
+			rel={secondaryIsExternal ? "noopener noreferrer" : undefined}
+		>
+			{secondaryLabel}
+		</a>
+	</div>
+</article>

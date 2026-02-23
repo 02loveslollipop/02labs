@@ -1,0 +1,19 @@
+{
+  "slug": "data-pipeline-lab",
+  "title": "Data Pipeline Lab",
+  "summary": "Small, testable pipelines: ingestion, transforms, validation, and metrics.",
+  "description": "A sandbox for building reliable data workflows with guardrails: schema validation, deterministic transforms, and output contracts that make failures obvious and recoverable.",
+  "featured": true,
+  "order": 3,
+  "stack": ["Python", "Data Engineering", "Testing"],
+  "highlights": ["Schema-first inputs/outputs", "Deterministic transforms", "Dashboards/metrics hooks"],
+  "links": {
+    "repo": "https://github.com/02loveslollipop/data-pipeline-lab",
+    "detailsLabel": "View details"
+  },
+  "card": {
+    "badge": "Featured",
+    "layout": "minimal"
+  }
+}
+

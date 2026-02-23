@@ -1,0 +1,34 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Navbar from "../../components/Navbar.astro";
+import ProjectCard from "../../components/ProjectCard.astro";
+import { getCollection } from "astro:content";
+
+const entries = await getCollection("projects");
+const projects = entries.map((e) => e.data).sort((a, b) => a.order - b.order);
+---
+
+<BaseLayout
+	title="Projects"
+	description="All projects in the 02Labs portfolio, sourced from static JSON at build time."
+	ogType="website"
+>
+	<Navbar />
+
+	<main id="main" class="snap-section scroll-target">
+		<div class="panel">
+			<div class="section-head">
+				<h2>Projects</h2>
+				<p>
+					<a class="btn" href="/#featured">Back to home</a>
+				</p>
+			</div>
+
+			<div class="featured-row" aria-label="Projects">
+				{projects.map((project) => (
+					<ProjectCard project={project} detailsHref={`/#project-${project.slug}`} />
+				))}
+			</div>
+		</div>
+	</main>
+</BaseLayout>

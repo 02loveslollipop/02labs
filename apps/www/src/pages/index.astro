@@ -1,0 +1,133 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Navbar from "../components/Navbar.astro";
+import Hero from "../components/Hero.astro";
+import ProjectCard from "../components/ProjectCard.astro";
+import ProjectDetail from "../components/ProjectDetail.astro";
+import { getCollection } from "astro:content";
+
+const entries = await getCollection("projects");
+const projects = entries.map((e) => e.data).sort((a, b) => a.order - b.order);
+const featured = projects.filter((p) => p.featured).slice(0, 5);
+
+const jsonLd = JSON.stringify(
+	[
+		{
+			"@context": "https://schema.org",
+			"@type": "Person",
+			name: "02loveslollipop",
+			jobTitle: "Computer and systems engineer & Data science engineer",
+			url: "https://02labs.me/",
+		},
+		{
+			"@context": "https://schema.org",
+			"@type": "WebSite",
+			name: "02Labs",
+			url: "https://02labs.me/",
+		},
+	],
+	null,
+	0
+);
+---
+
+<BaseLayout
+	title="02Labs"
+	description="02Labs portfolio: featured projects, deep dives, and a writing archive."
+	ogType="website"
+	jsonLd={jsonLd}
+>
+	<Navbar />
+	<main id="main">
+		<Hero />
+
+		<section class="snap-section scroll-target" id="intro" data-snap="card" data-snap-section>
+			<div class="panel intro">
+				<div class="intro-grid">
+					<div>
+						<h2>Introduction</h2>
+						<p>
+							I build systems that behave under pressure: data pipelines that fail loudly, interfaces
+							that stay readable, and tooling that makes investigation repeatable.
+						</p>
+					</div>
+					<div class="intro-divider" aria-hidden="true"></div>
+					<div>
+						<h2>Focus</h2>
+						<p>
+							Computer and systems engineering, data science engineering, and the overlap where
+							observability and iteration speed matter.
+						</p>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<section class="snap-section scroll-target" id="featured" data-snap="card" data-snap-section>
+			<div class="panel">
+				<div class="section-head">
+					<div>
+						<h2>Featured projects</h2>
+						<p>Five highlights. Static pages, crawlable links, and details below.</p>
+					</div>
+					<p>
+						<a class="btn" href="/projects/">All projects</a>
+					</p>
+				</div>
+
+				<div class="featured-row" aria-label="Featured projects">
+					{featured.map((project) => (
+						<ProjectCard project={project} detailsHref={`#project-${project.slug}`} />
+					))}
+				</div>
+			</div>
+		</section>
+
+		<div id="projects" class="scroll-target" aria-hidden="true"></div>
+
+		{featured.map((project) => (
+			<section
+				class="snap-section scroll-target"
+				id={`project-${project.slug}`}
+				data-snap="card"
+				data-snap-section
+			>
+				<div class="panel">
+					<ProjectDetail project={project} />
+				</div>
+			</section>
+		))}
+
+		<section class="snap-section scroll-target" id="blog" data-snap="card" data-snap-section>
+			<div class="panel">
+				<div class="section-head">
+					<h2>Blog</h2>
+					<p>Writeups, notes, and long-form breakdowns.</p>
+				</div>
+				<div class="cta">
+					<p>
+						The blog is deployed separately for clean canonicals and crawling:
+						<strong> blog.02labs.me</strong>.
+					</p>
+					<p>
+						<a class="btn" href="https://blog.02labs.me/" rel="noopener noreferrer">
+							Open the blog
+						</a>
+					</p>
+				</div>
+			</div>
+		</section>
+
+		<section class="snap-section" data-snap="card" data-snap-section>
+			<div class="panel">
+				<p class="footer">
+					© {new Date().getFullYear()} 02Labs. Built with Astro. Grayscale UI, accent on hover.
+				</p>
+			</div>
+		</section>
+	</main>
+
+	<script>
+		import "../scripts/home";
+	</script>
+</BaseLayout>
