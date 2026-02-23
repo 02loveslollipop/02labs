@@ -171,9 +171,9 @@ a:focus-visible {
 }
 
 .nav[data-scrolled="true"] {
-	background: rgba(255, 255, 255, 0.92);
-	border-bottom: 1px solid #000;
-	color: #000;
+	background: rgba(0, 0, 0, 0.92);
+	border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+	color: rgba(255, 255, 255, 0.92);
 }
 
 .nav__inner {
@@ -568,8 +568,28 @@ section[data-snap="card"][data-active="true"] .panel {
 	gap: 10px;
 }
 
-.footer {
-	text-align: center;
-	color: rgba(0, 0, 0, 0.62);
+.site-footer {
+	scroll-snap-align: end;
+	background: rgba(0, 0, 0, 0.92);
+	color: rgba(255, 255, 255, 0.92);
+	border-top: 1px solid rgba(255, 255, 255, 0.14);
+	padding: 22px var(--pad);
+}
+
+.site-footer__inner {
+	width: min(var(--max), calc(100% - (var(--pad) * 2)));
+	margin: 0 auto;
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 16px;
+	flex-wrap: wrap;
+}
+
+.site-footer__copy,
+.site-footer__meta {
+	margin: 0;
 	font-size: 13px;
+	letter-spacing: 0.01em;
+	opacity: 0.9;
 }

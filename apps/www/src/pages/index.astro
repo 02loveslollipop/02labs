@@ -117,15 +117,18 @@ const jsonLd = JSON.stringify(
 				</div>
 			</div>
 		</section>
-
-		<section class="snap-section" data-snap="card" data-snap-section>
-			<div class="panel">
-				<p class="footer">
-					© {new Date().getFullYear()} 02Labs. Built with Astro. Grayscale UI, accent on hover.
-				</p>
-			</div>
-		</section>
 	</main>
+
+	<footer class="site-footer" aria-label="Footer">
+		<div class="site-footer__inner">
+			<p class="site-footer__copy">
+				© {new Date().getFullYear()} 02Labs. Built with Astro.
+			</p>
+			<p class="site-footer__meta">
+				<a href="/#top">Back to top</a>
+			</p>
+		</div>
+	</footer>
 
 	<script>
 		import "../scripts/home";

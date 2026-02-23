@@ -43,7 +43,7 @@ Blog (`apps/blog/src/styles/global.css`) uses the same concept with slightly dif
 - Component: `apps/www/src/components/Navbar.astro`
 - Behavior:
   - On hero: transparent, blurred, white text
-  - After hero: near-white bar with **black** bottom border and **black** text
+  - After hero: **black** bar with **white** text
 - Implementation:
   - `apps/www/src/scripts/home.ts` toggles `data-scrolled="true"` on `#siteNav` using an IntersectionObserver.
 
@@ -57,6 +57,10 @@ Blog (`apps/blog/src/styles/global.css`) uses the same concept with slightly dif
   - `apps/www/src/scripts/home.ts` toggles `data-active="true"` to “flip in”
 - Reduced motion:
   - Card transforms and scroll-snap are disabled when `prefers-reduced-motion: reduce`.
+
+### Footer (Portfolio)
+
+- Footer is a normal, full-width band (not a card panel), using the same colors as the navbar scrolled state.
 
 ## Hover / Focus Rules
 
