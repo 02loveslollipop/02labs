@@ -62,15 +62,19 @@ export function getPostExcerpt(markdownBody: string, fallback: string): string {
 	return truncate(fallback);
 }
 
-export function getPostFirstImageSrc(markdownBody: string, slug: string): string | null {
-	const match = /!\[[^\]]*]\(([^)\s]+)(?:\s+"[^"]*")?\)/.exec(String(markdownBody || ""));
-	if (!match?.[1]) return null;
-
-	const raw = match[1].replace(/^<|>$/g, "").trim();
+export function resolvePostImageSrc(imagePath: string | null | undefined, slug: string): string | null {
+	const raw = String(imagePath ?? "")
+		.replace(/^<|>$/g, "")
+		.trim();
 	if (!raw) return null;
 	if (raw.startsWith("http://") || raw.startsWith("https://") || raw.startsWith("//")) return raw;
 	if (raw.startsWith("/")) return raw;
 
 	const normalized = raw.replace(/^\.\//, "");
 	return `/posts/${slug}/${normalized}`;
+}
+
+export function getPostFirstImageSrc(markdownBody: string, slug: string): string | null {
+	const match = /!\[[^\]]*]\(([^)\s]+)(?:\s+"[^"]*")?\)/.exec(String(markdownBody || ""));
+	return resolvePostImageSrc(match?.[1], slug);
 }

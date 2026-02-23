@@ -1,7 +1,13 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { getCollection } from "astro:content";
-import { getPostExcerpt, getPostFirstImageSrc, getPostSlug, stripMarkdownInline } from "../lib/posts";
+import {
+	getPostExcerpt,
+	getPostFirstImageSrc,
+	getPostSlug,
+	resolvePostImageSrc,
+	stripMarkdownInline,
+} from "../lib/posts";
 
 const entries = await getCollection("blog");
 const posts = entries
@@ -14,7 +20,9 @@ const posts = entries
 			slug,
 			title: stripMarkdownInline(post.data.title),
 			excerpt: getPostExcerpt(post.body, stripMarkdownInline(post.data.description)),
-			imageSrc: getPostFirstImageSrc(post.body, slug),
+			imageSrc:
+				resolvePostImageSrc(post.data.featuredImage, slug) ??
+				getPostFirstImageSrc(post.body, slug),
 		};
 	});
 ---

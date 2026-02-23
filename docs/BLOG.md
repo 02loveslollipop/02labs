@@ -33,8 +33,18 @@ Optional frontmatter:
 ```yaml
 updatedDate: 2026-02-23
 tags: ["osint", "writeup"]
+featuredImage: "1.jpg"
 draft: true
 ```
+
+`featuredImage` rules:
+
+- Used by the blog home card thumbnail.
+- If omitted, the first image found in the markdown body is used as fallback.
+- Accepted formats:
+  - Relative path from post folder (recommended): `featuredImage: "1.jpg"`
+  - Absolute site path: `featuredImage: "/posts/<slug>/1.jpg"`
+  - External URL: `featuredImage: "https://..."`.
 
 ## Routes
 

@@ -1,5 +1,8 @@
-# OSINT Writeup — *Eye on the Sky* / *Eye on the Sky 2*
-
+---
+title: "OSINT Writeup — Eye on the Sky / Eye on the Sky 2"
+description: "Goal: Determine the aircraft’s marketed flight number (operating airline) and the baggage carousel number."
+pubDate: 2026-02-22
+featuredImage: "2.png"
 ---
 
 ## Challenge statements
