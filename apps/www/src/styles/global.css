@@ -405,6 +405,7 @@ section[data-snap="card"][data-active="true"] .panel {
 	padding: 16px;
 	display: grid;
 	gap: 12px;
+	align-content: start;
 	transition:
 		transform 140ms ease,
 		border-color 160ms ease,
@@ -473,11 +474,14 @@ section[data-snap="card"][data-active="true"] .panel {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 8px;
+	align-items: flex-start;
+	align-content: flex-start;
 }
 
 .chip {
 	font-size: 12px;
 	padding: 6px 8px;
+	line-height: 1.2;
 	border-radius: 999px;
 	border: 1px solid var(--ink-stroke);
 	color: rgba(0, 0, 0, 0.7);
