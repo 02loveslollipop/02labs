@@ -52,11 +52,12 @@ function runHeroAnimation() {
 	const title = document.querySelector("[data-animate='hero-title']");
 	const sub = document.querySelector("[data-animate='hero-sub']");
 	const navBrand = document.querySelector("[data-animate='nav-brand']");
+	const navGithub = document.querySelector("[data-animate='nav-github']");
 	const navLinks = document.querySelectorAll(".nav__links a");
 
 	if (!title || !sub) return;
 
-	const initialTargets = [title, sub, navBrand, ...Array.from(navLinks)].filter(
+	const initialTargets = [title, sub, navBrand, navGithub, ...Array.from(navLinks)].filter(
 		(v): v is Element => Boolean(v)
 	);
 
@@ -81,6 +82,10 @@ function runHeroAnimation() {
 			},
 			"-=520"
 		);
+	}
+
+	if (navGithub) {
+		tl.add(navGithub, { opacity: [0, 1], translateY: [10, 0], duration: 480 }, "-=420");
 	}
 }
 

@@ -2,9 +2,14 @@
 export interface Props {
 	rightText?: string;
 	forceScrolled?: boolean;
+	githubHref?: string;
 }
 
-const { rightText = "", forceScrolled = false } = Astro.props;
+const {
+	rightText = "",
+	forceScrolled = false,
+	githubHref = "https://github.com/02loveslollipop",
+} = Astro.props;
 ---
 
 <nav
@@ -23,8 +28,22 @@ const { rightText = "", forceScrolled = false } = Astro.props;
 			<a href="/#blog">Blog</a>
 			<a href="/projects/">Projects</a>
 		</div>
-		<div class="nav__spacer" aria-hidden="true">
-			{rightText}
+		<div class="nav__actions">
+			{rightText ? (
+				<span class="nav__meta" aria-hidden="true">
+					{rightText}
+				</span>
+			) : null}
+			<a
+				class="nav__github"
+				href={githubHref}
+				target="_blank"
+				rel="noopener noreferrer"
+				data-animate="nav-github"
+				aria-label="Open GitHub profile"
+			>
+				GitHub
+			</a>
 		</div>
 	</div>
 </nav>
