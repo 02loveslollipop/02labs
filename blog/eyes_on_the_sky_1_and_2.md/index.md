@@ -94,7 +94,7 @@ The peak was identified as **Mount Rainier (Washington State, USA)**. This also 
 
 ![Photo](1.jpg)
 
-* **Figure 1:** `sky.jpg` (corrected for EXIF rotation). Caption should note: “Long-lens image containing Mount Rainier and a distant aircraft; EXIF FOV = 15.5°.”
+> **Figure 1:** `sky.jpg` (corrected for EXIF rotation).
 
 ---
 
@@ -115,7 +115,7 @@ The ADS-B view at the replay time showed multiple aircraft in the region. A prel
 
 ![ADS-B replay](2.png)
 
-* **Figure 2:** ADS-B replay overview around the Rainier region at ((T_{UTC} \approx 17{:}18{:}40,\text{Z})). Caption should note that multiple aircraft are present and that subsequent steps prune candidates using angular constraints.
+> **Figure 2:** ADS-B replay overview around the Rainier region at ((T_{UTC} \approx 17{:}18{:}40,\text{Z})).
 
 ---
 
