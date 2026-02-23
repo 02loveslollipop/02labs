@@ -3,6 +3,10 @@
   "title": "Systems Scratchpad",
   "summary": "Low-level experiments around networking, concurrency, and performance profiling.",
   "description": "A set of focused, well-scoped experiments: protocol sketches, timing probes, concurrency patterns, and profiling notes. Built to document what works, what fails, and why.",
+  "image": {
+    "src": "/projects/systems-scratchpad.svg",
+    "alt": "Systems Scratchpad cover image"
+  },
   "featured": true,
   "order": 4,
   "stack": ["C/C++", "Rust", "Networking", "Perf"],
@@ -16,4 +20,3 @@
     "layout": "minimal"
   }
 }
-

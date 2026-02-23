@@ -3,6 +3,10 @@
   "title": "Cobalt Wash Player UI",
   "summary": "An SSE-driven “now playing” UI with a blurred, drifting cobalt wash background and a lyric-window display.",
   "description": "A static-first UI pattern that consumes Server-Sent Events for live updates while keeping interactions and motion lightweight. Focused on readable typography, minimal controls, and a background that feels alive without becoming noisy.",
+  "image": {
+    "src": "/projects/cobalt-wash-player.svg",
+    "alt": "Cobalt Wash Player UI cover image"
+  },
   "featured": true,
   "order": 1,
   "stack": ["Astro", "SSE", "CSS", "TypeScript"],
@@ -16,4 +20,3 @@
     "layout": "minimal"
   }
 }
-

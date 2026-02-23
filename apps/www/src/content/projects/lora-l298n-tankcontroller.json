@@ -1,0 +1,13 @@
+{
+  "slug": "lora-l298n-tankcontroller",
+  "title": "LoRa L298N Tank Controller",
+  "summary": "End-to-end IoT tank control system using LoRa radios, ESP32/ESP8266, and cloud microservices.",
+  "description": "LoRa‑L298N‑TankController is a hobbyist IoT platform for remotely piloting a tank‑style rover via LoRa radios. ESP‑based controllers drive an L298N H‑bridge while encrypted commands and telemetry flow through Redis streams and a modular microservice backend hosted in Docker‑containers on AWS. It’s ideal for experimenting with low‑bandwidth long‑range control, real‑time media relay and distributed telemetry.",
+  "featured": false,
+  "order": 20,
+  "stack": ["C/C++", "Python", "LoRa", "Redis Streams", "WebSocket", "Docker", "AWS"],
+  "links": {
+    "repo": "https://github.com/02loveslollipop/LoRa-L298N-TankController",
+    "detailsLabel": "View details"
+  }
+}

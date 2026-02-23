@@ -41,7 +41,7 @@ const jsonLd = JSON.stringify(
 	<main id="main">
 		<Hero />
 
-		<section class="snap-section scroll-target" id="intro" data-snap="card" data-snap-section>
+		<section class="snap-section" id="intro" data-snap="card" data-snap-section>
 			<div class="panel intro">
 				<div class="intro-grid">
 					<div>
@@ -63,7 +63,7 @@ const jsonLd = JSON.stringify(
 			</div>
 		</section>
 
-		<section class="snap-section scroll-target" id="featured" data-snap="card" data-snap-section>
+		<section class="snap-section" id="featured" data-snap="card" data-snap-section>
 			<div class="panel">
 				<div class="section-head">
 					<div>
@@ -83,11 +83,11 @@ const jsonLd = JSON.stringify(
 			</div>
 		</section>
 
-		<div id="projects" class="scroll-target" aria-hidden="true"></div>
+		<div id="projects" aria-hidden="true"></div>
 
 		{featured.map((project) => (
 			<section
-				class="snap-section scroll-target"
+				class="snap-section"
 				id={`project-${project.slug}`}
 				data-snap="card"
 				data-snap-section
@@ -98,7 +98,7 @@ const jsonLd = JSON.stringify(
 			</section>
 		))}
 
-		<section class="snap-section scroll-target" id="blog" data-snap="card" data-snap-section>
+		<section class="snap-section" id="blog" data-snap="card" data-snap-section>
 			<div class="panel">
 				<div class="section-head">
 					<h2>Blog</h2>

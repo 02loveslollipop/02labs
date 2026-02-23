@@ -3,6 +3,10 @@
   "title": "Data Pipeline Lab",
   "summary": "Small, testable pipelines: ingestion, transforms, validation, and metrics.",
   "description": "A sandbox for building reliable data workflows with guardrails: schema validation, deterministic transforms, and output contracts that make failures obvious and recoverable.",
+  "image": {
+    "src": "/projects/data-pipeline-lab.svg",
+    "alt": "Data Pipeline Lab cover image"
+  },
   "featured": true,
   "order": 3,
   "stack": ["Python", "Data Engineering", "Testing"],
@@ -16,4 +20,3 @@
     "layout": "minimal"
   }
 }
-

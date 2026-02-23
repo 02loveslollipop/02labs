@@ -1,0 +1,13 @@
+{
+  "slug": "hpc-scalability-analysis",
+  "title": "HPC Scalability Analysis",
+  "summary": "Scripts and data for running scalability experiments on HPC clusters.",
+  "description": "A lightweight toolkit for automating and recording scalability experiments on HPC systems – hpcScalabilityAnalysis bundles shell scripts and Docker configuration to launch cluster runs, gather performance data, and inspect how applications scale across nodes. Whether you’re benchmarking MPI jobs or tuning parallel workloads, it provides the scaffolding and sample results to jump‑start your analysis.",
+  "featured": false,
+  "order": 100,
+  "stack": ["Shell", "Docker"],
+  "links": {
+    "repo": "https://github.com/02loveslollipop/hpcScalabilityAnalysis",
+    "detailsLabel": "View details"
+  }
+}

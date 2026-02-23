@@ -1,0 +1,13 @@
+{
+  "slug": "genshin-image-classifier",
+  "title": "Genshin Image Classifier",
+  "summary": "Python CNN that classifies Genshin Impact character images scraped from Pixiv.",
+  "description": "A hobbyist image‑classification tool that automatically gathers and normalizes fan‑art from Pixiv and uses a lightweight convolutional network to distinguish between six popular Genshin Impact characters, complete with training notebooks and simple deployment scripts for experimentation.",
+  "featured": false,
+  "order": 50,
+  "stack": ["Python", "TensorFlow", "Jupyter Notebooks", "Data Scraping"],
+  "links": {
+    "repo": "https://github.com/02loveslollipop/GenshinImageClassifier",
+    "detailsLabel": "View details"
+  }
+}

@@ -1,12 +1,18 @@
 ---
 export interface Props {
 	rightText?: string;
+	forceScrolled?: boolean;
 }
 
-const { rightText = "" } = Astro.props;
+const { rightText = "", forceScrolled = false } = Astro.props;
 ---
 
-<nav class="nav" id="siteNav" aria-label="Primary">
+<nav
+	class="nav"
+	id="siteNav"
+	aria-label="Primary"
+	data-scrolled={forceScrolled ? "true" : undefined}
+>
 	<div class="nav__inner">
 		<a class="nav__brand" href="/#top" data-animate="nav-brand">
 			02Labs

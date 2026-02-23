@@ -1,0 +1,13 @@
+{
+  "slug": "mi-pedido",
+  "title": "MiPedido",
+  "summary": "Integrated shared ordering and ahead-order management platform with real-time WebSocket support.",
+  "description": "MiPedido delivers a seamless ordering experience by unifying client, vendor, and administrator interfaces into a single ecosystem. With real‑time notifications via WebSockets, containerized backend services, and dedicated mobile/web applications, it makes managing group orders and advance purchases effortless and efficient for businesses and their customers.",
+  "featured": false,
+  "order": 30,
+  "stack": ["Node.js", "Docker", "WebSockets", "Cron Jobs", "Mobile Apps"],
+  "links": {
+    "repo": "https://github.com/02loveslollipop/MiPedido",
+    "detailsLabel": "View details"
+  }
+}

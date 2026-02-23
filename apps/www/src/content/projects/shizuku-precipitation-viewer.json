@@ -1,0 +1,14 @@
+{
+  "slug": "shizuku-precipitation-viewer",
+  "title": "Shizuku Precipitation Viewer",
+  "summary": "Real-time precipitation visualization platform for Medellín with microservices and Flutter front-end.",
+  "description": "Shizuku Precipitation Viewer delivers an elegant, real‑time map of rainfall over Medellín, powered by a microservices backend in Go and Python and a sleek Flutter frontend. Deployed via Docker, the project ingests live meteorological feeds to render up‑to‑the‑minute precipitation data for developers, urban planners, and weather enthusiasts.",
+  "featured": false,
+  "order": 70,
+  "stack": ["Go", "Python", "Flutter", "Docker", "PostgreSQL"],
+  "links": {
+    "repo": "https://github.com/02loveslollipop/Shizuku-precipitation-viewer",
+    "live": "https://shizuku.02labs.me",
+    "detailsLabel": "View details"
+  }
+}

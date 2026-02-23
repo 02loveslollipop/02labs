@@ -1,8 +1,11 @@
 ---
-title: "OSINT Writeup — Eye on the Sky / Eye on the Sky 2"
-description: "Using EXIF constraints and ADS-B replay to identify a flight and infer the photographer’s location."
+title: "OSINT Writeup — *Eye on the Sky* / *Eye on the Sky 2*"
+description: "**Goal:** Determine the aircraft’s marketed flight number (operating airline) and the baggage carousel number."
 pubDate: 2026-02-22
-tags: ["osint", "ctf", "writeup"]
+---
+
+# OSINT Writeup — *Eye on the Sky* / *Eye on the Sky 2*
+
 ---
 
 ## Challenge statements

@@ -1,0 +1,13 @@
+{
+  "slug": "dos-sniffer-lab",
+  "title": "DoS Sniffer Lab",
+  "summary": "Educational toolkit simulating denial-of-service attacks with attacker/victim/sniffer components.",
+  "description": "DoS‑Sniffer‑lab is an educational toolkit that simulates a complete denial‑of‑service attack scenario: you can run an attacker, a victim, and a packet sniffer side‑by‑side to observe and analyse malicious traffic. With ready‑made filtering rules, Docker‑based Snort integration, and detailed lab instructions, it’s ideal for security students and researchers wanting to learn about network intrusion detection and traffic forensics in a controlled environment.",
+  "featured": false,
+  "order": 80,
+  "stack": ["Python", "C", "Docker", "Wireshark", "Snort"],
+  "links": {
+    "repo": "https://github.com/02loveslollipop/DoS-Sniffer-lab",
+    "detailsLabel": "View details"
+  }
+}

@@ -3,11 +3,12 @@
   "type": "module",
   "version": "0.0.1",
   "scripts": {
-    "predev": "node scripts/sync-post-assets.mjs",
+    "predev": "node scripts/sync-root-blog.mjs && node scripts/sync-post-assets.mjs",
     "dev": "astro dev",
-    "prebuild": "node scripts/sync-post-assets.mjs",
+    "prebuild": "node scripts/sync-root-blog.mjs && node scripts/sync-post-assets.mjs",
     "build": "astro build",
     "preview": "astro preview",
+    "preastro": "node scripts/sync-root-blog.mjs && node scripts/sync-post-assets.mjs",
     "astro": "astro"
   },
   "dependencies": {

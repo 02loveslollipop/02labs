@@ -2,10 +2,15 @@
 
 ## Location
 
-- Posts live in `apps/blog/src/content/blog/`.
-- Folder-per-post layout:
-  - `apps/blog/src/content/blog/<slug>/index.md`
+- Source of truth (edit here):
+  - `blog/<post-folder>/index.md`
   - Put post images next to the markdown file in the same folder.
+- Build sync (Astro expects content under `src/content`):
+  - Synced to `apps/blog/src/content/blog/<slug>/index.md` on dev/build/check.
+
+Notes:
+
+- `<slug>` is derived from the folder name (lowercased, underscores/spaces to hyphens, `.md` suffix stripped).
 
 ## Frontmatter Schema
 
@@ -39,10 +44,10 @@ draft: true
 
 ## Images (Static)
 
-The blog syncs image files from the content folders into `public/` automatically:
+The blog syncs image files into `public/` automatically:
 
 - Source of truth:
-  - `apps/blog/src/content/blog/<slug>/*.(png|jpg|jpeg|webp|gif|svg|avif)`
+  - `blog/<post-folder>/*.(png|jpg|jpeg|webp|gif|svg|avif)`
 - Copied to:
   - `apps/blog/public/posts/<slug>/...`
 - In markdown, you can use either:
@@ -53,7 +58,8 @@ This keeps builds fully static and guarantees the images resolve in production.
 
 Implementation:
 
-- `apps/blog/scripts/sync-post-assets.mjs` runs on `npm -w apps/blog run dev` and `npm -w apps/blog run build`.
+- `apps/blog/scripts/sync-root-blog.mjs` syncs `./blog` into `apps/blog/src/content/blog`.
+- `apps/blog/scripts/sync-post-assets.mjs` copies images into `apps/blog/public/posts`.
 
 ## Draft Workflow
 

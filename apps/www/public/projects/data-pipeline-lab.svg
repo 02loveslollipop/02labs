@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f7f7f5"/>
+      <stop offset="1" stop-color="#e9e9e6"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="900" fill="url(#g)"/>
+  <rect x="56" y="56" width="1088" height="788" rx="34" fill="none" stroke="#000" stroke-opacity="0.14" stroke-width="6"/>
+
+  <text x="120" y="210" fill="#000" font-size="72" font-weight="850" font-family="Outfit, ui-sans-serif, system-ui, sans-serif" letter-spacing="-1.5">
+    Data Pipeline Lab
+  </text>
+  <text x="120" y="270" fill="#000" opacity="0.62" font-size="26" font-weight="520" font-family="Outfit, ui-sans-serif, system-ui, sans-serif">
+    Ingestion -> validation -> transforms -> artifacts
+  </text>
+
+  <g transform="translate(120 340)" fill="none" stroke="#000" stroke-opacity="0.14" stroke-width="4">
+    <rect x="0" y="0" width="200" height="120" rx="22"/>
+    <rect x="270" y="0" width="200" height="120" rx="22"/>
+    <rect x="540" y="0" width="200" height="120" rx="22"/>
+    <rect x="810" y="0" width="200" height="120" rx="22"/>
+
+    <path d="M200 60h70" />
+    <path d="M470 60h70" />
+    <path d="M740 60h70" />
+
+    <circle cx="235" cy="60" r="10" fill="#000" fill-opacity="0.12" stroke="none"/>
+    <circle cx="505" cy="60" r="10" fill="#000" fill-opacity="0.12" stroke="none"/>
+    <circle cx="775" cy="60" r="10" fill="#000" fill-opacity="0.12" stroke="none"/>
+  </g>
+
+  <g transform="translate(120 520)" fill="#000" opacity="0.62" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace" font-size="18">
+    <text x="0" y="0">schema.validate(input)</text>
+    <text x="0" y="34">transform.deterministic(records)</text>
+    <text x="0" y="68">metrics.emit()</text>
+    <text x="0" y="102">artifacts.export()</text>
+  </g>
+
+  <text x="120" y="780" fill="#000" opacity="0.55" font-size="18" font-weight="520" font-family="Outfit, ui-sans-serif, system-ui, sans-serif" letter-spacing="2">
+    02LABS
+  </text>
+</svg>
+

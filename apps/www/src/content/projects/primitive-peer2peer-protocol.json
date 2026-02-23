@@ -1,0 +1,13 @@
+{
+  "slug": "primitive-peer2peer-protocol",
+  "title": "Primitive Peer2Peer Protocol",
+  "summary": "Simple HTTP‑and‑gRPC based peer-to-peer file sharing protocol.",
+  "description": "PrimitivePeer2PeerProtocol (P4) is a minimalist, HTTP‑primed peer‑to‑peer file sharing system with built‑in gRPC support. Its REST API handles control operations while gRPC streams bulk data between nodes, making it easy to deploy in containers and integrate with modern microservices.",
+  "featured": false,
+  "order": 40,
+  "stack": ["Go", "Python", "HTTP", "gRPC", "Docker"],
+  "links": {
+    "repo": "https://github.com/02loveslollipop/PrimitivePeer2PeerProtocol",
+    "detailsLabel": "View details"
+  }
+}

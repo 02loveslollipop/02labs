@@ -33,12 +33,18 @@
 html {
 	height: 100%;
 	color-scheme: dark light;
+}
+
+/* Root scroller differs across browsers (html vs body). Set both for consistent snapping. */
+html,
+body {
 	scroll-behavior: smooth;
 	scroll-snap-type: y proximity;
 }
 
 @media (prefers-reduced-motion: reduce) {
-	html {
+	html,
+	body {
 		scroll-behavior: auto;
 		scroll-snap-type: none;
 	}
@@ -81,10 +87,6 @@ a:focus-visible {
 
 ::selection {
 	background: rgba(255, 255, 255, 0.14);
-}
-
-.scroll-target {
-	scroll-margin-top: calc(var(--nav-h) + 14px);
 }
 
 .skip-link {
@@ -400,6 +402,35 @@ section[data-snap="card"][data-active="true"] .panel {
 	background: rgba(255, 255, 255, 0.72);
 }
 
+.project-card__top {
+	display: grid;
+	gap: 12px;
+}
+
+.project-card__top[data-has-image="true"] {
+	grid-template-columns: 86px 1fr;
+	align-items: start;
+}
+
+.project-card__img {
+	width: 86px;
+	height: 86px;
+	border-radius: 14px;
+	object-fit: cover;
+	border: 1px solid var(--ink-stroke);
+	background: rgba(0, 0, 0, 0.04);
+	filter: grayscale(1) contrast(1.05);
+}
+
+.project-card:hover .project-card__img {
+	border-color: var(--accent);
+}
+
+.project-card__text {
+	display: grid;
+	gap: 8px;
+}
+
 .project-card__badge {
 	display: inline-flex;
 	align-items: center;
@@ -478,6 +509,37 @@ section[data-snap="card"][data-active="true"] .panel {
 .project-detail {
 	display: grid;
 	gap: 16px;
+}
+
+.project-detail__grid {
+	display: grid;
+	gap: 22px;
+	align-items: start;
+}
+
+.project-detail__grid[data-has-image="true"] {
+	grid-template-columns: minmax(220px, 0.42fr) 1fr;
+}
+
+.project-detail__img {
+	width: 100%;
+	height: auto;
+	border-radius: 18px;
+	object-fit: cover;
+	border: 1px solid var(--ink-stroke);
+	background: rgba(0, 0, 0, 0.04);
+	filter: grayscale(1) contrast(1.05);
+}
+
+.project-detail__body {
+	display: grid;
+	gap: 16px;
+}
+
+@media (max-width: 980px) {
+	.project-detail__grid[data-has-image="true"] {
+		grid-template-columns: 1fr;
+	}
 }
 
 .project-detail h3 {

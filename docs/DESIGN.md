@@ -50,8 +50,8 @@ Blog (`apps/blog/src/styles/global.css`) uses the same concept with slightly dif
 ### Sections (“Flipping Cards”)
 
 - Each section uses:
-  - `min-height: 100vh`
-  - `scroll-snap-align: start` (snap is set to `y proximity` on `html`)
+  - `height: 100vh` / `100svh`
+  - `scroll-snap-align: center` (snap is set to `y proximity` on `html, body`)
 - Card flip effect:
   - Sections with `data-snap="card"` get a 3D tilt + opacity reduction by default
   - `apps/www/src/scripts/home.ts` toggles `data-active="true"` to “flip in”

@@ -30,8 +30,12 @@
 
 ## Optional Fields
 
+- `image.src`: string (path under `apps/www/public/` like `/projects/my-project.svg`)
+- `image.alt`: string (alt text for the card/detail image)
 - `highlights`: `string[]`
 - `links.live`: URL string
+- `links.cta.href`: URL string (used for the **second** button next to GitHub in featured cards)
+- `links.cta.label`: string (button label)
 - `card.badge`: string (small label above title)
 - `card.layout`: `"minimal" | "dense"`
 
@@ -51,4 +55,3 @@
 3. If you want it to appear in the featured row, set:
    - `featured: true`
    - `order` so it sorts into the first 5
-

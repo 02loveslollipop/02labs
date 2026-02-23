@@ -3,6 +3,10 @@
   "title": "Forecasting Kit",
   "summary": "Baseline time-series forecasting workflows with evaluation and deployment-friendly artifacts.",
   "description": "A practical kit for quickly standing up forecasting baselines, comparing metrics, and exporting artifacts that are usable in downstream systems (reports, services, scheduled jobs).",
+  "image": {
+    "src": "/projects/forecasting-kit.svg",
+    "alt": "Forecasting Kit cover image"
+  },
   "featured": true,
   "order": 5,
   "stack": ["Time Series", "Evaluation", "Packaging"],
@@ -16,4 +20,3 @@
     "layout": "minimal"
   }
 }
-
