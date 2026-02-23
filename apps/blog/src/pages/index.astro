@@ -1,12 +1,22 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { getCollection } from "astro:content";
-import { getPostSlug } from "../lib/posts";
+import { getPostExcerpt, getPostFirstImageSrc, getPostSlug, stripMarkdownInline } from "../lib/posts";
 
 const entries = await getCollection("blog");
 const posts = entries
 	.filter((p) => !p.data.draft)
-	.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+	.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+	.map((post) => {
+		const slug = getPostSlug(post);
+		return {
+			post,
+			slug,
+			title: stripMarkdownInline(post.data.title),
+			excerpt: getPostExcerpt(post.body, stripMarkdownInline(post.data.description)),
+			imageSrc: getPostFirstImageSrc(post.body, slug),
+		};
+	});
 ---
 
 <BaseLayout title="02Labs Blog" description="Writeups, notes, and deep dives." ogType="website">
@@ -23,15 +33,23 @@ const posts = entries
 	<main class="wrap">
 		<section class="paper" aria-label="Posts">
 			<div class="post-list">
-				{posts.map((post) => (
-					<a class="post-item" href={`/posts/${getPostSlug(post)}/`}>
-						<h2>{post.data.title}</h2>
-						<p>{post.data.description}</p>
-						<div class="meta">
-							<span>{post.data.pubDate.toISOString().slice(0, 10)}</span>
-							{Array.isArray(post.data.tags) && post.data.tags.length > 0 ? (
-								<span> · {post.data.tags.join(", ")}</span>
-							) : null}
+				{posts.map(({ post, slug, title, excerpt, imageSrc }) => (
+					<a class={`post-item ${imageSrc ? "" : "post-item--no-image"}`} href={`/posts/${slug}/`}>
+						{imageSrc ? (
+							<img
+								class="post-item__thumb"
+								src={imageSrc}
+								alt={`${title} preview`}
+								loading="lazy"
+								decoding="async"
+							/>
+						) : null}
+						<div class="post-item__body">
+							<h2>{title}</h2>
+							<p class="post-item__excerpt">{excerpt}</p>
+							<div class="meta">
+								<span>{post.data.pubDate.toISOString().slice(0, 10)}</span>
+							</div>
 						</div>
 					</a>
 				))}

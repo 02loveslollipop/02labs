@@ -1,7 +1,7 @@
 ---
 import PostLayout from "../../layouts/PostLayout.astro";
 import { getCollection } from "astro:content";
-import { getPostSlug } from "../../lib/posts";
+import { getPostSlug, stripMarkdownInline } from "../../lib/posts";
 
 export async function getStaticPaths() {
 	const entries = await getCollection("blog");
@@ -15,6 +15,8 @@ export async function getStaticPaths() {
 const { entry } = Astro.props;
 const { Content } = await entry.render();
 const slug = getPostSlug(entry);
+const titlePlain = stripMarkdownInline(entry.data.title);
+const descriptionPlain = stripMarkdownInline(entry.data.description);
 
 const url = Astro.site
 	? new URL(`/posts/${slug}/`, Astro.site).toString()
@@ -24,8 +26,8 @@ const jsonLd = JSON.stringify(
 	{
 		"@context": "https://schema.org",
 		"@type": "BlogPosting",
-		headline: entry.data.title,
-		description: entry.data.description,
+		headline: titlePlain,
+		description: descriptionPlain,
 		datePublished: entry.data.pubDate.toISOString(),
 		dateModified: (entry.data.updatedDate ?? entry.data.pubDate).toISOString(),
 		mainEntityOfPage: url,

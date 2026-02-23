@@ -1,6 +1,7 @@
 ---
 import Background from "../components/Background.astro";
 import "../styles/global.css";
+import "katex/dist/katex.min.css";
 
 export interface Props {
 	title?: string;
@@ -43,6 +44,7 @@ const fullTitle = title === "02Labs Blog" ? title : `${title} | 02Labs Blog`;
 		<meta name="twitter:card" content="summary" />
 		<meta name="twitter:title" content={fullTitle} />
 		<meta name="twitter:description" content={description} />
+		<link rel="alternate" type="application/rss+xml" title="02Labs Blog RSS" href="/rss.xml" />
 
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

@@ -1,6 +1,6 @@
 import rss from "@astrojs/rss";
 import { getCollection } from "astro:content";
-import { getPostSlug } from "../lib/posts";
+import { getPostSlug, stripMarkdownInline } from "../lib/posts";
 
 export async function GET(context: { site: URL }) {
 	const entries = await getCollection("blog");
@@ -13,8 +13,8 @@ export async function GET(context: { site: URL }) {
 		description: "Writeups, notes, and deep dives.",
 		site: context.site,
 		items: posts.map((post) => ({
-			title: post.data.title,
-			description: post.data.description,
+			title: stripMarkdownInline(post.data.title),
+			description: stripMarkdownInline(post.data.description),
 			link: `/posts/${getPostSlug(post)}/`,
 			pubDate: post.data.pubDate,
 		})),

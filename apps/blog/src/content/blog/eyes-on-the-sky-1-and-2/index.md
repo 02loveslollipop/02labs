@@ -1,6 +1,6 @@
 ---
-title: "OSINT Writeup — *Eye on the Sky* / *Eye on the Sky 2*"
-description: "**Goal:** Determine the aircraft’s marketed flight number (operating airline) and the baggage carousel number."
+title: "OSINT Writeup — Eye on the Sky / Eye on the Sky 2"
+description: "Goal: Determine the aircraft’s marketed flight number (operating airline) and the baggage carousel number."
 pubDate: 2026-02-22
 ---
 
@@ -83,9 +83,9 @@ From the EXIF dump, the constraints used downstream were:
 
 The timestamp was converted to UTC for ADS-B replay:
 
-[
+$$
 T_{UTC} = 2026\text{-}01\text{-}19;17{:}18{:}43,\text{Z}
-]
+$$
 
 ---
 
@@ -107,7 +107,7 @@ Historical ADS-B traffic was queried using ADSBexchange:
 
 * [https://globe.adsbexchange.com/](https://globe.adsbexchange.com/)
 
-The replay time window was centered on ((T_{UTC} \approx 17{:}18{:}40,\text{Z})), matching the EXIF time within sub-second tolerance.
+The replay time window was centered on $T_{UTC} \approx 17{:}18{:}40,\text{Z}$, matching the EXIF time within sub-second tolerance.
 
 The ADS-B view at the replay time showed multiple aircraft in the region. A preliminary set of plausible candidates (based on proximity and altitude bands) included:
 
@@ -118,7 +118,7 @@ The ADS-B view at the replay time showed multiple aircraft in the region. A prel
 
 ![ADS-B replay](2.png)
 
-* **Figure 2:** ADS-B replay overview around the Rainier region at ((T_{UTC} \approx 17{:}18{:}40,\text{Z})). Caption should note that multiple aircraft are present and that subsequent steps prune candidates using angular constraints.
+* **Figure 2:** ADS-B replay overview around the Rainier region at $T_{UTC} \approx 17{:}18{:}40,\text{Z}$. Caption should note that multiple aircraft are present and that subsequent steps prune candidates using angular constraints.
 
 ---
 
@@ -130,36 +130,36 @@ Because the aircraft is only a few pixels in size, direct identification from li
 
 Given:
 
-* EXIF field of view (vertical, portrait): ((\text{FOV} \approx 15.5^\circ))
-* Rotated working image height: ((H = 2048)) px
-* Measured aircraft vertical offset above the mountain summit silhouette along the same image column: ((\Delta y \approx 1180)) px
+* EXIF field of view (vertical, portrait): $\text{FOV} \approx 15.5^\circ$
+* Rotated working image height: $H = 2048$ px
+* Measured aircraft vertical offset above the mountain summit silhouette along the same image column: $\Delta y \approx 1180$ px
 
 Approximate angular separation:
 
-[
+$$
 \Delta \theta \approx \text{FOV} \cdot \frac{\Delta y}{H}
 = 15.5^\circ \cdot \frac{1180}{2048}
 \approx 8.9^\circ
-]
+$$
 
 ### 4.2 Elevation angle estimate
 
-From a north/northwestern viewpoint at ~70–80 km range (consistent with typical traffic corridors in the Tacoma/Seattle area), the summit appears approximately ((\sim 2.7^\circ))–((3.3^\circ)) above the horizon (observer-elevation dependent). Therefore, the aircraft elevation was estimated at:
+From a north/northwestern viewpoint at ~70–80 km range (consistent with typical traffic corridors in the Tacoma/Seattle area), the summit appears approximately $\sim 2.7^\circ$–$3.3^\circ$ above the horizon (observer-elevation dependent). Therefore, the aircraft elevation was estimated at:
 
-[
+$$
 \theta_{plane} \approx (2.7^\circ\text{ to }3.3^\circ) + 8.9^\circ
 \approx 11.6^\circ\text{ to }12.2^\circ
-]
+$$
 
 ### 4.3 Apparent angular width sanity check
 
-In the rotated image (width ((W = 1365)) px), the aircraft blob spanned ((\sim 16)) px. Using a short-side horizontal FOV of ((\sim 10^\circ)) (85 mm on APS-C in portrait), the apparent angular width was:
+In the rotated image (width $W = 1365$ px), the aircraft blob spanned $\sim 16$ px. Using a short-side horizontal FOV of $\sim 10^\circ$ (85 mm on APS-C in portrait), the apparent angular width was:
 
-[
+$$
 \theta_w \approx 10^\circ \cdot \frac{16}{1365} \approx 0.12^\circ
-]
+$$
 
-This is consistent with a commercial jet at tens of kilometers range (e.g., Embraer-class or 737-class) and implies an altitude band on the order of ((\sim 11{,}000))–((16{,}000)) ft given the ((\sim 12^\circ)) elevation estimate, disfavoring low-altitude aircraft candidates.
+This is consistent with a commercial jet at tens of kilometers range (e.g., Embraer-class or 737-class) and implies an altitude band on the order of $\sim 11{,}000$–$16{,}000$ ft given the $\sim 12^\circ$ elevation estimate, disfavoring low-altitude aircraft candidates.
 
 ---
 
@@ -191,21 +191,21 @@ With the aircraft identified, its precise state vector (lat/lon/alt) at capture 
 
 ### 6.1 Known values (from ADS-B + terrain)
 
-* **Mount Rainier:** ((46.851405,,-121.757990)), elevation ((H_m = 14{,}411)) ft
-* **Aircraft (AS265) at capture time:** ((47.371365,,-121.972296)), altitude ((H_p = 10{,}550)) ft
-* **Distance aircraft→mountain:** ((D_m \approx 60.3)) km
+* **Mount Rainier:** $46.851405,,-121.757990$, elevation $H_m = 14{,}411$ ft
+* **Aircraft (AS265) at capture time:** $47.371365,,-121.972296$, altitude $H_p = 10{,}550$ ft
+* **Distance aircraft→mountain:** $D_m \approx 60.3$ km
 
 ### 6.2 Line-of-sight vector
 
 Vector from mountain to airplane:
 
-[
+$$
 \Delta \text{Lat} = 47.371365 - 46.851405 = 0.51996
-]
+$$
 
-[
+$$
 \Delta \text{Lon} = -121.972296 - (-121.757990) = -0.214306
-]
+$$
 
 Since the aircraft lies N–NW of the mountain, the photographer is located further N–NW along the same line (looking S–SE).
 
@@ -213,41 +213,41 @@ Since the aircraft lies N–NW of the mountain, the photographer is located furt
 
 Even though the plane is physically lower than the mountain, it appears much higher above the horizon in the photograph, implying the aircraft is much closer to the camera than the mountain.
 
-Define ((R)) as the apparent height ratio (plane elevation above the horizon relative to the mountain peak’s elevation above the horizon). Visual estimation yielded ((R \approx 4.5))–((5)).
+Define $R$ as the apparent height ratio (plane elevation above the horizon relative to the mountain peak’s elevation above the horizon). Visual estimation yielded $R \approx 4.5$–$5$.
 
 Using:
 
-[
+$$
 d_c = \frac{D_m \cdot H_p}{R\cdot H_m - H_p}
-]
+$$
 
-For ((R = 5)):
+For $R = 5$:
 
-[
+$$
 d_c = \frac{60.3\cdot 10550}{5\cdot 14411 - 10550}
 = \frac{636165}{61505}
 \approx 10.34;\text{km}
-]
+$$
 
-For ((R \approx 4.5)), ((d_c)) increases to roughly ((11.7)) km.
+For $R \approx 4.5$, $d_c$ increases to roughly $11.7$ km.
 
 ### 6.4 Back-projection to coordinates
 
-Define the scale ((k = d_c / D_m)). With ((d_c \approx 10.34)) km and ((D_m \approx 60.3)) km:
+Define the scale $k = d_c / D_m$. With $d_c \approx 10.34$ km and $D_m \approx 60.3$ km:
 
-[
+$$
 k \approx 0.171
-]
+$$
 
-Extend the mountain→aircraft vector by ((k)) starting at the aircraft coordinate:
+Extend the mountain→aircraft vector by $k$ starting at the aircraft coordinate:
 
-[
+$$
 \text{Lat}_{cam} \approx 47.371365 + 0.51996\cdot 0.171 \approx 47.460
-]
+$$
 
-[
+$$
 \text{Lon}_{cam} \approx -121.972296 + (-0.214306)\cdot 0.171 \approx -122.009
-]
+$$
 
 This corridor intersects the Tiger Mountain / Squak Mountain region. Testing prominent viewpoints along this line yielded the correct location.
 

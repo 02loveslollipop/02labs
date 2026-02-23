@@ -42,13 +42,23 @@ function yamlQuote(value) {
 	return `"${String(value).replace(/\\/g, "\\\\").replace(/\"/g, '\\"')}"`;
 }
 
+function stripMarkdownInline(value) {
+	return String(value || "")
+		.replace(/!\[[^\]]*]\([^)]+\)/g, " ")
+		.replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+		.replace(/`([^`]+)`/g, "$1")
+		.replace(/[*_~]+/g, "")
+		.replace(/\s+/g, " ")
+		.trim();
+}
+
 function extractTitle(md, fallback) {
 	const lines = md.split(/\r?\n/);
 	for (const line of lines) {
 		const m = /^#\s+(.+?)\s*$/.exec(line);
-		if (m) return m[1];
+		if (m) return stripMarkdownInline(m[1]);
 	}
-	return fallback;
+	return stripMarkdownInline(fallback);
 }
 
 function extractDescription(md, fallback) {
@@ -64,9 +74,9 @@ function extractDescription(md, fallback) {
 		if (trimmed === "---") continue;
 		if (/^#{1,6}\s+/.test(trimmed)) continue;
 		if (/^[-*]\s+/.test(trimmed)) continue;
-		return trimmed.slice(0, 180);
+		return stripMarkdownInline(trimmed).slice(0, 180);
 	}
-	return fallback;
+	return stripMarkdownInline(fallback);
 }
 
 function toIsoDateOnly(date) {
@@ -83,6 +93,62 @@ async function pathExists(p) {
 	} catch {
 		return false;
 	}
+}
+
+function normalizeMathDelimiters(md) {
+	const lines = String(md || "").split(/\r?\n/);
+	const out = [];
+	let inCodeFence = false;
+	let inBracketMath = false;
+	let bracketMathLines = [];
+
+	for (const rawLine of lines) {
+		const trimmed = rawLine.trim();
+
+		if (/^```/.test(trimmed)) {
+			inCodeFence = !inCodeFence;
+			out.push(rawLine);
+			continue;
+		}
+
+		if (!inCodeFence && !inBracketMath && trimmed === "[") {
+			inBracketMath = true;
+			bracketMathLines = [];
+			continue;
+		}
+
+		if (!inCodeFence && inBracketMath && trimmed === "]") {
+			const inner = bracketMathLines.join("\n").trim();
+			if (inner.length > 0) {
+				out.push("$$");
+				out.push(inner);
+				out.push("$$");
+			} else {
+				out.push("[");
+				out.push("]");
+			}
+			inBracketMath = false;
+			bracketMathLines = [];
+			continue;
+		}
+
+		if (inBracketMath) {
+			bracketMathLines.push(rawLine);
+			continue;
+		}
+
+		if (!inCodeFence) {
+			out.push(rawLine.replace(/(?<!\\)\(\((.+?)\)\)/g, (_m, value) => `$${String(value).trim()}$`));
+		} else {
+			out.push(rawLine);
+		}
+	}
+
+	if (inBracketMath) {
+		out.push("[", ...bracketMathLines);
+	}
+
+	return out.join("\n");
 }
 
 async function main() {
@@ -112,14 +178,15 @@ async function main() {
 		await fs.cp(srcDir, destDir, { recursive: true, force: true });
 
 		const raw = await fs.readFile(srcIndex, "utf-8");
+		const normalizedSource = normalizeMathDelimiters(raw);
 		const normalized = await (async () => {
-			if (hasFrontmatter(raw)) return raw;
+			if (hasFrontmatter(normalizedSource)) return normalizedSource;
 
 			const st = await fs.stat(srcIndex);
 			const pubDate = toIsoDateOnly(st.mtime);
 
-			const title = extractTitle(raw, slug);
-			const description = extractDescription(raw, title);
+			const title = extractTitle(normalizedSource, slug);
+			const description = extractDescription(normalizedSource, title);
 
 			const fm =
 				`---\n` +
@@ -128,7 +195,7 @@ async function main() {
 				`pubDate: ${pubDate}\n` +
 				`---\n\n`;
 
-			return fm + raw;
+			return fm + normalizedSource;
 		})();
 
 		await fs.writeFile(path.join(destDir, "index.md"), normalized, "utf-8");
@@ -142,4 +209,3 @@ async function main() {
 }
 
 await main();
-

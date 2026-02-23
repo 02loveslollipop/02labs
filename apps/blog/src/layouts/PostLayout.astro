@@ -1,5 +1,6 @@
 ---
 import BaseLayout from "./BaseLayout.astro";
+import { renderInlineMarkdown, stripMarkdownInline } from "../lib/posts";
 
 export interface Props {
 	title: string;
@@ -13,9 +14,13 @@ export interface Props {
 const { title, description, pubDate, updatedDate, tags, jsonLd } = Astro.props;
 const published = pubDate.toISOString().slice(0, 10);
 const updated = updatedDate ? updatedDate.toISOString().slice(0, 10) : null;
+const titlePlain = stripMarkdownInline(title);
+const descriptionPlain = stripMarkdownInline(description);
+const titleHtml = renderInlineMarkdown(title);
+const descriptionHtml = renderInlineMarkdown(description);
 ---
 
-<BaseLayout title={title} description={description} ogType="article" jsonLd={jsonLd}>
+<BaseLayout title={titlePlain} description={descriptionPlain} ogType="article" jsonLd={jsonLd}>
 	<header class="header">
 		<div class="header__inner">
 			<a class="brand" href="/">02Labs Blog</a>
@@ -28,8 +33,8 @@ const updated = updatedDate ? updatedDate.toISOString().slice(0, 10) : null;
 
 	<main class="wrap">
 		<article class="paper article">
-			<h1>{title}</h1>
-			<p class="lede">{description}</p>
+			<h1 set:html={titleHtml}></h1>
+			<p class="lede" set:html={descriptionHtml}></p>
 
 			<div class="meta">
 				<span>Published {published}</span>
@@ -46,4 +51,3 @@ const updated = updatedDate ? updatedDate.toISOString().slice(0, 10) : null;
 		</article>
 	</main>
 </BaseLayout>
-
