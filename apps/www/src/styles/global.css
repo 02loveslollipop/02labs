@@ -252,6 +252,21 @@ a:focus-visible {
 	align-content: start;
 }
 
+/* Home sections: keep featured row full-width; center only specific content blocks */
+.home-main .intro-grid,
+.home-main .project-detail,
+.home-main .cta {
+	width: min(1000px, 100%);
+	margin-inline: auto;
+}
+
+/* You clarified the issue was vertical alignment, so center key panels on Y axis */
+.home-main #intro .panel,
+.home-main section[id^="project-"] .panel,
+.home-main #blog .panel {
+	align-content: center;
+}
+
 section[data-snap="card"] .panel {
 	transform: perspective(1200px) rotateX(-6deg) translateY(24px);
 	opacity: 0.55;
@@ -560,6 +575,92 @@ section[data-snap="card"][data-active="true"] .panel {
 	padding-left: 18px;
 	color: rgba(0, 0, 0, 0.72);
 	line-height: 1.75;
+}
+
+/* Projects page (all projects + client-side filtering) */
+.projects-page {
+	min-height: 100vh;
+	min-height: 100svh;
+	padding: calc(var(--nav-h) + var(--pad)) var(--pad) var(--pad);
+}
+
+.projects-shell {
+	width: min(var(--max), calc(100% - (var(--pad) * 2)));
+	margin: 0 auto;
+	border-radius: 28px;
+	padding: clamp(22px, 4.2vw, 56px);
+	border: 1px solid var(--ink-stroke);
+	background: var(--surface);
+	color: var(--ink);
+	box-shadow: 0 18px 70px rgba(0, 0, 0, 0.25);
+	display: grid;
+	gap: 20px;
+}
+
+.projects-filters {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) minmax(0, 240px) auto;
+	gap: 12px;
+	align-items: end;
+}
+
+.projects-filter {
+	display: grid;
+	gap: 6px;
+	font-size: 13px;
+	color: rgba(0, 0, 0, 0.7);
+}
+
+.projects-filter input,
+.projects-filter select {
+	height: 40px;
+	width: 100%;
+	border-radius: 12px;
+	border: 1px solid var(--ink-stroke);
+	background: rgba(255, 255, 255, 0.75);
+	color: var(--ink);
+	padding: 0 12px;
+	font: inherit;
+}
+
+.projects-filter input:focus-visible,
+.projects-filter select:focus-visible {
+	outline: 2px solid rgba(45, 108, 255, 0.45);
+	outline-offset: 1px;
+	border-color: var(--accent);
+}
+
+.projects-toggle {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	height: 40px;
+	padding: 0 12px;
+	border-radius: 12px;
+	border: 1px solid var(--ink-stroke);
+	background: rgba(255, 255, 255, 0.6);
+	font-size: 14px;
+}
+
+.projects-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+	gap: 14px;
+}
+
+.project-item[hidden] {
+	display: none !important;
+}
+
+@media (max-width: 900px) {
+	.projects-filters {
+		grid-template-columns: 1fr;
+		align-items: stretch;
+	}
+
+	.projects-toggle {
+		justify-content: flex-start;
+	}
 }
 
 /* Blog CTA + footer */

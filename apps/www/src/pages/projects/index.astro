@@ -6,6 +6,11 @@ import { getCollection } from "astro:content";
 
 const entries = await getCollection("projects");
 const projects = entries.map((e) => e.data).sort((a, b) => a.order - b.order);
+const stackSet = new Set<string>();
+for (const project of projects) {
+	for (const stackItem of project.stack) stackSet.add(stackItem);
+}
+const stacks = Array.from(stackSet).sort((a, b) => a.localeCompare(b));
 ---
 
 <BaseLayout
@@ -15,20 +20,94 @@ const projects = entries.map((e) => e.data).sort((a, b) => a.order - b.order);
 >
 	<Navbar forceScrolled />
 
-	<main id="main" class="snap-section">
-		<div class="panel">
+	<main id="main" class="projects-page">
+		<div class="projects-shell">
 			<div class="section-head">
 				<h2>Projects</h2>
 				<p>
-					<a class="btn" href="/#featured">Back to home</a>
+					<a class="btn" href="/#featured">Featured</a>
 				</p>
 			</div>
 
-			<div class="featured-row" aria-label="Projects">
+			<div class="projects-filters" aria-label="Project filters">
+				<label class="projects-filter">
+					<span>Search</span>
+					<input
+						id="projectSearch"
+						type="search"
+						placeholder="Search title, summary, stack..."
+						autocomplete="off"
+					/>
+				</label>
+
+				<label class="projects-filter">
+					<span>Stack</span>
+					<select id="stackFilter">
+						<option value="all">All stacks</option>
+						{stacks.map((stack) => (
+							<option value={stack}>{stack}</option>
+						))}
+					</select>
+				</label>
+
+				<label class="projects-toggle">
+					<input id="featuredOnly" type="checkbox" />
+					<span>Featured only</span>
+				</label>
+			</div>
+
+			<div class="projects-grid" id="projectsGrid" aria-label="Projects">
 				{projects.map((project) => (
-					<ProjectCard project={project} detailsHref={`/#project-${project.slug}`} />
+					<div
+						class="project-item"
+						data-project-item
+						data-title={project.title.toLowerCase()}
+						data-summary={project.summary.toLowerCase()}
+						data-stack={project.stack.join("|").toLowerCase()}
+						data-featured={project.featured ? "true" : "false"}
+					>
+						<ProjectCard project={project} detailsHref={`/#project-${project.slug}`} />
+					</div>
 				))}
 			</div>
 		</div>
 	</main>
+
+	<script>
+		const searchInput = document.getElementById("projectSearch");
+		const stackSelect = document.getElementById("stackFilter");
+		const featuredOnly = document.getElementById("featuredOnly");
+		const items = Array.from(document.querySelectorAll("[data-project-item]"));
+
+		const normalize = (v: string | null | undefined) => String(v || "").toLowerCase().trim();
+
+		const applyFilters = () => {
+			const query = normalize(searchInput instanceof HTMLInputElement ? searchInput.value : "");
+			const stack = normalize(stackSelect instanceof HTMLSelectElement ? stackSelect.value : "all");
+			const onlyFeatured = featuredOnly instanceof HTMLInputElement ? featuredOnly.checked : false;
+
+			for (const item of items) {
+				const title = normalize(item.getAttribute("data-title"));
+				const summary = normalize(item.getAttribute("data-summary"));
+				const stackText = normalize(item.getAttribute("data-stack"));
+				const isFeatured = item.getAttribute("data-featured") === "true";
+
+				const queryMatch =
+					query.length === 0 ||
+					title.includes(query) ||
+					summary.includes(query) ||
+					stackText.includes(query);
+
+				const stackMatch = stack === "all" || stackText.split("|").includes(stack);
+				const featuredMatch = !onlyFeatured || isFeatured;
+				const show = queryMatch && stackMatch && featuredMatch;
+
+				item.toggleAttribute("hidden", !show);
+			}
+		};
+
+		searchInput?.addEventListener("input", applyFilters);
+		stackSelect?.addEventListener("change", applyFilters);
+		featuredOnly?.addEventListener("change", applyFilters);
+	</script>
 </BaseLayout>
