@@ -40,6 +40,7 @@ draft: true
 `featuredImage` rules:
 
 - Used by the blog home card thumbnail.
+- Used for social link previews (`og:image` and `twitter:image`) on post pages.
 - If omitted, the first image found in the markdown body is used as fallback.
 - Accepted formats:
   - Relative path from post folder (recommended): `featuredImage: "1.jpg"`

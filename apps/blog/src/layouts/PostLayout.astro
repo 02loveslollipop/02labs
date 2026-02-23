@@ -8,10 +8,12 @@ export interface Props {
 	pubDate: Date;
 	updatedDate?: Date;
 	tags?: string[];
+	ogImage?: string;
+	ogImageAlt?: string;
 	jsonLd?: string;
 }
 
-const { title, description, pubDate, updatedDate, tags, jsonLd } = Astro.props;
+const { title, description, pubDate, updatedDate, tags, ogImage, ogImageAlt, jsonLd } = Astro.props;
 const published = pubDate.toISOString().slice(0, 10);
 const updated = updatedDate ? updatedDate.toISOString().slice(0, 10) : null;
 const titlePlain = stripMarkdownInline(title);
@@ -20,7 +22,14 @@ const titleHtml = renderInlineMarkdown(title);
 const descriptionHtml = renderInlineMarkdown(description);
 ---
 
-<BaseLayout title={titlePlain} description={descriptionPlain} ogType="article" jsonLd={jsonLd}>
+<BaseLayout
+	title={titlePlain}
+	description={descriptionPlain}
+	ogType="article"
+	ogImage={ogImage}
+	ogImageAlt={ogImageAlt}
+	jsonLd={jsonLd}
+>
 	<header class="header">
 		<div class="header__inner">
 			<a class="brand" href="/">02Labs Blog</a>

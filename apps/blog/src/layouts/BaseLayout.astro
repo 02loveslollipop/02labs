@@ -7,6 +7,9 @@ export interface Props {
 	title?: string;
 	description?: string;
 	ogType?: "website" | "article";
+	ogImage?: string;
+	ogImageAlt?: string;
+	twitterCard?: "summary" | "summary_large_image";
 	jsonLd?: string;
 }
 
@@ -14,12 +17,16 @@ const {
 	title = "02Labs Blog",
 	description = "Writeups, notes, and deep dives.",
 	ogType = "website",
+	ogImage,
+	ogImageAlt,
+	twitterCard,
 	jsonLd,
 } = Astro.props;
 
 const site = Astro.site;
 const canonicalUrl = site ? new URL(Astro.url.pathname, site).toString() : Astro.url.toString();
 const fullTitle = title === "02Labs Blog" ? title : `${title} | 02Labs Blog`;
+const resolvedTwitterCard = twitterCard ?? (ogImage ? "summary_large_image" : "summary");
 ---
 
 <html lang="en">
@@ -40,10 +47,13 @@ const fullTitle = title === "02Labs Blog" ? title : `${title} | 02Labs Blog`;
 		<meta property="og:description" content={description} />
 		<meta property="og:type" content={ogType} />
 		<meta property="og:url" content={canonicalUrl} />
+		{ogImage ? <meta property="og:image" content={ogImage} /> : null}
+		{ogImageAlt ? <meta property="og:image:alt" content={ogImageAlt} /> : null}
 
-		<meta name="twitter:card" content="summary" />
+		<meta name="twitter:card" content={resolvedTwitterCard} />
 		<meta name="twitter:title" content={fullTitle} />
 		<meta name="twitter:description" content={description} />
+		{ogImage ? <meta name="twitter:image" content={ogImage} /> : null}
 		<link rel="alternate" type="application/rss+xml" title="02Labs Blog RSS" href="/rss.xml" />
 
 		<link rel="preconnect" href="https://fonts.googleapis.com" />

@@ -246,7 +246,7 @@ $$
 \text{Lon}_{cam} \approx -121.972296 + (-0.214306)\cdot 0.171 \approx -122.009
 $$
 
-This corridor intersects the Tiger Mountain / Squak Mountain region. Testing prominent viewpoints along this line yielded the correct location.
+This corridor intersects the Tiger Mountain / Poo Poo Point / Squak Mountain region. Testing prominent viewpoints along this line yielded the correct location.
 
 ### 6.5 Result
 

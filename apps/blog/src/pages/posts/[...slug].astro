@@ -1,7 +1,7 @@
 ---
 import PostLayout from "../../layouts/PostLayout.astro";
 import { getCollection } from "astro:content";
-import { getPostSlug, stripMarkdownInline } from "../../lib/posts";
+import { getPostFirstImageSrc, getPostSlug, resolvePostImageSrc, stripMarkdownInline } from "../../lib/posts";
 
 export async function getStaticPaths() {
 	const entries = await getCollection("blog");
@@ -17,6 +17,15 @@ const { Content } = await entry.render();
 const slug = getPostSlug(entry);
 const titlePlain = stripMarkdownInline(entry.data.title);
 const descriptionPlain = stripMarkdownInline(entry.data.description);
+const imageSrc =
+	resolvePostImageSrc(entry.data.featuredImage, slug) ??
+	getPostFirstImageSrc(entry.body, slug);
+const imageUrl = (() => {
+	if (!imageSrc) return undefined;
+	if (/^https?:\/\//i.test(imageSrc)) return imageSrc;
+	if (imageSrc.startsWith("//")) return `https:${imageSrc}`;
+	return Astro.site ? new URL(imageSrc, Astro.site).toString() : imageSrc;
+})();
 
 const url = Astro.site
 	? new URL(`/posts/${slug}/`, Astro.site).toString()
@@ -31,6 +40,7 @@ const jsonLd = JSON.stringify(
 		datePublished: entry.data.pubDate.toISOString(),
 		dateModified: (entry.data.updatedDate ?? entry.data.pubDate).toISOString(),
 		mainEntityOfPage: url,
+		...(imageUrl ? { image: imageUrl } : {}),
 		author: { "@type": "Person", name: "02loveslollipop" },
 		publisher: { "@type": "Organization", name: "02Labs" },
 	},
@@ -45,6 +55,8 @@ const jsonLd = JSON.stringify(
 	pubDate={entry.data.pubDate}
 	updatedDate={entry.data.updatedDate}
 	tags={entry.data.tags}
+	ogImage={imageUrl}
+	ogImageAlt={`${titlePlain} featured image`}
 	jsonLd={jsonLd}
 >
 	<Content />
