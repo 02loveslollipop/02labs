@@ -1,10 +1,46 @@
 ---
+export const prerender = false;
+
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Navbar from "../components/Navbar.astro";
 import Hero from "../components/Hero.astro";
 import ProjectCard from "../components/ProjectCard.astro";
 import ProjectDetail from "../components/ProjectDetail.astro";
 import { getCollection } from "astro:content";
+import type { CTFTimeData } from "./api/ctftime.json";
+
+// ---------- Server-side KV read ----------
+const kv = Astro.locals.runtime?.env?.CTFTIME_KV;
+let ctf: CTFTimeData | null = null;
+if (kv) {
+	try {
+		const raw = await kv.get("ctftime_data");
+		if (raw) ctf = JSON.parse(raw) as CTFTimeData;
+	} catch {
+		// fall through to static fallback
+	}
+}
+
+// Static fallback used on first deploy / before first sync
+const fallbackTeam = {
+	rating_place: 40,
+	country_place: 1,
+	rating_points: 121.352,
+};
+const fallbackEvents = [
+	{ event_id: "3043", title: "Srdnlen CTF 2026 Quals",       place: 131, ctf_points: "250.0000",   time: 0 },
+	{ event_id: "3127", title: "EHAX CTF 2026",                 place: 24,  ctf_points: "5312.0000",  time: 0 },
+	{ event_id: "3098", title: "Batman's Kitchen CTF 2026",     place: 10,  ctf_points: "10689.0000", time: 0 },
+	{ event_id: "3122", title: "BITSCTF 2026",                  place: 31,  ctf_points: "2672.0000",  time: 0 },
+	{ event_id: "3086", title: "TaipanByte\u2019s Chart CTF",   place: 34,  ctf_points: "5730.0000",  time: 0 },
+	{ event_id: "3081", title: "0xFUN CTF 2026",                place: 291, ctf_points: "1903.0000",  time: 0 },
+	{ event_id: "3066", title: "Nullcon Goa HackIM 2026 CTF",   place: 12,  ctf_points: "5262.0000",  time: 0 },
+	{ event_id: "2767", title: "PascalCTF 2026",                place: 63,  ctf_points: "6413.0000",  time: 0 },
+];
+
+const team    = ctf?.team    ?? fallbackTeam;
+const events  = ctf?.events  ?? fallbackEvents;
+const ctfYear = ctf?.year    ?? new Date().getUTCFullYear();
 
 const entries = await getCollection("projects");
 const projects = entries.map((e) => e.data).sort((a, b) => a.order - b.order);
@@ -83,9 +119,9 @@ const jsonLd = JSON.stringify(
 							Elite cybersecurity CTF team. I manage the core infrastructure: web apps, CTF platforms, workshops, and instances.
 						</p>
 						<div class="ch0wn3rs-badges">
-							<span class="badge">Colombia #1</span>
-							<span class="badge">World #40</span>
-							<span class="badge">121.352 pts</span>
+							<span class="badge" id="ctf-badge-country">Colombia #{team.country_place ?? 1}</span>
+							<span class="badge" id="ctf-badge-world">World #{team.rating_place ?? "—"}</span>
+							<span class="badge" id="ctf-badge-pts">{team.rating_points != null ? `${team.rating_points.toFixed(3)} pts` : "— pts"}</span>
 						</div>
 					</div>
 				</div>
@@ -93,8 +129,10 @@ const jsonLd = JSON.stringify(
 				<div class="ch0wn3rs-events">
 					<div class="section-head ch0wn3rs-events-head">
 						<div>
-							<h3>2026 CTF Participations</h3>
-							<p>Overall rating place: 40 &mdash; 121.352 pts</p>
+							<h3 id="ctf-year-heading">{ctfYear} CTF Participations</h3>
+							<p id="ctf-rating-summary">
+								Overall rating place: {team.rating_place ?? "—"} &mdash; {team.rating_points != null ? team.rating_points.toFixed(3) : "—"} pts
+							</p>
 						</div>
 						<a class="btn" href="https://ctftime.org/team/408704" target="_blank" rel="noopener noreferrer">CTFtime profile</a>
 					</div>
@@ -105,18 +143,16 @@ const jsonLd = JSON.stringify(
 									<th>Place</th>
 									<th>Event</th>
 									<th>CTF pts</th>
-									<th>Rating pts</th>
 								</tr>
 							</thead>
-							<tbody>
-								<tr><td>131</td><td>Srdnlen CTF 2026 Quals</td><td>250.0000</td><td>2.817</td></tr>
-								<tr><td>24</td><td>EHAX CTF 2026</td><td>5312.0000</td><td>14.111</td></tr>
-								<tr><td>10</td><td>Batman's Kitchen CTF 2026</td><td>10689.0000</td><td>21.637</td></tr>
-								<tr><td>31</td><td>BITSCTF 2026</td><td>2672.0000</td><td>19.582</td></tr>
-								<tr><td>34</td><td>TaipanByte's Chart CTF</td><td>5730.0000</td><td>15.605</td></tr>
-								<tr><td>291</td><td>0xFUN CTF 2026</td><td>1903.0000</td><td>1.772</td></tr>
-								<tr><td>12</td><td>Nullcon Goa HackIM 2026 CTF</td><td>5262.0000</td><td>24.753</td></tr>
-								<tr><td>63</td><td>PascalCTF 2026</td><td>6413.0000</td><td>21.074</td></tr>
+							<tbody id="ctf-events-tbody">
+								{events.map((ev) => (
+									<tr>
+										<td>{ev.place}</td>
+										<td>{ev.title}</td>
+										<td>{ev.ctf_points}</td>
+									</tr>
+								))}
 							</tbody>
 						</table>
 					</div>
@@ -193,5 +229,75 @@ const jsonLd = JSON.stringify(
 
 	<script>
 		import "../scripts/home";
+	</script>
+
+	<script>
+		// Refresh Ch0wn3rs CTFtime data every 10 minutes without a full page reload.
+		const POLL_MS = 10 * 60 * 1000;
+
+		interface CTFEvent {
+			event_id: string;
+			title: string;
+			place: number;
+			ctf_points: string;
+			time: number;
+		}
+
+		interface CTFTimeData {
+			team: {
+				rating_place: number | null;
+				rating_points: number | null;
+				country_place: number | null;
+			};
+			events: CTFEvent[];
+			year: number;
+		}
+
+		function applyData(data: CTFTimeData) {
+			const { team, events, year } = data;
+
+			const countryBadge = document.getElementById("ctf-badge-country");
+			const worldBadge   = document.getElementById("ctf-badge-world");
+			const ptsBadge     = document.getElementById("ctf-badge-pts");
+			const yearHeading  = document.getElementById("ctf-year-heading");
+			const ratingSummary = document.getElementById("ctf-rating-summary");
+			const tbody        = document.getElementById("ctf-events-tbody");
+
+			if (countryBadge) countryBadge.textContent = `Colombia #${team.country_place ?? "—"}`;
+			if (worldBadge)   worldBadge.textContent   = `World #${team.rating_place ?? "—"}`;
+			if (ptsBadge)     ptsBadge.textContent     = team.rating_points != null
+				? `${team.rating_points.toFixed(3)} pts`
+				: "— pts";
+			if (yearHeading)  yearHeading.textContent  = `${year} CTF Participations`;
+			if (ratingSummary) ratingSummary.textContent =
+				`Overall rating place: ${team.rating_place ?? "—"} — ${
+					team.rating_points != null ? team.rating_points.toFixed(3) : "—"
+				} pts`;
+
+			if (tbody && events.length > 0) {
+				tbody.innerHTML = events
+					.map(
+						(ev) =>
+							`<tr><td>${ev.place}</td><td>${ev.title}</td><td>${ev.ctf_points}</td></tr>`
+					)
+					.join("");
+			}
+		}
+
+		async function poll() {
+			try {
+				const res = await fetch("/api/ctftime.json");
+				if (!res.ok) return;
+				const data: CTFTimeData = await res.json();
+				applyData(data);
+			} catch {
+				// silently ignore — stale server-rendered content stays visible
+			}
+		}
+
+		// Kick off the first client refresh after 10 minutes, then repeat.
+		const id = setInterval(poll, POLL_MS);
+		// Clean up if the page is torn down (e.g. SPA navigation).
+		document.addEventListener("astro:before-swap", () => clearInterval(id), { once: true });
 	</script>
 </BaseLayout>

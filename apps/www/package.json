@@ -9,12 +9,14 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@astrojs/cloudflare": "^12.6.12",
     "@astrojs/sitemap": "^3.7.0",
     "animejs": "^4.3.6",
     "astro": "^5.17.1"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.6",
+    "@cloudflare/workers-types": "^4.20260301.1",
     "typescript": "^5.9.3"
   }
 }
