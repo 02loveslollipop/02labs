@@ -416,6 +416,131 @@ section[data-snap="card"][data-active="true"] .panel {
 	line-height: 1.65;
 }
 
+/* Ch0wn3rs CTF team */
+.ch0wn3rs-header {
+	display: flex;
+	align-items: flex-start;
+	gap: clamp(14px, 2vw, 28px);
+	margin-bottom: 18px;
+}
+
+.ch0wn3rs-logo {
+	width: clamp(56px, 6vw, 80px);
+	height: clamp(56px, 6vw, 80px);
+	object-fit: contain;
+	border-radius: 14px;
+	border: 1px solid var(--ink-stroke);
+	flex-shrink: 0;
+}
+
+.ch0wn3rs-meta {
+	flex: 1;
+	min-width: 0;
+}
+
+.ch0wn3rs-meta h2 {
+	margin: 0 0 4px;
+	font-size: clamp(22px, 2.2vw, 30px);
+	letter-spacing: -0.02em;
+}
+
+.ch0wn3rs-role {
+	margin: 0 0 6px;
+	font-size: 14px;
+	color: var(--ink-dim);
+}
+
+.ch0wn3rs-desc {
+	margin: 0 0 10px;
+	font-size: 14px;
+	line-height: 1.6;
+	color: var(--ink-dim);
+	max-width: 62ch;
+}
+
+.ch0wn3rs-badges {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+}
+
+.badge {
+	display: inline-block;
+	padding: 3px 10px;
+	border-radius: 999px;
+	font-size: 12px;
+	font-weight: 650;
+	letter-spacing: 0.02em;
+	background: var(--ink);
+	color: var(--surface);
+}
+
+.ch0wn3rs-events {
+	flex: 1;
+}
+
+.ch0wn3rs-events-head {
+	margin-bottom: 10px;
+}
+
+.ch0wn3rs-events-head h3 {
+	margin: 0 0 2px;
+	font-size: clamp(16px, 1.6vw, 20px);
+	letter-spacing: -0.02em;
+}
+
+.ch0wn3rs-events-head p {
+	margin: 0;
+	color: var(--ink-dim);
+	font-size: 13px;
+}
+
+.ch0wn3rs-table-wrap {
+	overflow-x: auto;
+	margin-top: 4px;
+}
+
+.ch0wn3rs-table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 13px;
+}
+
+.ch0wn3rs-table th,
+.ch0wn3rs-table td {
+	text-align: left;
+	padding: 7px 10px;
+	border-bottom: 1px solid var(--ink-stroke);
+	white-space: nowrap;
+}
+
+.ch0wn3rs-table th {
+	font-weight: 650;
+	font-size: 12px;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: var(--ink-dim);
+}
+
+.ch0wn3rs-table td:first-child {
+	font-weight: 700;
+	color: var(--ink);
+}
+
+.ch0wn3rs-table td:nth-child(2) {
+	white-space: normal;
+}
+
+.ch0wn3rs-table tbody tr:last-child td {
+	border-bottom: none;
+}
+
+@media (max-width: 640px) {
+	.ch0wn3rs-header {
+		flex-direction: column;
+	}
+}
+
 /* Featured projects */
 .section-head {
 	display: flex;
