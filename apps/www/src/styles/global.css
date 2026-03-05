@@ -302,11 +302,12 @@ a:focus-visible {
 	opacity: 0;
 	pointer-events: none;
 	z-index: 0;
-	/* anime.js drives all transforms/opacity — no CSS transition here */
+	/* JS inline styles (opacity, transform) override these during transitions */
 }
 
-/* Only the active card receives pointer events */
+/* The active card is visible and interactive */
 .snap-section[data-state="active"] {
+	opacity: 1;
 	pointer-events: auto;
 	z-index: 2;
 }

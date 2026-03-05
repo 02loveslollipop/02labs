@@ -1,9 +1,57 @@
-import { createTimeline, set, stagger } from "animejs";
+/**
+ * 02Labs home – card-stack controller + hero entrance.
+ *
+ * All animations use the browser-native Web Animations API (WAAPI).
+ * No external animation library required.
+ */
+
+const EASE = "cubic-bezier(0.4, 0, 0.2, 1)";
 
 const prefersReducedMotion =
 	typeof window !== "undefined" &&
-	window.matchMedia &&
-	window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+	window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+
+// --------------------------------------------------------------------------
+// Helpers
+// --------------------------------------------------------------------------
+
+/** Build a CSS transform string from individual values. */
+function tf(y = 0, rotate = 0, scale = 1): string {
+	return `translateY(${y}px) rotate(${rotate}deg) scale(${scale})`;
+}
+
+/** Set inline opacity + transform in one shot. */
+function pose(el: HTMLElement, opacity: number, y = 0, rotate = 0, scale = 1) {
+	el.style.opacity = String(opacity);
+	el.style.transform = tf(y, rotate, scale);
+}
+
+/**
+ * Run a WAAPI animation, commit its final keyframe as inline style,
+ * and return a promise that resolves when it's done.
+ */
+function run(
+	el: HTMLElement,
+	from: Keyframe,
+	to: Keyframe,
+	duration: number,
+	delay = 0,
+	easing = EASE
+): Promise<void> {
+	const anim = el.animate([from, to], {
+		duration,
+		delay,
+		easing,
+		fill: "forwards",
+	});
+	return anim.finished.then(() => {
+		// Commit the "to" state as persistent inline styles
+		for (const [k, v] of Object.entries(to)) {
+			(el.style as any)[k] = v;
+		}
+		anim.cancel(); // release the fill-forward hold
+	});
+}
 
 // --------------------------------------------------------------------------
 // Navbar scroll-aware styling
@@ -14,25 +62,18 @@ function setupNav() {
 	const sentinel = document.getElementById("heroSentinel");
 	if (!nav || !sentinel) return;
 
-	const setScrolled = (scrolled: boolean) => {
-		if (scrolled) nav.dataset.scrolled = "true";
-		else nav.removeAttribute("data-scrolled");
-	};
-
 	const io = new IntersectionObserver(
-		(entries) => {
-			const entry = entries[0];
-			if (!entry) return;
-			setScrolled(!entry.isIntersecting);
+		([entry]) => {
+			if (entry.isIntersecting) nav.removeAttribute("data-scrolled");
+			else nav.dataset.scrolled = "true";
 		},
 		{ threshold: 0 }
 	);
-
 	io.observe(sentinel);
 }
 
 // --------------------------------------------------------------------------
-// Card-stack controller — anime.js drives every transition
+// Card-stack controller — WAAPI-driven transitions
 // --------------------------------------------------------------------------
 
 function setupCardStack() {
@@ -43,63 +84,47 @@ function setupCardStack() {
 
 	let current = 0;
 	let transitioning = false;
-
-	// ms for each animation phase (outgoing + incoming overlap slightly)
 	const DUR = 560;
 
-	// Lock page scroll
 	document.documentElement.classList.add("card-stack-active");
 
-	// ── Build progress dots ──────────────────────────────────────────────
-	const dotsContainer = document.createElement("nav");
-	dotsContainer.className = "card-dots";
-	dotsContainer.setAttribute("aria-label", "Card navigation");
+	// ── Progress dots ────────────────────────────────────────────────────
+	const dotsNav = document.createElement("nav");
+	dotsNav.className = "card-dots";
+	dotsNav.setAttribute("aria-label", "Card navigation");
 
 	const dots: HTMLButtonElement[] = sections.map((_, i) => {
-		const btn = document.createElement("button");
-		btn.className = "card-dot";
-		btn.setAttribute("aria-label", `Go to card ${i + 1}`);
-		btn.addEventListener("click", () => goTo(i));
-		dotsContainer.appendChild(btn);
-		return btn;
+		const b = document.createElement("button");
+		b.className = "card-dot";
+		b.setAttribute("aria-label", `Go to card ${i + 1}`);
+		b.addEventListener("click", () => goTo(i));
+		dotsNav.appendChild(b);
+		return b;
 	});
-	document.body.appendChild(dotsContainer);
+	document.body.appendChild(dotsNav);
 
-	// ── Initial visual state (set via anime.js, no CSS transitions) ──────
-	// Hero card: visible, centred
-	set(sections[0], { opacity: 1, translateY: 0, rotate: 0, scale: 1 });
+	// ── Initial state ────────────────────────────────────────────────────
 	sections[0].dataset.state = "active";
-
-	// All other cards: hidden below
+	pose(sections[0], 1, 0, 0, 1);
 	for (let i = 1; i < sections.length; i++) {
-		set(sections[i], { opacity: 0, translateY: 50, rotate: 0, scale: 0.96 });
+		pose(sections[i], 0, 60, 0, 0.96);
 	}
 
-	// ── Helpers ──────────────────────────────────────────────────────────
-	function updateDots(idx: number) {
+	function syncUI(idx: number) {
 		for (let i = 0; i < dots.length; i++) {
 			if (i === idx) dots[i].dataset.active = "true";
 			else dots[i].removeAttribute("data-active");
 		}
-	}
-
-	function updateNav(idx: number) {
 		const nav = document.getElementById("siteNav");
-		if (!nav) return;
-		if (idx > 0) nav.dataset.scrolled = "true";
-		else nav.removeAttribute("data-scrolled");
-	}
-
-	function setZ(outEl: HTMLElement, inEl: HTMLElement) {
-		for (const s of sections) s.style.zIndex = "0";
-		outEl.style.zIndex = "2";
-		inEl.style.zIndex = "3";
+		if (nav) {
+			if (idx > 0) nav.dataset.scrolled = "true";
+			else nav.removeAttribute("data-scrolled");
+		}
 	}
 
 	// ── Transition engine ────────────────────────────────────────────────
 	function goTo(to: number) {
-		if (to === current || to < 0 || to >= sections.length) return;
-		if (transitioning) return;
+		if (to === current || to < 0 || to >= sections.length || transitioning) return;
 
 		transitioning = true;
 		const from = current;
@@ -107,101 +132,76 @@ function setupCardStack() {
 		const outEl = sections[from];
 		const inEl = sections[to];
 
-		// Update logical state immediately
 		current = to;
-		updateDots(to);
-		updateNav(to);
+		syncUI(to);
 		outEl.dataset.state = "";
 		inEl.dataset.state = "active";
-		setZ(outEl, inEl);
+
+		// z-order so both are visible during animation
+		for (const s of sections) s.style.zIndex = "0";
+		outEl.style.zIndex = "2";
+		inEl.style.zIndex = "3";
 
 		if (prefersReducedMotion) {
-			set(outEl, { opacity: 0, translateY: 0, rotate: 0, scale: 1 });
-			set(inEl,  { opacity: 1, translateY: 0, rotate: 0, scale: 1 });
+			pose(outEl, 0, 0, 0, 1);
+			pose(inEl, 1, 0, 0, 1);
 			outEl.style.zIndex = "0";
 			inEl.style.zIndex = "2";
 			transitioning = false;
 			return;
 		}
 
-		const tl = createTimeline({
-			defaults: { ease: "inOutCubic" },
-		});
+		let outFrom: Keyframe, outTo: Keyframe;
+		let inFrom: Keyframe, inTo: Keyframe;
+		let outDur: number, inDur: number, inDelay: number;
 
 		if (from === 0 && forward) {
-			// ── Hero → first card: slide up ─────────────────────────────
-			tl
-				.add(outEl, {
-					opacity: [1, 0],
-					translateY: [0, -70],
-					scale: [1, 0.97],
-					duration: DUR,
-				})
-				.add(inEl, {
-					opacity: [0, 1],
-					translateY: [55, 0],
-					scale: [0.97, 1],
-					duration: DUR,
-				}, `-=${DUR * 0.45}`);
+			// Hero → first card: slide up
+			outFrom = { opacity: "1", transform: tf(0, 0, 1) };
+			outTo   = { opacity: "0", transform: tf(-100, 0, 0.96) };
+			inFrom  = { opacity: "0", transform: tf(80, 0, 0.96) };
+			inTo    = { opacity: "1", transform: tf(0, 0, 1) };
+			outDur  = DUR;
+			inDur   = DUR;
+			inDelay = DUR * 0.55;
 
 		} else if (to === 0 && !forward) {
-			// ── Back to hero: slide down ────────────────────────────────
-			tl
-				.add(outEl, {
-					opacity: [1, 0],
-					translateY: [0, 55],
-					scale: [1, 0.97],
-					duration: DUR,
-				})
-				.add(inEl, {
-					opacity: [0, 1],
-					translateY: [-70, 0],
-					scale: [0.97, 1],
-					duration: DUR,
-				}, 0);
+			// Back to hero: slide down
+			outFrom = { opacity: "1", transform: tf(0, 0, 1) };
+			outTo   = { opacity: "0", transform: tf(80, 0, 0.96) };
+			inFrom  = { opacity: "0", transform: tf(-100, 0, 0.96) };
+			inTo    = { opacity: "1", transform: tf(0, 0, 1) };
+			outDur  = DUR;
+			inDur   = DUR;
+			inDelay = 0; // both play simultaneously
 
 		} else if (forward) {
-			// ── Shuffle forward: current tilts to back, next dealt in ───
-			tl
-				.add(outEl, {
-					opacity: [1, 0],
-					translateY: [0, -28],
-					rotate: [0, 5],
-					scale: [1, 0.90],
-					duration: DUR * 0.65,
-				})
-				.add(inEl, {
-					opacity: [0, 1],
-					translateY: [45, 0],
-					rotate: [-4, 0],
-					scale: [0.93, 1],
-					duration: DUR,
-				}, `+=${DUR * 0.05}`);
+			// Shuffle forward: current tilts to back, next dealt from below
+			outFrom = { opacity: "1", transform: tf(0, 0, 1) };
+			outTo   = { opacity: "0", transform: tf(-40, 6, 0.88) };
+			inFrom  = { opacity: "0", transform: tf(60, -5, 0.92) };
+			inTo    = { opacity: "1", transform: tf(0, 0, 1) };
+			outDur  = DUR * 0.65;
+			inDur   = DUR;
+			inDelay = outDur + DUR * 0.05;
 
 		} else {
-			// ── Shuffle backward: reverse deal ──────────────────────────
-			tl
-				.add(outEl, {
-					opacity: [1, 0],
-					translateY: [0, 45],
-					rotate: [0, -4],
-					scale: [1, 0.93],
-					duration: DUR * 0.65,
-				})
-				.add(inEl, {
-					opacity: [0, 1],
-					translateY: [-28, 0],
-					rotate: [5, 0],
-					scale: [0.90, 1],
-					duration: DUR,
-				}, `+=${DUR * 0.05}`);
+			// Shuffle backward: reverse deal
+			outFrom = { opacity: "1", transform: tf(0, 0, 1) };
+			outTo   = { opacity: "0", transform: tf(60, -5, 0.92) };
+			inFrom  = { opacity: "0", transform: tf(-40, 6, 0.88) };
+			inTo    = { opacity: "1", transform: tf(0, 0, 1) };
+			outDur  = DUR * 0.65;
+			inDur   = DUR;
+			inDelay = outDur + DUR * 0.05;
 		}
 
-		tl.then(() => {
+		const outP = run(outEl, outFrom, outTo, outDur);
+		const inP  = run(inEl, inFrom, inTo, inDur, inDelay);
+
+		Promise.all([outP, inP]).then(() => {
 			outEl.style.zIndex = "0";
 			inEl.style.zIndex = "2";
-			// Reset hidden outgoing card to a neutral resting state
-			set(outEl, { rotate: 0, translateY: forward ? -70 : 55, scale: 0.97 });
 			transitioning = false;
 		});
 	}
@@ -212,7 +212,6 @@ function setupCardStack() {
 	// ── Wheel ────────────────────────────────────────────────────────────
 	let wheelAcc = 0;
 	const WHEEL_THRESHOLD = 50;
-
 	window.addEventListener(
 		"wheel",
 		(e) => {
@@ -229,15 +228,13 @@ function setupCardStack() {
 	// ── Touch ────────────────────────────────────────────────────────────
 	let touchStartY = 0;
 	const TOUCH_THRESHOLD = 50;
-
 	window.addEventListener("touchstart", (e) => {
 		touchStartY = e.touches[0].clientY;
 	}, { passive: true });
-
 	window.addEventListener("touchend", (e) => {
-		const delta = touchStartY - e.changedTouches[0].clientY;
-		if (Math.abs(delta) < TOUCH_THRESHOLD) return;
-		if (delta > 0) next(); else prev();
+		const dy = touchStartY - e.changedTouches[0].clientY;
+		if (Math.abs(dy) < TOUCH_THRESHOLD) return;
+		if (dy > 0) next(); else prev();
 	}, { passive: true });
 
 	// ── Keyboard ─────────────────────────────────────────────────────────
@@ -252,63 +249,68 @@ function setupCardStack() {
 		}
 	});
 
-	// ── Hash navigation ──────────────────────────────────────────────────
+	// ── Hash ─────────────────────────────────────────────────────────────
 	function handleHash() {
-		const hash = window.location.hash.replace("#", "");
+		const hash = location.hash.slice(1);
 		if (!hash) return;
 		const idx = sections.findIndex(
 			(s) => s.id === hash || s.querySelector(`#${CSS.escape(hash)}`) !== null
 		);
 		if (idx >= 0) goTo(idx);
 	}
-
 	window.addEventListener("hashchange", handleHash);
 	handleHash();
 
-	// Initial dot state
-	updateDots(0);
+	syncUI(0);
 }
 
 // --------------------------------------------------------------------------
-// Hero entrance animation
+// Hero entrance animation (WAAPI stagger)
 // --------------------------------------------------------------------------
 
 function runHeroAnimation() {
 	if (prefersReducedMotion) return;
 
-	const title = document.querySelector("[data-animate='hero-title']");
-	const sub = document.querySelector("[data-animate='hero-sub']");
-	const navBrand = document.querySelector("[data-animate='nav-brand']");
-	const navGithub = document.querySelector("[data-animate='nav-github']");
-	const navLinks = document.querySelectorAll(".nav__links a");
+	const title    = document.querySelector<HTMLElement>("[data-animate='hero-title']");
+	const sub      = document.querySelector<HTMLElement>("[data-animate='hero-sub']");
+	const navBrand = document.querySelector<HTMLElement>("[data-animate='nav-brand']");
+	const navGH    = document.querySelector<HTMLElement>("[data-animate='nav-github']");
+	const navLinks = Array.from(document.querySelectorAll<HTMLElement>(".nav__links a"));
 
 	if (!title || !sub) return;
 
-	const initialTargets = [title, sub, navBrand, navGithub, ...Array.from(navLinks)].filter(
-		(v): v is Element => Boolean(v)
+	const els = [title, sub, navBrand, navGH, ...navLinks].filter(
+		(v): v is HTMLElement => Boolean(v)
 	);
 
-	set(initialTargets, { opacity: 0, translateY: 14, duration: 1 });
-
-	const tl = createTimeline({ defaults: { ease: "outCubic" } });
-	tl.add(title, { opacity: [0, 1], translateY: [14, 0], duration: 720 });
-	tl.add(sub, { opacity: [0, 1], translateY: [14, 0], duration: 640 }, "-=520");
-
-	if (navBrand) {
-		tl.add(navBrand, { opacity: [0, 1], translateY: [10, 0], duration: 520 }, "-=640");
+	// Hide immediately before first paint
+	for (const el of els) {
+		el.style.opacity = "0";
+		el.style.transform = "translateY(14px)";
 	}
 
-	if (navLinks.length > 0) {
-		tl.add(
-			navLinks,
-			{ opacity: [0, 1], translateY: [10, 0], delay: stagger(60), duration: 520 },
-			"-=520"
+	const fadeIn = (el: HTMLElement, dur: number, delay: number) => {
+		const a = el.animate(
+			[
+				{ opacity: "0", transform: "translateY(14px)" },
+				{ opacity: "1", transform: "translateY(0)" },
+			],
+			{ duration: dur, delay, easing: "cubic-bezier(0.33,1,0.68,1)", fill: "forwards" }
 		);
-	}
+		a.finished.then(() => {
+			el.style.opacity = "1";
+			el.style.transform = "translateY(0)";
+			a.cancel();
+		});
+	};
 
-	if (navGithub) {
-		tl.add(navGithub, { opacity: [0, 1], translateY: [10, 0], duration: 480 }, "-=420");
-	}
+	fadeIn(title, 720, 0);
+	fadeIn(sub, 640, 200);
+
+	let t = 80;
+	if (navBrand) { fadeIn(navBrand, 520, t); t += 60; }
+	for (const link of navLinks) { fadeIn(link, 520, t); t += 60; }
+	if (navGH) { fadeIn(navGH, 480, t + 40); }
 }
 
 // --------------------------------------------------------------------------
