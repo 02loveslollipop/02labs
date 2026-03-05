@@ -76,9 +76,11 @@ const jsonLd = JSON.stringify(
 >
 	<Navbar />
 	<main id="main" class="home-main">
+		<div class="card-stack">
+
 		<Hero />
 
-		<section class="snap-section" id="intro" data-snap="card" data-snap-section>
+		<section class="snap-section" id="intro" data-snap-section>
 			<div class="panel intro">
 				<div class="intro-grid">
 					<div>
@@ -98,7 +100,7 @@ const jsonLd = JSON.stringify(
 			</div>
 		</section>
 
-		<section class="snap-section" id="ch0wn3rs" data-snap="card" data-snap-section>
+		<section class="snap-section" id="ch0wn3rs" data-snap-section>
 			<div class="panel">
 				<div class="ch0wn3rs-header">
 					<img
@@ -160,7 +162,7 @@ const jsonLd = JSON.stringify(
 			</div>
 		</section>
 
-		<section class="snap-section" id="featured" data-snap="card" data-snap-section>
+		<section class="snap-section" id="featured" data-snap-section>
 			<div class="panel">
 				<div class="section-head">
 					<div>
@@ -180,13 +182,10 @@ const jsonLd = JSON.stringify(
 			</div>
 		</section>
 
-		<div id="projects" aria-hidden="true"></div>
-
 		{featured.map((project) => (
 			<section
 				class="snap-section"
 				id={`project-${project.slug}`}
-				data-snap="card"
 				data-snap-section
 			>
 				<div class="panel">
@@ -195,7 +194,7 @@ const jsonLd = JSON.stringify(
 			</section>
 		))}
 
-		<section class="snap-section" id="blog" data-snap="card" data-snap-section>
+		<section class="snap-section" id="blog" data-snap-section>
 			<div class="panel">
 				<div class="section-head">
 					<h2>Blog</h2>
@@ -214,6 +213,8 @@ const jsonLd = JSON.stringify(
 				</div>
 			</div>
 		</section>
+
+		</div><!-- .card-stack -->
 	</main>
 
 	<footer class="site-footer" aria-label="Footer">

@@ -35,19 +35,16 @@ html {
 	color-scheme: dark light;
 }
 
-/* Root scroller differs across browsers (html vs body). Set both for consistent snapping. */
-html,
-body {
-	scroll-behavior: smooth;
-	scroll-snap-type: y proximity;
+/* Disable native scrolling on the home page — the card-stack JS controls navigation. */
+html.card-stack-active,
+html.card-stack-active body {
+	overflow: hidden;
+	scroll-behavior: auto;
 }
 
-@media (prefers-reduced-motion: reduce) {
-	html,
-	body {
-		scroll-behavior: auto;
-		scroll-snap-type: none;
-	}
+/* Hide footer on card-stack pages (no scroll to reach it) */
+html.card-stack-active .site-footer {
+	display: none;
 }
 
 body {
@@ -87,6 +84,10 @@ a:focus-visible {
 
 ::selection {
 	background: rgba(255, 255, 255, 0.14);
+}
+
+.scroll-target {
+	scroll-margin-top: calc(var(--nav-h) + 14px);
 }
 
 .skip-link {
@@ -283,15 +284,37 @@ a:focus-visible {
 	}
 }
 
-/* Sections + “flip card” feel */
+/* --- Card-stack layout --- */
+.card-stack {
+	position: fixed;
+	inset: 0;
+	z-index: 1;
+	perspective: 1400px;
+	pointer-events: none;
+}
+
 .snap-section {
-	height: 100vh;
-	height: 100svh;
-	scroll-snap-align: center;
-	scroll-snap-stop: always;
+	position: absolute;
+	inset: 0;
 	display: grid;
 	place-items: center;
 	padding: var(--pad);
+	opacity: 0;
+	pointer-events: none;
+	z-index: 0;
+	/* anime.js drives all transforms/opacity — no CSS transition here */
+}
+
+/* Only the active card receives pointer events */
+.snap-section[data-state="active"] {
+	pointer-events: auto;
+	z-index: 2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.snap-section {
+		transition: none !important;
+	}
 }
 
 .panel {
@@ -320,42 +343,49 @@ a:focus-visible {
 	margin-inline: auto;
 }
 
-/* You clarified the issue was vertical alignment, so center key panels on Y axis */
 .home-main #intro .panel,
 .home-main section[id^="project-"] .panel,
 .home-main #blog .panel {
 	align-content: center;
 }
 
-section[data-snap="card"] .panel {
-	transform: perspective(1200px) rotateX(-6deg) translateY(24px);
-	opacity: 0.55;
-	transition:
-		transform 650ms cubic-bezier(0.2, 0.8, 0.2, 1),
-		opacity 650ms cubic-bezier(0.2, 0.8, 0.2, 1);
-	will-change: transform, opacity;
+/* Card-stack progress dots */
+.card-dots {
+	position: fixed;
+	right: 18px;
+	top: 50%;
+	translate: 0 -50%;
+	z-index: 60;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
 }
 
-section[data-snap="card"][data-active="true"] .panel {
-	transform: perspective(1200px) rotateX(0deg) translateY(0);
-	opacity: 1;
+.card-dot {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, 0.25);
+	border: 1px solid rgba(255, 255, 255, 0.35);
+	cursor: pointer;
+	transition: background 200ms ease, transform 200ms ease;
+	padding: 0;
 }
 
-@media (prefers-reduced-motion: reduce) {
-	section[data-snap="card"] .panel {
-		transform: none;
-		opacity: 1;
-		transition: none;
-	}
+.card-dot[data-active="true"] {
+	background: rgba(255, 255, 255, 0.9);
+	transform: scale(1.35);
+}
+
+.card-dot:hover {
+	background: rgba(255, 255, 255, 0.6);
 }
 
 /* Hero */
 .hero {
-	padding-top: var(--nav-h);
 	text-align: center;
 	display: grid;
 	place-items: center;
-	position: relative;
 }
 
 .hero__inner {
