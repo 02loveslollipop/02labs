@@ -1,0 +1,18 @@
+{
+  "slug": "open-meta-siata",
+  "title": "OpenMetaSIATA",
+  "summary": "A Python-based solution to review and watch graphically the river levels using the SIATA API.",
+  "description": "OpenMetaSIATA leverages the SIATA API to provide an easier understanding of river level data. It features a streamlined setup process via a setup script for deploying containerized services. The project requires a Linux-based system and optionally a MapBox token for guided setup.",
+  "featured": false,
+  "order": 100,
+  "stack": [
+    "Python",
+    "API",
+    "Docker",
+    "Linux"
+  ],
+  "links": {
+    "repo": "https://github.com/02loveslollipop/OpenMetaSIATA",
+    "detailsLabel": "View details"
+  }
+}

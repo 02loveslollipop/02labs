@@ -1,0 +1,16 @@
+{
+  "slug": "piarpis-api",
+  "title": "PIARPIS API",
+  "summary": "A Python API to facilitate data exchange between a JavaScript frontend and the project's database.",
+  "description": "PIARPIS API acts as the core backend component for the PIARPIS project ecosystem. It routes data, handles queries, and connects the user-facing JavaScript application with the project's database, written entirely in Python.",
+  "featured": false,
+  "order": 100,
+  "stack": [
+    "Python",
+    "API"
+  ],
+  "links": {
+    "repo": "https://github.com/02loveslollipop/PIARPIS_API",
+    "detailsLabel": "View details"
+  }
+}

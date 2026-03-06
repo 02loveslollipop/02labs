@@ -1,0 +1,23 @@
+{
+  "slug": "company-operation-simulator",
+  "title": "Company Operation Simulator",
+  "summary": "A modular simulator for modeling and reporting operational costs and income based on a JSON configuration.",
+  "description": "This tool simulates and reports operational costs and income for businesses, particularly useful for modeling tech companies. It uses a structured JSON configuration to define business logic, resources, and simulation parameters like growth models and randomization (Monte Carlo analysis). The project provides a CLI for batch processing and automated reports, as well as an interactive Streamlit web dashboard for visual analysis, parameter tuning, and exploration.",
+  "featured": false,
+  "order": 100,
+  "stack": [
+    "Python",
+    "Streamlit"
+  ],
+  "highlights": [
+    "JSON configuration to define models, costs, and income",
+    "Simulation engine capturing growth over time (linear/polynomial/logistic rates)",
+    "Randomization support for Monte Carlo simulations",
+    "Flexible calculation engine with expression language support",
+    "Dual interface: CLI for automation and Streamlit dashboard for interactivity"
+  ],
+  "links": {
+    "repo": "https://github.com/02loveslollipop/companyOperationSimulator",
+    "detailsLabel": "View details"
+  }
+}

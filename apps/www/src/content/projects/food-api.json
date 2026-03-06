@@ -1,0 +1,22 @@
+{
+  "slug": "food-api",
+  "title": "Food Recommendation System API",
+  "summary": "A Python API to exchange data between a Flutter frontend, MongoDB, and an AI recommendation model.",
+  "description": "This repository serves as the backend component for a Food Recommendation System project. Developed using Flask, the API facilitates communication between a Flutter-based mobile frontend, a MongoDB database, and an external AI recommendation model. It securely handles data exchange, user authentication (via bcrypt), and requests routing within a local network testing environment.",
+  "featured": false,
+  "order": 100,
+  "stack": [
+    "Python",
+    "Flask",
+    "MongoDB"
+  ],
+  "highlights": [
+    "Serves as middleware between a Flutter app, an AI model, and MongoDB layer",
+    "Handles API requests and basic data routing",
+    "Configurable setup via YAML files"
+  ],
+  "links": {
+    "repo": "https://github.com/02loveslollipop/Food-API",
+    "detailsLabel": "View details"
+  }
+}

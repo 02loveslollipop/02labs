@@ -2,10 +2,14 @@
   "slug": "basic-blockchain-key-value-db",
   "title": "Basic Blockchain Key-Value DB",
   "summary": "Blockchain-based key-value store with CLI and Docker cluster support.",
-  "description": "A minimalistic blockchain-backed key-value database that treats every mutation as an append-only block, enabling deterministic state recovery and auditability. With a Go-based engine, a CLI for interaction, and Docker configurations for easy deployment, it’s ideal for learning or lightweight use-cases where immutability and traceability matter.",
+  "description": "A minimalistic blockchain-backed key-value database that treats every mutation as an append-only block, enabling deterministic state recovery and auditability. With a Go-based engine, a CLI for interaction, and Docker configurations for easy deployment, it\u2019s ideal for learning or lightweight use-cases where immutability and traceability matter.",
   "featured": false,
-  "order": 110,
-  "stack": ["Go", "Docker", "Python CLI"],
+  "order": 100,
+  "stack": [
+    "Go",
+    "Docker",
+    "Python CLI"
+  ],
   "links": {
     "repo": "https://github.com/02loveslollipop/basicBlockchainKeyValueDB",
     "detailsLabel": "View details"

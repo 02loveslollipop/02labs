@@ -1,0 +1,16 @@
+{
+  "slug": "rpn-calculator",
+  "title": "RPN C Calculator",
+  "summary": "A simple Reverse Polish Notation (RPN) calculator written in C.",
+  "description": "An interactive terminal-based calculator implementing Reverse Polish Notation (RPN) using a central stack data structure to hold execution state. Written in C and powered by ncurses, it allows random-access to operators, supports parsing input scripts through file I/O operations, and lets users export their computational stacks seamlessly.",
+  "featured": false,
+  "order": 100,
+  "stack": [
+    "C/C++",
+    "ncurses"
+  ],
+  "links": {
+    "repo": "https://github.com/02loveslollipop/rpn_calculator",
+    "detailsLabel": "View details"
+  }
+}

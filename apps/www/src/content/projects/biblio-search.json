@@ -1,0 +1,25 @@
+{
+  "slug": "biblio-search",
+  "title": "Biblio Search",
+  "summary": "A Streamlit-based tool to visualize and analyze articles using a search equation and the Scopus API.",
+  "description": "Biblio Search is a web application built with Streamlit that lets users explore data from the Scopus academic database. It provides an intuitive interface to search for articles using Scopus query equations and generates rich visualizations such as word clouds, bar charts for top authors and organizations, choropleth maps for country distribution, and temporal publication trends. Advanced features include period filtering, rolling window animations to visualize research topic evolution, and the ability to export results in CSV or JSON formats for further analysis.",
+  "featured": false,
+  "order": 100,
+  "stack": [
+    "Python",
+    "Streamlit",
+    "Plotly",
+    "Matplotlib",
+    "Scopus API"
+  ],
+  "highlights": [
+    "Comprehensive metrics and rich visualizations (word clouds, charts, maps)",
+    "Animated visualizations with adjustable rolling windows for temporal pattern analysis",
+    "Data export to CSV and JSON",
+    "Direct integration with Scopus API"
+  ],
+  "links": {
+    "repo": "https://github.com/02loveslollipop/BiblioSearch",
+    "detailsLabel": "View details"
+  }
+}

@@ -2,13 +2,19 @@
   "slug": "cuanto-pal-3",
   "title": "CuantoPal3",
   "summary": "Web/mobile grade calculator showing what score is needed to pass a course.",
-  "description": "CuantoPal3 makes it easy for students to figure out what grade they need on a final exam or project to pass a class. Packed into a slick web interface powered by Astro and React, and wrapped for mobile with Capacitor, the app works seamlessly in the browser or on your phone – drop in your current scores and it instantly tells you what’s required to cross the passing line.",
+  "description": "CuantoPal3 makes it easy for students to figure out what grade they need on a final exam or project to pass a class. Packed into a slick web interface powered by Astro and React, and wrapped for mobile with Capacitor, the app works seamlessly in the browser or on your phone \u2013 drop in your current scores and it instantly tells you what\u2019s required to cross the passing line.",
   "featured": false,
-  "order": 90,
-  "stack": ["JavaScript", "Astro", "React", "Capacitor", "Node.js"],
+  "order": 100,
+  "stack": [
+    "JavaScript",
+    "Astro",
+    "React",
+    "Capacitor",
+    "Node.js"
+  ],
   "links": {
     "repo": "https://github.com/02loveslollipop/CuantoPal3",
     "live": "https://app.cuantopal3.02loveslollipop.uk",
-    "details_label": "View details"
+    "detailsLabel": "View details"
   }
 }

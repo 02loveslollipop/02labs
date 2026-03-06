@@ -1,0 +1,17 @@
+{
+  "slug": "wokwi-led-game",
+  "title": "Wokwi LED Game",
+  "summary": "A simple LED reaction game to showcase the use of C/C++ for embedded systems.",
+  "description": "This repository showcases a simple and educational LED reaction game implemented in C/C++ for embedded microcontrollers. The game requires the user to press a button at the exact moment a moving LED light aligns with a specific target LED, demonstrating basic hardware interaction, timing, and logical flows within the Wokwi ecosystem.",
+  "featured": false,
+  "order": 100,
+  "stack": [
+    "C/C++",
+    "Embedded Systems",
+    "Wokwi"
+  ],
+  "links": {
+    "repo": "https://github.com/02loveslollipop/wokwi-led-game",
+    "detailsLabel": "View details"
+  }
+}

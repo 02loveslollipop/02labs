@@ -1,0 +1,29 @@
+{
+  "slug": "open-sensor-suite",
+  "title": "OpenSensorSuite",
+  "summary": "A comprehensive sensor monitoring ecosystem for ESP32 microcontrollers featuring real-time data conversion and a GUI.",
+  "description": "OpenSensorSuite is a complete, lightweight IoT sensor monitoring ecosystem. It consists of three decoupled components: a C/C++ firmware for ESP32 microcontrollers to interface with hardware sensors; a Python-powered data conversion middleware that persists incoming streams into a Redis database; and a responsive Python graphical user interface (GUI) to visualize and manage real-time IoT metrics. Together, they provide a seamless pipeline from hardware sensing to user-facing dashboards.",
+  "featured": false,
+  "order": 100,
+  "stack": [
+    "Python",
+    "C/C++",
+    "ESP32",
+    "Redis",
+    "IoT",
+    "GUI"
+  ],
+  "highlights": [
+    "End-to-end IoT pipeline: from microcontroller sensing to real-time GUI",
+    "Modular architecture utilizing Redis for data persistence",
+    "Python middleware for device-agnostic data conversion"
+  ],
+  "links": {
+    "repo": "https://github.com/02loveslollipop/OpenSensorSuiteGUI",
+    "detailsLabel": "View details",
+    "cta": {
+      "href": "https://github.com/02loveslollipop/OpenSensorSuiteESP32",
+      "label": "ESP32 Firmware"
+    }
+  }
+}

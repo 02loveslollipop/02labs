@@ -1,0 +1,21 @@
+{
+  "slug": "python-benchmark",
+  "title": "Python CPU Benchmark",
+  "summary": "A cross-architecture CPU benchmark tool written in pure Python measuring single/multi-threaded compute performance.",
+  "description": "This cross-architecture CPU benchmark utility evaluates single-threaded and multi-threaded performance through math-heavy High-Performance Computing workloads. It targets diverse architectures, including AMD64, AArch64, and RISC-V, and outputs structured JSON data suitable for cross-run and cross-architecture comparisons. Built in pure Python, it relies on workloads like dense matrix multiplications, FFT, numerical integrations, and optional solvers.",
+  "featured": false,
+  "order": 100,
+  "stack": [
+    "Python",
+    "HPC"
+  ],
+  "highlights": [
+    "Evaluates math-heavy continuous computations (FFT, Monte Carlo, Math integrations)",
+    "Offers structured JSON output for easy chart plotting and cross-platform analysis",
+    "Works gracefully across a huge array of targets including QEMU emulated devices"
+  ],
+  "links": {
+    "repo": "https://github.com/02loveslollipop/python_benchmark",
+    "detailsLabel": "View details"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "slug": "tets-lucky-draw",
+  "title": "Tet's Lucky Draw",
+  "summary": "A Capture The Flag (CTF) challenge centered around a Linear Congruential Generator cryptosystem.",
+  "description": "Originally designed for the CTF-UPB workshop, this challenge presents a TCP service running a guessing game powered by a 32-bit Linear Congruential Generator. It requires attackers to brute-force hidden initial lower bits by analyzing partially revealed LCG states in an interactive oracle environment.",
+  "featured": false,
+  "order": 100,
+  "stack": [
+    "Python",
+    "Cryptography",
+    "CTF"
+  ],
+  "links": {
+    "repo": "https://github.com/02loveslollipop/tets-lucky-draw",
+    "detailsLabel": "View details"
+  }
+}

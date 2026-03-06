@@ -1,0 +1,19 @@
+{
+  "slug": "ssl-and-supervised-for-character-classification",
+  "title": "SSL vs Supervised Character Classification",
+  "summary": "A comparative analysis of self-supervised and supervised pretraining approaches for Genshin Impact character classification using ResNet-18.",
+  "description": "This project explores the effectiveness of self-supervised learning (SSL) methods, specifically SimCLR, in improving image classification performance compared to traditional supervised learning (SL) approaches on a restricted labeled dataset of 9600 Genshin Impact character images. It heavily relies on the ResNet-18 architecture as its backbone model.",
+  "featured": false,
+  "order": 100,
+  "stack": [
+    "Python",
+    "PyTorch",
+    "ResNet-18",
+    "SimCLR",
+    "Machine Learning"
+  ],
+  "links": {
+    "repo": "https://github.com/02loveslollipop/SSL-and-Supervised-for-Character-Classification",
+    "detailsLabel": "View details"
+  }
+}

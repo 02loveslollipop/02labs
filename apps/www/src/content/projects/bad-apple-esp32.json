@@ -1,0 +1,29 @@
+{
+  "slug": "bad-apple-esp32",
+  "title": "Bad Apple ESP32 Utilities",
+  "summary": "High-performance developer utilities that encode and play the Bad Apple video on ESP32 microcontrollers using composite video output.",
+  "description": "A clever suite of tools designed for retro-style ESP32 tech demos. Feed it a video and it slices the footage into frames, applies delta encoding and RLE compression, and outputs a bundled C array ready to be flashed directly onto an ESP32. While the original CodeMaker utilized a sequential Cython implementation, the Composite evolution features a modular, parallelized architecture running on Numba (CPU) and CuPy (CUDA GPU) resulting in exponentially faster encoding speeds, and adds native audio support.",
+  "featured": true,
+  "order": 3,
+  "stack": [
+    "Python",
+    "Numba",
+    "CuPy",
+    "ESP32",
+    "C/C++",
+    "CUDA"
+  ],
+  "highlights": [
+    "Modular architecture with CPU (Numba) and GPU (CuPy) acceleration",
+    "Parallelized video encoding maintaining delta and RLE compression",
+    "Included Composite ESP32 player with experimental audio"
+  ],
+  "links": {
+    "repo": "https://github.com/02loveslollipop/BadAppleESP32Composite",
+    "detailsLabel": "View details",
+    "cta": {
+      "href": "https://github.com/02loveslollipop/BadAppleESP32CodeMaker",
+      "label": "Original CodeMaker"
+    }
+  }
+}

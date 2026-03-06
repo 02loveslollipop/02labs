@@ -1,0 +1,23 @@
+{
+  "slug": "sap-price-updater",
+  "title": "SAP Price Updater",
+  "summary": "A desktop utility to match SAP article codes against cost databases for automated manufacturing cost values retrieval.",
+  "description": "SAP Price Updater bridges the gap between raw SAP exports and internal cost spreadsheets. Replacing tedious manual lookups, this Pandas-driven desktop application seamlessly joins SAP article codes with cost databases. Built with a responsive Tkinter GUI, it features type normalization preventing dataset mismatch, intelligent missing-value interpolation, and clipboard data transfer workflows.",
+  "featured": false,
+  "order": 100,
+  "stack": [
+    "Python",
+    "Pandas",
+    "Tkinter",
+    "SAP"
+  ],
+  "highlights": [
+    "Smart merging and automated cross-referencing capabilities",
+    "Type normalization processing ensuring code uniformity",
+    "Dual language interface support alongside clipboard injections"
+  ],
+  "links": {
+    "repo": "https://github.com/02loveslollipop/Sap-Price-Updater",
+    "detailsLabel": "View details"
+  }
+}

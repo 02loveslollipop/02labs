@@ -1,11 +1,17 @@
 {
   "slug": "discord-gpt-chatbot",
   "title": "Discord GPT Chat Bot",
-  "summary": "Python Discord bot powered by OpenAI GPT‑3.5 with customizable behavior via system roles.",
-  "description": "DiscordGPTChatBot is a lightweight Python Discord bot that leverages OpenAI’s GPT‑3.5 with customizable system roles, giving server owners full control over the personality and responses of the AI. Configure behavior in a simple YAML file, run the included scripts, and watch as GPT‑powered conversations come to life in your Discord channels—with queueing, TTS options and easy deployment baked in.",
-  "featured": false,
-  "order": 10,
-  "stack": ["Python", "Discord API", "OpenAI GPT-3.5", "YAML", "TTS"],
+  "summary": "Python Discord bot powered by OpenAI GPT\u20113.5 with customizable behavior via system roles.",
+  "description": "DiscordGPTChatBot is a lightweight Python Discord bot that leverages OpenAI\u2019s GPT\u20113.5 with customizable system roles, giving server owners full control over the personality and responses of the AI. Configure behavior in a simple YAML file, run the included scripts, and watch as GPT\u2011powered conversations come to life in your Discord channels\u2014with queueing, TTS options and easy deployment baked in.",
+  "featured": true,
+  "order": 2,
+  "stack": [
+    "Python",
+    "Discord API",
+    "OpenAI GPT-3.5",
+    "YAML",
+    "TTS"
+  ],
   "links": {
     "repo": "https://github.com/02loveslollipop/DiscordGPTChatBot",
     "detailsLabel": "View details"
