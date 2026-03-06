@@ -65,6 +65,43 @@ const jsonLd = JSON.stringify(
 	null,
 	0
 );
+
+// ---------- Blog RSS fetch ----------
+interface BlogPost {
+	title: string;
+	description: string;
+	link: string;
+	pubDate: string;
+}
+
+function parseRssItems(xml: string): BlogPost[] {
+	const items: BlogPost[] = [];
+	const itemRe = /<item>([\s\S]*?)<\/item>/g;
+	let m: RegExpExecArray | null;
+	while ((m = itemRe.exec(xml)) !== null) {
+		const block = m[1];
+		const title = (block.match(/<title>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/title>/)?.[1] ?? "").trim();
+		const desc  = (block.match(/<description>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/description>/)?.[1] ?? "").trim();
+		const link  = (block.match(/<link>([\s\S]*?)<\/link>/)?.[1] ?? "").trim();
+		const date  = (block.match(/<pubDate>([\s\S]*?)<\/pubDate>/)?.[1] ?? "").trim();
+		if (title && link) items.push({ title, description: desc, link, pubDate: date });
+	}
+	return items;
+}
+
+let blogPosts: BlogPost[] = [];
+try {
+	const rssRes = await fetch("https://blog.02labs.me/rss.xml", {
+		signal: AbortSignal.timeout(3000),
+		headers: { Accept: "application/rss+xml, application/xml, text/xml" },
+	});
+	if (rssRes.ok) {
+		const xml = await rssRes.text();
+		blogPosts = parseRssItems(xml).slice(0, 4);
+	}
+} catch {
+	// fallback — static CTA shown when RSS is unreachable
+}
 ---
 
 <BaseLayout
@@ -197,20 +234,36 @@ const jsonLd = JSON.stringify(
 		<section class="snap-section" id="blog" data-snap-section>
 			<div class="panel">
 				<div class="section-head">
-					<h2>Blog</h2>
-					<p>Writeups, notes, and long-form breakdowns.</p>
+					<div>
+						<h2>Blog</h2>
+						<p>Writeups, notes, and long-form breakdowns.</p>
+					</div>
+					<a class="btn" href="https://blog.02labs.me/" target="_blank" rel="noopener noreferrer">All posts</a>
 				</div>
-				<div class="cta">
-					<p>
-						The blog is deployed separately for clean canonicals and crawling:
-						<strong> blog.02labs.me</strong>.
-					</p>
-					<p>
-						<a class="btn" href="https://blog.02labs.me/" rel="noopener noreferrer">
-							Open the blog
-						</a>
-					</p>
-				</div>
+				{blogPosts.length > 0 ? (
+					<ul class="blog-posts">
+						{blogPosts.map((post) => (
+							<li class="blog-post-item">
+								<a class="blog-post-link" href={post.link} target="_blank" rel="noopener noreferrer">
+									<span class="blog-post-title">{post.title}</span>
+									{post.pubDate ? (
+										<time class="blog-post-date" datetime={new Date(post.pubDate).toISOString()}>
+											{new Date(post.pubDate).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}
+										</time>
+									) : null}
+									{post.description ? (
+										<p class="blog-post-desc">{post.description}</p>
+									) : null}
+								</a>
+							</li>
+						))}
+					</ul>
+				) : (
+					<div class="cta">
+						<p>The blog is deployed separately at <strong>blog.02labs.me</strong>.</p>
+						<p><a class="btn" href="https://blog.02labs.me/" target="_blank" rel="noopener noreferrer">Open the blog</a></p>
+					</div>
+				)}
 			</div>
 		</section>
 
