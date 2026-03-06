@@ -199,6 +199,41 @@ try {
 			</div>
 		</section>
 
+		<section class="snap-section" id="blog" data-snap-section>
+			<div class="panel">
+				<div class="section-head">
+					<div>
+						<h2>Blog</h2>
+						<p>Writeups, notes, and long-form breakdowns.</p>
+					</div>
+					<a class="btn" href="https://blog.02labs.me/" target="_blank" rel="noopener noreferrer">All posts</a>
+				</div>
+				{blogPosts.length > 0 ? (
+					<div class="blog-row" aria-label="Latest posts">
+						{blogPosts.map((post) => (
+							<article class="blog-card">
+								<div class="blog-card__text">
+									<div class="blog-card__badge">
+										{post.pubDate ? new Date(post.pubDate).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) : "Post"}
+									</div>
+									<h3 class="blog-card__title">{post.title}</h3>
+									<p class="blog-card__summary">{post.description}</p>
+								</div>
+								<div class="btn-row">
+									<a class="btn" href={post.link} target="_blank" rel="noopener noreferrer">Read post</a>
+								</div>
+							</article>
+						))}
+					</div>
+				) : (
+					<div class="cta">
+						<p>The blog is deployed separately at <strong>blog.02labs.me</strong>.</p>
+						<p><a class="btn" href="https://blog.02labs.me/" target="_blank" rel="noopener noreferrer">Open the blog</a></p>
+					</div>
+				)}
+			</div>
+		</section>
+
 		<section class="snap-section" id="featured" data-snap-section>
 			<div class="panel">
 				<div class="section-head">
@@ -230,42 +265,6 @@ try {
 				</div>
 			</section>
 		))}
-
-		<section class="snap-section" id="blog" data-snap-section>
-			<div class="panel">
-				<div class="section-head">
-					<div>
-						<h2>Blog</h2>
-						<p>Writeups, notes, and long-form breakdowns.</p>
-					</div>
-					<a class="btn" href="https://blog.02labs.me/" target="_blank" rel="noopener noreferrer">All posts</a>
-				</div>
-				{blogPosts.length > 0 ? (
-					<ul class="blog-posts">
-						{blogPosts.map((post) => (
-							<li class="blog-post-item">
-								<a class="blog-post-link" href={post.link} target="_blank" rel="noopener noreferrer">
-									<span class="blog-post-title">{post.title}</span>
-									{post.pubDate ? (
-										<time class="blog-post-date" datetime={new Date(post.pubDate).toISOString()}>
-											{new Date(post.pubDate).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}
-										</time>
-									) : null}
-									{post.description ? (
-										<p class="blog-post-desc">{post.description}</p>
-									) : null}
-								</a>
-							</li>
-						))}
-					</ul>
-				) : (
-					<div class="cta">
-						<p>The blog is deployed separately at <strong>blog.02labs.me</strong>.</p>
-						<p><a class="btn" href="https://blog.02labs.me/" target="_blank" rel="noopener noreferrer">Open the blog</a></p>
-					</div>
-				)}
-			</div>
-		</section>
 
 		</div><!-- .card-stack -->
 	</main>
