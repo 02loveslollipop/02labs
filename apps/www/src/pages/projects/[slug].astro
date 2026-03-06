@@ -27,7 +27,7 @@ const project = entry.data;
         <Navbar forceScrolled />
 
         <main id="main" class="project-page">
-                <div class="project-page__shell">
+                <div class="project-page__shell panel">
                         <nav class="project-page__breadcrumb" aria-label="Breadcrumb">
                                 <a href="/">Home</a>
                                 <span aria-hidden="true"> / </span>
@@ -56,12 +56,16 @@ const project = entry.data;
         .project-page {
                 min-height: 100dvh;
                 padding-block-start: var(--nav-h, 4rem);
+                padding: calc(var(--nav-h, 4rem) + 2rem) var(--pad, 1.5rem) 4rem;
+                display: grid;
+                place-items: start center;
         }
 
         .project-page__shell {
+                /* Override panel's fixed-height from the card-stack context */
+                height: auto !important;
+                width: min(900px, calc(100vw - (var(--pad, 1.5rem) * 2)));
                 max-width: 900px;
-                margin-inline: auto;
-                padding: 3rem 1.5rem 6rem;
         }
 
         .project-page__breadcrumb {
