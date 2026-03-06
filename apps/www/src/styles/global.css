@@ -344,8 +344,15 @@ a:focus-visible {
 	margin-inline: auto;
 }
 
-.home-main #intro .panel,
-.home-main section[id^="project-"] .panel {
+.panel--centered > .panel__body {
+	min-height: 100%;
+	width: 100%;
+	display: grid;
+	align-content: center;
+}
+
+.home-main #intro .panel {
+	align-content: center;
 }
 
 /* Card-stack progress dots */

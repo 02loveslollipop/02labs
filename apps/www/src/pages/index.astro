@@ -138,118 +138,124 @@ try {
 		</section>
 
 		<section class="snap-section" id="ch0wn3rs" data-snap-section>
-			<div class="panel">
-				<div class="ch0wn3rs-header">
-					<img
-						class="ch0wn3rs-logo"
-						src="/ch0wn3rs-logo.jpeg"
-						alt="Ch0wn3rs team logo"
-						width="80"
-						height="80"
-						loading="lazy"
-					/>
-					<div class="ch0wn3rs-meta">
-						<h2>Ch0wn3rs</h2>
-						<p class="ch0wn3rs-role">
-							Co-founder &amp; CTO &mdash;
-							<a href="https://ch0wn3rs.ninja" target="_blank" rel="noopener noreferrer">ch0wn3rs.ninja</a>
-						</p>
-						<p class="ch0wn3rs-desc">
-							Elite cybersecurity CTF team. I manage the core infrastructure: web apps, CTF platforms, workshops, and instances.
-						</p>
-						<div class="ch0wn3rs-badges">
-							<span class="badge" id="ctf-badge-country">Colombia #{team.country_place ?? 1}</span>
-							<span class="badge" id="ctf-badge-world">World #{team.rating_place ?? "—"}</span>
-							<span class="badge" id="ctf-badge-pts">{team.rating_points != null ? `${team.rating_points.toFixed(3)} pts` : "— pts"}</span>
-						</div>
-					</div>
-				</div>
-
-				<div class="ch0wn3rs-events">
-					<div class="section-head ch0wn3rs-events-head">
-						<div>
-							<h3 id="ctf-year-heading">{ctfYear} CTF Participations</h3>
-							<p id="ctf-rating-summary">
-								Overall rating place: {team.rating_place ?? "—"} &mdash; {team.rating_points != null ? team.rating_points.toFixed(3) : "—"} pts
+			<div class="panel panel--centered">
+				<div class="panel__body">
+					<div class="ch0wn3rs-header">
+						<img
+							class="ch0wn3rs-logo"
+							src="/ch0wn3rs-logo.jpeg"
+							alt="Ch0wn3rs team logo"
+							width="80"
+							height="80"
+							loading="lazy"
+						/>
+						<div class="ch0wn3rs-meta">
+							<h2>Ch0wn3rs</h2>
+							<p class="ch0wn3rs-role">
+								Co-founder &amp; CTO &mdash;
+								<a href="https://ch0wn3rs.ninja" target="_blank" rel="noopener noreferrer">ch0wn3rs.ninja</a>
 							</p>
+							<p class="ch0wn3rs-desc">
+								Elite cybersecurity CTF team. I manage the core infrastructure: web apps, CTF platforms, workshops, and instances.
+							</p>
+							<div class="ch0wn3rs-badges">
+								<span class="badge" id="ctf-badge-country">Colombia #{team.country_place ?? 1}</span>
+								<span class="badge" id="ctf-badge-world">World #{team.rating_place ?? "—"}</span>
+								<span class="badge" id="ctf-badge-pts">{team.rating_points != null ? `${team.rating_points.toFixed(3)} pts` : "— pts"}</span>
+							</div>
 						</div>
-						<a class="btn" href="https://ctftime.org/team/408704" target="_blank" rel="noopener noreferrer">CTFtime profile</a>
 					</div>
-					<div class="ch0wn3rs-table-wrap">
-						<table class="ch0wn3rs-table">
-							<thead>
-								<tr>
-									<th>Place</th>
-									<th>Event</th>
-									<th>CTF pts</th>
-								</tr>
-							</thead>
-							<tbody id="ctf-events-tbody">
-								{events.map((ev) => (
+
+					<div class="ch0wn3rs-events">
+						<div class="section-head ch0wn3rs-events-head">
+							<div>
+								<h3 id="ctf-year-heading">{ctfYear} CTF Participations</h3>
+								<p id="ctf-rating-summary">
+									Overall rating place: {team.rating_place ?? "—"} &mdash; {team.rating_points != null ? team.rating_points.toFixed(3) : "—"} pts
+								</p>
+							</div>
+							<a class="btn" href="https://ctftime.org/team/408704" target="_blank" rel="noopener noreferrer">CTFtime profile</a>
+						</div>
+						<div class="ch0wn3rs-table-wrap">
+							<table class="ch0wn3rs-table">
+								<thead>
 									<tr>
-										<td>{ev.place}</td>
-										<td>{ev.title}</td>
-										<td>{ev.ctf_points}</td>
+										<th>Place</th>
+										<th>Event</th>
+										<th>CTF pts</th>
 									</tr>
-								))}
-							</tbody>
-						</table>
+								</thead>
+								<tbody id="ctf-events-tbody">
+									{events.map((ev) => (
+										<tr>
+											<td>{ev.place}</td>
+											<td>{ev.title}</td>
+											<td>{ev.ctf_points}</td>
+										</tr>
+									))}
+								</tbody>
+							</table>
+						</div>
 					</div>
 				</div>
 			</div>
 		</section>
 
 		<section class="snap-section" id="blog" data-snap-section>
-			<div class="panel">
-				<div class="section-head">
-					<div>
-						<h2>Blog</h2>
-						<p>Writeups, notes, and long-form breakdowns.</p>
+			<div class="panel panel--centered">
+				<div class="panel__body">
+					<div class="section-head">
+						<div>
+							<h2>Blog</h2>
+							<p>Writeups, notes, and long-form breakdowns.</p>
+						</div>
+						<a class="btn" href="https://blog.02labs.me/" target="_blank" rel="noopener noreferrer">All posts</a>
 					</div>
-					<a class="btn" href="https://blog.02labs.me/" target="_blank" rel="noopener noreferrer">All posts</a>
-				</div>
-				{blogPosts.length > 0 ? (
-					<div class="blog-row" aria-label="Latest posts">
-						{blogPosts.map((post) => (
-							<article class="blog-card">
-								<div class="blog-card__text">
-									<div class="blog-card__badge">
-										{post.pubDate ? new Date(post.pubDate).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) : "Post"}
+					{blogPosts.length > 0 ? (
+						<div class="blog-row" aria-label="Latest posts">
+							{blogPosts.map((post) => (
+								<article class="blog-card">
+									<div class="blog-card__text">
+										<div class="blog-card__badge">
+											{post.pubDate ? new Date(post.pubDate).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) : "Post"}
+										</div>
+										<h3 class="blog-card__title">{post.title}</h3>
+										<p class="blog-card__summary">{post.description}</p>
 									</div>
-									<h3 class="blog-card__title">{post.title}</h3>
-									<p class="blog-card__summary">{post.description}</p>
-								</div>
-								<div class="btn-row">
-									<a class="btn" href={post.link} target="_blank" rel="noopener noreferrer">Read post</a>
-								</div>
-							</article>
-						))}
-					</div>
-				) : (
-					<div class="cta">
-						<p>The blog is deployed separately at <strong>blog.02labs.me</strong>.</p>
-						<p><a class="btn" href="https://blog.02labs.me/" target="_blank" rel="noopener noreferrer">Open the blog</a></p>
-					</div>
-				)}
+									<div class="btn-row">
+										<a class="btn" href={post.link} target="_blank" rel="noopener noreferrer">Read post</a>
+									</div>
+								</article>
+							))}
+						</div>
+					) : (
+						<div class="cta">
+							<p>The blog is deployed separately at <strong>blog.02labs.me</strong>.</p>
+							<p><a class="btn" href="https://blog.02labs.me/" target="_blank" rel="noopener noreferrer">Open the blog</a></p>
+						</div>
+					)}
+				</div>
 			</div>
 		</section>
 
 		<section class="snap-section" id="featured" data-snap-section>
-			<div class="panel">
-				<div class="section-head">
-					<div>
-						<h2>Featured projects</h2>
-						<p>Five highlights. Static pages, crawlable links, and details below.</p>
+			<div class="panel panel--centered">
+				<div class="panel__body">
+					<div class="section-head">
+						<div>
+							<h2>Featured projects</h2>
+							<p>Five highlights. Static pages, crawlable links, and details below.</p>
+						</div>
+						<p>
+							<a class="btn" href="/projects/">All projects</a>
+						</p>
 					</div>
-					<p>
-						<a class="btn" href="/projects/">All projects</a>
-					</p>
-				</div>
 
-				<div class="featured-row" aria-label="Featured projects">
-					{featured.map((project) => (
-						<ProjectCard project={project} detailsHref={`/projects/${project.slug}`} />
-					))}
+					<div class="featured-row" aria-label="Featured projects">
+						{featured.map((project) => (
+							<ProjectCard project={project} detailsHref={`/projects/${project.slug}`} />
+						))}
+					</div>
 				</div>
 			</div>
 		</section>
@@ -260,8 +266,10 @@ try {
 				id={`project-${project.slug}`}
 				data-snap-section
 			>
-				<div class="panel">
-					<ProjectDetail project={project} />
+				<div class="panel panel--centered">
+					<div class="panel__body">
+						<ProjectDetail project={project} />
+					</div>
 				</div>
 			</section>
 		))}
