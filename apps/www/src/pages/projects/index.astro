@@ -66,7 +66,7 @@ const stacks = Array.from(stackSet).sort((a, b) => a.localeCompare(b));
 						data-stack={project.stack.join("|").toLowerCase()}
 						data-featured={project.featured ? "true" : "false"}
 					>
-						<ProjectCard project={project} detailsHref={`/#project-${project.slug}`} />
+						<ProjectCard project={project} detailsHref={`/projects/${project.slug}`} />
 					</div>
 				))}
 			</div>

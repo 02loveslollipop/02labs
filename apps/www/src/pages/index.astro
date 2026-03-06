@@ -176,7 +176,7 @@ const jsonLd = JSON.stringify(
 
 				<div class="featured-row" aria-label="Featured projects">
 					{featured.map((project) => (
-						<ProjectCard project={project} detailsHref={`#project-${project.slug}`} />
+						<ProjectCard project={project} detailsHref={`/projects/${project.slug}`} />
 					))}
 				</div>
 			</div>
