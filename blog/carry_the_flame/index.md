@@ -33,9 +33,9 @@ for _ in range(ROUNDS):
     pt = pbox(pt)
 ```
 
-![SPN structure](1.jpg)
-
 > The core round function from `challenge.py`
+
+![SPN structure](1.jpg)
 
 The challenge gave a netcat interface to encrypt arbitrary plaintexts, but there were some constraints that made large data collection unfeasible:
 
