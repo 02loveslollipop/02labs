@@ -1,11 +1,23 @@
 ---
-title: "OSINT Writeup — Eye on the Sky / Eye on the Sky 2"
+title: "OSINT Writeup: Batman's kitchen CTF — Eye on the Sky / Eye on the Sky 2"
 description: "Goal: Determine the aircraft’s marketed flight number (operating airline) and the baggage carousel number."
 pubDate: 2026-02-22
 featuredImage: "2.png"
 ---
 
+## Overview
+
+In this OSINT challenge for Batman’s kitchen CTF, we were given a single photo (`sky.jpg`) containing a mountain and a small aircraft silhouette above it. And 2 tasks were given with this:
+
+* get the flight number and baggage carousel number of the plane in the photo
+
+* determine the location where the photo was taken
+
+To solve this challenge, the main issues we had to solve were to identify the location of the mountain and, a time window when the photo was taken and some brief understanding of the direction where the photo was taken. With this information, and some geometry tricks (thanks to the available metadata of the photo) we were able (using an ADS-B replay) to reduce the number of candidates to 4, and then check the baggage carousel number for each of them until we found the correct one. With the correct flight identified, we had some extra information to use in our advantage to find the location of the photographer, as we knew the exact position and altitude of the plane at the moment the photo was taken and the position and altitude of the mountain, so we could make an estimation of the distance between the photographer and the plane, and then use that distance to find the location of the photographer along the line defined by the mountain and the plane.
+
 ## Challenge statements
+
+
 
 ### Part 1 — `osint/Eye on the Sky`
 
@@ -208,15 +220,22 @@ Since the aircraft lies N–NW of the mountain, the photographer is located furt
 
 ### 6.3 Distance to aircraft via apparent elevation ratio
 
-Even though the plane is physically lower than the mountain, it appears much higher above the horizon in the photograph, implying the aircraft is much closer to the camera than the mountain.
+Even though the plane is physically lower than the mountain, it appears much higher above the horizon in the photograph, implying the aircraft is much closer to the camera than the mountain. 
 
-Define ((R)) as the apparent height ratio (plane elevation above the horizon relative to the mountain peak’s elevation above the horizon). Visual estimation yielded ((R \approx 4.5))–((5)).
+**Deriving the Apparent Height Ratio ($R$):**
+To calculate exactly how much "higher" the plane appears in perspective, we analyzed the vertical pixel distances along the image's Y-axis. First, we estimated the true eye-level horizon line near the base of the visible terrain. We then measured two vertical pixel segments from this horizon line:
+1. The distance to the mountain summit ($y_m$).
+2. The distance to the aircraft ($y_p$).
 
-Using:
 
-[
-d_c = \frac{D_m \cdot H_p}{R\cdot H_m - H_p}
-]
+
+The apparent height ratio ($R$) is defined as the quotient of these two apparent elevations:
+$$R = \frac{y_p}{y_m}$$
+
+Based on visual pixel estimation from the cropped image, the aircraft sits approximately 4.5 to 5 times higher above the true horizon than the peak of Mount Rainier, yielding $R \approx 4.5$–$5$.
+
+Using the geometric relationship:
+$$d_c = \frac{D_m \cdot H_p}{R \cdot H_m - H_p}$$
 
 For ((R = 5)):
 
