@@ -1,5 +1,5 @@
 ---
-title: "OSINT Writeup: Batman's kitchen CTF — Eye on the Sky / Eye on the Sky 2"
+title: "Batman's kitchen CTF 2026 OSINT Writeup — Eye on the Sky / Eye on the Sky 2"
 description: "Goal: Determine the aircraft’s marketed flight number (operating airline) and the baggage carousel number."
 pubDate: 2026-02-22
 featuredImage: "2.png"
@@ -8,7 +8,7 @@ featuredImage: "2.png"
 ## Overview
 
 In this OSINT challenge for Batman’s kitchen CTF, we were given a single photo (`sky.jpg`) containing a mountain and a small aircraft silhouette above it. And 2 tasks were given with this:
-
+ 
 * get the flight number and baggage carousel number of the plane in the photo
 
 * determine the location where the photo was taken
