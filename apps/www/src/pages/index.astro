@@ -1,5 +1,6 @@
 ---
-export const prerender = false;
+// Prerender the home page so external data (blog RSS) is baked at build time.
+export const prerender = true;
 
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Navbar from "../components/Navbar.astro";
@@ -10,7 +11,7 @@ import { getCollection } from "astro:content";
 import type { CTFTimeData } from "./api/ctftime.json";
 
 // ---------- Server-side KV read ----------
-const kv = Astro.locals.runtime?.env?.CTFTIME_KV;
+const kv = Astro.locals?.runtime?.env?.CTFTIME_KV;
 let ctf: CTFTimeData | null = null;
 if (kv) {
 	try {
@@ -237,7 +238,14 @@ try {
 								<article class="blog-card">
 									<div class="blog-card__text">
 										<div class="blog-card__badge">
-											{post.pubDate ? new Date(post.pubDate).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) : "Post"}
+											{post.pubDate
+												? new Date(post.pubDate).toLocaleDateString("en-US", {
+														year: "numeric",
+														month: "short",
+														day: "numeric",
+														timeZone: "UTC",
+													})
+												: "Post"}
 										</div>
 										<h3 class="blog-card__title">{post.title}</h3>
 										<p class="blog-card__summary">{post.description}</p>
