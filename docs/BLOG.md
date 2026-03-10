@@ -25,6 +25,7 @@ Required frontmatter:
 title: "..."
 description: "..."
 pubDate: 2026-02-22
+tags: ["ctf", "writeup"]
 ---
 ```
 
@@ -32,10 +33,18 @@ Optional frontmatter:
 
 ```yaml
 updatedDate: 2026-02-23
-tags: ["osint", "writeup"]
 featuredImage: "1.jpg"
 draft: true
 ```
+
+`tags` are mandatory:
+
+- Every post must have at least one tag.
+- Tags are used for:
+  - tag archive pages at `/tags/<slug>/`
+  - linked tags on post pages
+  - related-post discovery
+  - `keywords` in post JSON-LD
 
 `featuredImage` rules:
 
@@ -51,6 +60,7 @@ draft: true
 
 - Blog home: `https://blog.02labs.me/`
 - Post pages: `https://blog.02labs.me/posts/<slug>/`
+- Tag pages: `https://blog.02labs.me/tags/<tag>/`
 - RSS: `https://blog.02labs.me/rss.xml`
 
 ## Images (Static)
@@ -76,5 +86,7 @@ Implementation:
 
 - Set `draft: true` to hide a post from:
   - blog home listing
+  - tag archive pages
+  - related-post recommendations
   - RSS feed
   - static routes generation

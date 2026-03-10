@@ -1,16 +1,13 @@
 import rss from "@astrojs/rss";
 import { getCollection } from "astro:content";
-import { getPostSlug, stripMarkdownInline } from "../lib/posts";
+import { BLOG_DESCRIPTION, BLOG_NAME, getPostSlug, sortBlogEntries, stripMarkdownInline } from "../lib/posts";
 
 export async function GET(context: { site: URL }) {
-	const entries = await getCollection("blog");
-	const posts = entries
-		.filter((p) => !p.data.draft)
-		.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+	const posts = sortBlogEntries((await getCollection("blog")).filter((p) => !p.data.draft));
 
 	return rss({
-		title: "02Labs Blog",
-		description: "Writeups, notes, and deep dives.",
+		title: BLOG_NAME,
+		description: BLOG_DESCRIPTION,
 		site: context.site,
 		items: posts.map((post) => ({
 			title: stripMarkdownInline(post.data.title),

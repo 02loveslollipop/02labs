@@ -74,14 +74,34 @@ interface BlogPost {
 	pubDate: string;
 }
 
+function decodeHtmlEntities(input: string): string {
+	let output = String(input || "");
+	for (let i = 0; i < 2; i++) {
+		const next = output
+			.replaceAll("&amp;", "&")
+			.replaceAll("&apos;", "'")
+			.replaceAll("&#39;", "'")
+			.replaceAll("&quot;", '"')
+			.replaceAll("&lt;", "<")
+			.replaceAll("&gt;", ">");
+		if (next === output) break;
+		output = next;
+	}
+	return output;
+}
+
 function parseRssItems(xml: string): BlogPost[] {
 	const items: BlogPost[] = [];
 	const itemRe = /<item>([\s\S]*?)<\/item>/g;
 	let m: RegExpExecArray | null;
 	while ((m = itemRe.exec(xml)) !== null) {
 		const block = m[1];
-		const title = (block.match(/<title>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/title>/)?.[1] ?? "").trim();
-		const desc  = (block.match(/<description>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/description>/)?.[1] ?? "").trim();
+		const title = decodeHtmlEntities(
+			(block.match(/<title>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/title>/)?.[1] ?? "").trim()
+		);
+		const desc = decodeHtmlEntities(
+			(block.match(/<description>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/description>/)?.[1] ?? "").trim()
+		);
 		const link  = (block.match(/<link>([\s\S]*?)<\/link>/)?.[1] ?? "").trim();
 		const date  = (block.match(/<pubDate>([\s\S]*?)<\/pubDate>/)?.[1] ?? "").trim();
 		if (title && link) items.push({ title, description: desc, link, pubDate: date });
@@ -105,8 +125,8 @@ try {
 ---
 
 <BaseLayout
-	title="02Labs"
-	description="02Labs portfolio: featured projects, deep dives, and a writing archive."
+	title="Systems, Data, Projects, and CTF Writeups"
+	description="02Labs is the portfolio of 02loveslollipop, featuring systems engineering projects, data work, security experiments, and technical writeups."
 	ogType="website"
 	canonical="https://02labs.me/"
 	jsonLd={jsonLd}
@@ -253,7 +273,7 @@ try {
 
 					<div class="featured-row" aria-label="Featured projects">
 						{featured.map((project) => (
-							<ProjectCard project={project} detailsHref={`/projects/${project.slug}`} />
+							<ProjectCard project={project} detailsHref={`/projects/${project.slug}/`} />
 						))}
 					</div>
 				</div>

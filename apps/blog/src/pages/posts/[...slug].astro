@@ -1,7 +1,17 @@
 ---
 import PostLayout from "../../layouts/PostLayout.astro";
 import { getCollection } from "astro:content";
-import { getPostFirstImageSrc, getPostSlug, resolvePostImageSrc, stripMarkdownInline } from "../../lib/posts";
+import {
+	BLOG_AUTHOR,
+	BLOG_NAME,
+	BLOG_PUBLISHER,
+	getPostFirstImageSrc,
+	getPostSlug,
+	getRelatedPosts,
+	resolvePostImageSrc,
+	resolveSiteUrl,
+	stripMarkdownInline,
+} from "../../lib/posts";
 
 export async function getStaticPaths() {
 	const entries = await getCollection("blog");
@@ -17,6 +27,7 @@ const { Content } = await entry.render();
 const slug = getPostSlug(entry);
 const titlePlain = stripMarkdownInline(entry.data.title);
 const descriptionPlain = stripMarkdownInline(entry.data.description);
+const relatedPosts = getRelatedPosts(entry, await getCollection("blog"));
 const imageSrc =
 	resolvePostImageSrc(entry.data.featuredImage, slug) ??
 	getPostFirstImageSrc(entry.body, slug);
@@ -27,26 +38,62 @@ const imageUrl = (() => {
 	return Astro.site ? new URL(imageSrc, Astro.site).toString() : imageSrc;
 })();
 
-const url = Astro.site
-	? new URL(`/posts/${slug}/`, Astro.site).toString()
-	: `/posts/${slug}/`;
-
-const jsonLd = JSON.stringify(
-	{
-		"@context": "https://schema.org",
-		"@type": "BlogPosting",
-		headline: titlePlain,
-		description: descriptionPlain,
-		datePublished: entry.data.pubDate.toISOString(),
-		dateModified: (entry.data.updatedDate ?? entry.data.pubDate).toISOString(),
-		mainEntityOfPage: url,
-		...(imageUrl ? { image: imageUrl } : {}),
-		author: { "@type": "Person", name: "02loveslollipop" },
-		publisher: { "@type": "Organization", name: "02Labs" },
+const url = resolveSiteUrl(`/posts/${slug}/`, Astro.site);
+const blogUrl = resolveSiteUrl("/", Astro.site);
+const breadcrumbJsonLd = {
+	"@context": "https://schema.org",
+	"@type": "BreadcrumbList",
+	itemListElement: [
+		{
+			"@type": "ListItem",
+			position: 1,
+			name: BLOG_NAME,
+			item: blogUrl,
+		},
+		{
+			"@type": "ListItem",
+			position: 2,
+			name: titlePlain,
+			item: url,
+		},
+	],
+};
+const articleJsonLd = {
+	"@context": "https://schema.org",
+	"@type": "BlogPosting",
+	headline: titlePlain,
+	description: descriptionPlain,
+	datePublished: entry.data.pubDate.toISOString(),
+	dateModified: (entry.data.updatedDate ?? entry.data.pubDate).toISOString(),
+	mainEntityOfPage: {
+		"@type": "WebPage",
+		"@id": url,
 	},
-	null,
-	0
-);
+	...(imageUrl ? { image: imageUrl } : {}),
+	author: {
+		"@type": "Person",
+		name: BLOG_AUTHOR.name,
+		url: BLOG_AUTHOR.url,
+		sameAs: [...BLOG_AUTHOR.sameAs],
+	},
+	publisher: {
+		"@type": "Organization",
+		name: BLOG_PUBLISHER.name,
+		url: BLOG_PUBLISHER.url,
+		logo: {
+			"@type": "ImageObject",
+			url: resolveSiteUrl(BLOG_PUBLISHER.logoPath, Astro.site),
+		},
+	},
+	keywords: entry.data.tags.join(", "),
+	isPartOf: {
+		"@type": "Blog",
+		name: BLOG_NAME,
+		url: blogUrl,
+	},
+};
+
+const jsonLd = JSON.stringify([articleJsonLd, breadcrumbJsonLd], null, 0);
 ---
 
 <PostLayout
@@ -58,6 +105,7 @@ const jsonLd = JSON.stringify(
 	ogImage={imageUrl}
 	ogImageAlt={`${titlePlain} featured image`}
 	jsonLd={jsonLd}
+	relatedPosts={relatedPosts}
 >
 	<Content />
 </PostLayout>

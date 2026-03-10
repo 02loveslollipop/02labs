@@ -1,6 +1,12 @@
 ---
 import BaseLayout from "./BaseLayout.astro";
-import { renderInlineMarkdown, stripMarkdownInline } from "../lib/posts";
+import {
+	BLOG_NAME,
+	renderInlineMarkdown,
+	slugifyTag,
+	stripMarkdownInline,
+	type RelatedPostPreview,
+} from "../lib/posts";
 
 export interface Props {
 	title: string;
@@ -11,9 +17,10 @@ export interface Props {
 	ogImage?: string;
 	ogImageAlt?: string;
 	jsonLd?: string;
+	relatedPosts?: RelatedPostPreview[];
 }
 
-const { title, description, pubDate, updatedDate, tags, ogImage, ogImageAlt, jsonLd } = Astro.props;
+const { title, description, pubDate, updatedDate, tags, ogImage, ogImageAlt, jsonLd, relatedPosts } = Astro.props;
 const published = pubDate.toISOString().slice(0, 10);
 const updated = updatedDate ? updatedDate.toISOString().slice(0, 10) : null;
 const titlePlain = stripMarkdownInline(title);
@@ -32,7 +39,7 @@ const descriptionHtml = renderInlineMarkdown(description);
 >
 	<header class="header">
 		<div class="header__inner">
-			<a class="brand" href="/">02Labs Blog</a>
+			<a class="brand" href="/">{BLOG_NAME}</a>
 			<nav class="header__links" aria-label="Site">
 				<a href="/rss.xml">RSS</a>
 				<a href="https://02labs.me/" rel="noopener noreferrer">Main site</a>
@@ -48,11 +55,36 @@ const descriptionHtml = renderInlineMarkdown(description);
 			<div class="meta">
 				<span>Published {published}</span>
 				{updated ? <span> · Updated {updated}</span> : null}
-				{Array.isArray(tags) && tags.length > 0 ? <span> · {tags.join(", ")}</span> : null}
 			</div>
+			{Array.isArray(tags) && tags.length > 0 ? (
+				<div class="article-tags" aria-label="Tags">
+					{tags.map((tag) => (
+						<a class="tag-pill" href={`/tags/${slugifyTag(tag)}/`}>
+							{tag}
+						</a>
+					))}
+				</div>
+			) : null}
 
 			<div style="height: 18px" aria-hidden="true"></div>
 			<slot />
+
+			{Array.isArray(relatedPosts) && relatedPosts.length > 0 ? (
+				<section class="related-posts" aria-label="Related posts">
+					<h2>Related posts</h2>
+					<div class="related-posts__list">
+						{relatedPosts.map((post) => (
+							<a class="related-post" href={`/posts/${post.slug}/`}>
+								<h3>{post.title}</h3>
+								<p>{post.excerpt}</p>
+								<div class="meta">
+									<span>{post.pubDate.toISOString().slice(0, 10)}</span>
+								</div>
+							</a>
+						))}
+					</div>
+				</section>
+			) : null}
 
 			<p class="footer">
 				<a href="/">Back to all posts</a>

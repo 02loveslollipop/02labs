@@ -1,22 +1,40 @@
 ---
-import BaseLayout from "../layouts/BaseLayout.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
 import { getCollection } from "astro:content";
 import {
-	BLOG_AUTHOR,
 	BLOG_DESCRIPTION,
 	BLOG_NAME,
-	BLOG_PUBLISHER,
 	getPostExcerpt,
 	getPostFirstImageSrc,
 	getPostSlug,
 	resolvePostImageSrc,
 	resolveSiteUrl,
+	slugifyTag,
 	sortBlogEntries,
 	stripMarkdownInline,
-} from "../lib/posts";
+} from "../../lib/posts";
 
-const entries = sortBlogEntries((await getCollection("blog")).filter((p) => !p.data.draft));
+export async function getStaticPaths() {
+	const entries = (await getCollection("blog")).filter((entry) => !entry.data.draft);
+	const tagMap = new Map<string, string>();
+
+	for (const entry of entries) {
+		for (const tag of entry.data.tags) {
+			const slug = slugifyTag(tag);
+			if (slug && !tagMap.has(slug)) tagMap.set(slug, tag);
+		}
+	}
+
+	return Array.from(tagMap.entries()).map(([tag, label]) => ({
+		params: { tag },
+		props: { tagSlug: tag, tagLabel: label },
+	}));
+}
+
+const { tagSlug, tagLabel } = Astro.props;
+const entries = sortBlogEntries((await getCollection("blog")).filter((entry) => !entry.data.draft));
 const posts = entries
+	.filter((post) => post.data.tags.some((tag) => slugifyTag(tag) === tagSlug))
 	.map((post) => {
 		const slug = getPostSlug(post);
 		return {
@@ -29,39 +47,31 @@ const posts = entries
 				getPostFirstImageSrc(post.body, slug),
 		};
 	});
-const blogUrl = resolveSiteUrl("/", Astro.site);
+const title = `Posts tagged ${tagLabel}`;
+const description = `Browse ${posts.length} ${tagLabel} post${posts.length === 1 ? "" : "s"} on ${BLOG_NAME}. ${BLOG_DESCRIPTION}`;
+const pageUrl = resolveSiteUrl(`/tags/${tagSlug}/`, Astro.site);
 const jsonLd = JSON.stringify(
 	[
 		{
 			"@context": "https://schema.org",
-			"@type": "Blog",
-			name: BLOG_NAME,
-			description: BLOG_DESCRIPTION,
-			url: blogUrl,
-			author: {
-				"@type": "Person",
-				name: BLOG_AUTHOR.name,
-				url: BLOG_AUTHOR.url,
-				sameAs: [...BLOG_AUTHOR.sameAs],
-			},
-			publisher: {
-				"@type": "Organization",
-				name: BLOG_PUBLISHER.name,
-				url: BLOG_PUBLISHER.url,
-				logo: {
-					"@type": "ImageObject",
-					url: resolveSiteUrl(BLOG_PUBLISHER.logoPath, Astro.site),
-				},
+			"@type": "CollectionPage",
+			name: title,
+			description,
+			url: pageUrl,
+			isPartOf: {
+				"@type": "Blog",
+				name: BLOG_NAME,
+				url: resolveSiteUrl("/", Astro.site),
 			},
 		},
 		{
 			"@context": "https://schema.org",
 			"@type": "ItemList",
-			name: `${BLOG_NAME} Posts`,
-			itemListElement: posts.map(({ slug, title }, index) => ({
+			name: `${tagLabel} posts`,
+			itemListElement: posts.map(({ slug, title: postTitle }, index) => ({
 				"@type": "ListItem",
 				position: index + 1,
-				name: title,
+				name: postTitle,
 				url: resolveSiteUrl(`/posts/${slug}/`, Astro.site),
 			})),
 		},
@@ -71,12 +81,7 @@ const jsonLd = JSON.stringify(
 );
 ---
 
-<BaseLayout
-	title="CTF Writeups, OSINT Notes, Crypto Solves, and Systems Deep Dives"
-	description={BLOG_DESCRIPTION}
-	ogType="website"
-	jsonLd={jsonLd}
->
+<BaseLayout title={title} description={description} ogType="website" jsonLd={jsonLd}>
 	<header class="header">
 		<div class="header__inner">
 			<a class="brand" href="/">{BLOG_NAME}</a>
@@ -88,29 +93,27 @@ const jsonLd = JSON.stringify(
 	</header>
 
 	<main class="wrap">
-		<section class="paper" aria-label="Posts">
+		<section class="paper" aria-label={`Posts tagged ${tagLabel}`}>
 			<header class="archive-hero">
-				<p class="archive-hero__eyebrow">{BLOG_NAME}</p>
-				<h1>CTF writeups, OSINT notes, crypto solves, and systems deep dives</h1>
-				<p>
-					Long-form breakdowns from 02loveslollipop covering security challenges,
-					investigations, and engineering work.
-				</p>
+				<p class="archive-hero__eyebrow">Tag archive</p>
+				<h1>{tagLabel}</h1>
+				<p>{description}</p>
 			</header>
+
 			<div class="post-list">
-				{posts.map(({ post, slug, title, excerpt, imageSrc }) => (
+				{posts.map(({ post, slug, title: postTitle, excerpt, imageSrc }) => (
 					<a class={`post-item ${imageSrc ? "" : "post-item--no-image"}`} href={`/posts/${slug}/`}>
 						{imageSrc ? (
 							<img
 								class="post-item__thumb"
 								src={imageSrc}
-								alt={`${title} preview`}
+								alt={`${postTitle} preview`}
 								loading="lazy"
 								decoding="async"
 							/>
 						) : null}
 						<div class="post-item__body">
-							<h2>{title}</h2>
+							<h2>{postTitle}</h2>
 							<p class="post-item__excerpt">{excerpt}</p>
 							<div class="meta">
 								<span>{post.data.pubDate.toISOString().slice(0, 10)}</span>

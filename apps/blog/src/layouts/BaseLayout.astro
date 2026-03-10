@@ -1,5 +1,6 @@
 ---
 import Background from "../components/Background.astro";
+import { BLOG_DESCRIPTION, BLOG_NAME } from "../lib/posts";
 import "../styles/global.css";
 import "katex/dist/katex.min.css";
 
@@ -14,8 +15,8 @@ export interface Props {
 }
 
 const {
-	title = "02Labs Blog",
-	description = "Writeups, notes, and deep dives.",
+	title = BLOG_NAME,
+	description = BLOG_DESCRIPTION,
 	ogType = "website",
 	ogImage,
 	ogImageAlt,
@@ -25,7 +26,7 @@ const {
 
 const site = Astro.site;
 const canonicalUrl = site ? new URL(Astro.url.pathname, site).toString() : Astro.url.toString();
-const fullTitle = title === "02Labs Blog" ? title : `${title} | 02Labs Blog`;
+const fullTitle = title === BLOG_NAME ? title : `${title} | ${BLOG_NAME}`;
 const resolvedTwitterCard = twitterCard ?? (ogImage ? "summary_large_image" : "summary");
 ---
 
@@ -42,7 +43,7 @@ const resolvedTwitterCard = twitterCard ?? (ogImage ? "summary_large_image" : "s
 		<meta name="robots" content="index,follow" />
 		<meta name="theme-color" content="#0b0b10" />
 
-		<meta property="og:site_name" content="02Labs Blog" />
+		<meta property="og:site_name" content={BLOG_NAME} />
 		<meta property="og:title" content={fullTitle} />
 		<meta property="og:description" content={description} />
 		<meta property="og:type" content={ogType} />
@@ -54,7 +55,7 @@ const resolvedTwitterCard = twitterCard ?? (ogImage ? "summary_large_image" : "s
 		<meta name="twitter:title" content={fullTitle} />
 		<meta name="twitter:description" content={description} />
 		{ogImage ? <meta name="twitter:image" content={ogImage} /> : null}
-		<link rel="alternate" type="application/rss+xml" title="02Labs Blog RSS" href="/rss.xml" />
+		<link rel="alternate" type="application/rss+xml" title={`${BLOG_NAME} RSS`} href="/rss.xml" />
 
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

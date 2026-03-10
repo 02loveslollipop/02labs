@@ -1,28 +1,93 @@
 ---
-export const prerender = false;
-
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Navbar from "../../components/Navbar.astro";
 import ProjectDetail from "../../components/ProjectDetail.astro";
 import { getCollection } from "astro:content";
 
-const { slug } = Astro.params;
-
-const entries = await getCollection("projects");
-const entry = entries.find((e) => e.data.slug === slug);
-
-if (!entry) {
-        return Astro.redirect("/projects/");
+export async function getStaticPaths() {
+	const entries = await getCollection("projects");
+	return entries.map((entry) => ({
+		params: { slug: entry.data.slug },
+		props: { project: entry.data },
+	}));
 }
 
-const project = entry.data;
+const { project } = Astro.props;
+const projectUrl = Astro.site
+	? new URL(`/projects/${project.slug}/`, Astro.site).toString()
+	: `/projects/${project.slug}/`;
+const jsonLd = JSON.stringify(
+	[
+		{
+			"@context": "https://schema.org",
+			"@type": "BreadcrumbList",
+			itemListElement: [
+				{
+					"@type": "ListItem",
+					position: 1,
+					name: "02Labs",
+					item: Astro.site ? new URL("/", Astro.site).toString() : "/",
+				},
+				{
+					"@type": "ListItem",
+					position: 2,
+					name: "Projects",
+					item: Astro.site ? new URL("/projects/", Astro.site).toString() : "/projects/",
+				},
+				{
+					"@type": "ListItem",
+					position: 3,
+					name: project.title,
+					item: projectUrl,
+				},
+			],
+		},
+		{
+			"@context": "https://schema.org",
+			"@type": "WebPage",
+			name: project.title,
+			description: project.summary,
+			url: projectUrl,
+			breadcrumb: {
+				"@type": "BreadcrumbList",
+				itemListElement: [
+					{
+						"@type": "ListItem",
+						position: 1,
+						name: "02Labs",
+						item: Astro.site ? new URL("/", Astro.site).toString() : "/",
+					},
+					{
+						"@type": "ListItem",
+						position: 2,
+						name: "Projects",
+						item: Astro.site ? new URL("/projects/", Astro.site).toString() : "/projects/",
+					},
+					{
+						"@type": "ListItem",
+						position: 3,
+						name: project.title,
+						item: projectUrl,
+					},
+				],
+			},
+			isPartOf: {
+				"@type": "WebSite",
+				name: "02Labs",
+				url: Astro.site ? new URL("/", Astro.site).toString() : "/",
+			},
+		},
+	],
+	null,
+	0
+);
 ---
 
 <BaseLayout
-        title={`${project.title} – 02Labs`}
+        title={project.title}
         description={project.summary}
         ogType="website"
-        canonical={`https://02labs.me/projects/${project.slug}`}
+        jsonLd={jsonLd}
 >
         <Navbar forceScrolled />
 
@@ -36,7 +101,7 @@ const project = entry.data;
                                 <span>{project.title}</span>
                         </nav>
 
-                        <ProjectDetail project={project} />
+                        <ProjectDetail project={project} headingTag="h1" />
                 </div>
         </main>
 

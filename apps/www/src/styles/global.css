@@ -586,7 +586,7 @@ a:focus-visible {
 	margin-bottom: 18px;
 }
 
-.section-head h2 {
+.section-head :is(h1, h2) {
 	margin: 0;
 	font-size: clamp(26px, 2.6vw, 36px);
 	letter-spacing: -0.02em;
@@ -789,7 +789,7 @@ a:focus-visible {
 	}
 }
 
-.project-detail h3 {
+.project-detail :is(h1, h2, h3) {
 	margin: 0;
 	font-size: clamp(26px, 3.2vw, 44px);
 	letter-spacing: -0.03em;
@@ -982,6 +982,8 @@ a:focus-visible {
         align-items: flex-start;
         flex-wrap: nowrap;
 }
+
+.site-footer {
 	border-top: 1px solid rgba(255, 255, 255, 0.14);
 	padding: 22px var(--pad);
 }

@@ -3,9 +3,11 @@ import type { Project } from "./ProjectCard.astro";
 
 export interface Props {
 	project: Project;
+	headingTag?: "h1" | "h2" | "h3";
 }
 
-const { project } = Astro.props;
+const { project, headingTag = "h3" } = Astro.props;
+const HeadingTag = headingTag;
 ---
 
 <div class="project-detail">
@@ -23,7 +25,7 @@ const { project } = Astro.props;
 		) : null}
 
 		<div class="project-detail__body">
-			<h3>{project.title}</h3>
+			<HeadingTag>{project.title}</HeadingTag>
 			<p>{project.description}</p>
 
 			{Array.isArray(project.highlights) && project.highlights.length > 0 ? (

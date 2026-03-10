@@ -71,16 +71,16 @@ The keyspace is only 2^40, which is large for CPU brute force, but very manageab
 
 For each byte position and each possible byte value, we precompute:
 
-[
+$$
 T_i[b] = P(S(b) \ll \text{byte-shift}_i)
-]
+$$
 
 Then one full round becomes:
 
-[
+$$
 \text{round}(state, key)
 = T_0[b_0] \oplus T_1[b_1] \oplus T_2[b_2] \oplus T_3[b_3] \oplus T_4[b_4]
-]
+$$
 
 This optimization avoids bit-level permutation work inside the hot loop and turns each round into a small fixed sequence of byte extraction, table loads, and XORs, which is very efficient on a GPU.
 

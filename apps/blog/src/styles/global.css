@@ -161,6 +161,34 @@ a:focus-visible {
 	padding: clamp(22px, 4.2vw, 46px);
 }
 
+.archive-hero {
+	display: grid;
+	gap: 12px;
+	margin-bottom: 24px;
+}
+
+.archive-hero__eyebrow {
+	margin: 0;
+	font-size: 12px;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: rgba(0, 0, 0, 0.56);
+}
+
+.archive-hero h1 {
+	margin: 0;
+	font-size: clamp(30px, 4.2vw, 50px);
+	letter-spacing: -0.03em;
+	line-height: 1.04;
+}
+
+.archive-hero p {
+	margin: 0;
+	max-width: 62ch;
+	color: var(--ink-dim);
+	line-height: 1.65;
+}
+
 .post-list {
 	display: grid;
 	gap: 16px;
@@ -245,6 +273,38 @@ a:focus-visible {
 	line-height: 1.75;
 }
 
+.article-tags {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	margin: 14px 0 0;
+}
+
+.tag-pill {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 6px 10px;
+	border-radius: 999px;
+	border: 1px solid rgba(0, 0, 0, 0.12);
+	background: rgba(0, 0, 0, 0.03);
+	color: rgba(0, 0, 0, 0.72);
+	text-decoration: none;
+	font-size: 12px;
+	font-weight: 600;
+	letter-spacing: 0.02em;
+	transition:
+		border-color 160ms ease,
+		color 160ms ease,
+		background 160ms ease;
+}
+
+.tag-pill:hover,
+.tag-pill:focus-visible {
+	border-color: var(--accent);
+	background: rgba(45, 108, 255, 0.08);
+}
+
 .article h2 {
 	margin-top: 26px;
 	letter-spacing: -0.02em;
@@ -285,6 +345,54 @@ a:focus-visible {
 	height: auto;
 	object-fit: contain;
 	margin: 20px auto;
+}
+
+.related-posts {
+	display: grid;
+	gap: 16px;
+	margin-top: 34px;
+	padding-top: 28px;
+	border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.related-posts h2 {
+	margin: 0;
+}
+
+.related-posts__list {
+	display: grid;
+	gap: 14px;
+}
+
+.related-post {
+	display: grid;
+	gap: 8px;
+	padding: 16px;
+	border-radius: 16px;
+	border: 1px solid rgba(0, 0, 0, 0.1);
+	background: rgba(0, 0, 0, 0.02);
+	text-decoration: none;
+	transition:
+		transform 140ms ease,
+		border-color 160ms ease,
+		background 160ms ease;
+}
+
+.related-post:hover,
+.related-post:focus-visible {
+	transform: translateY(-2px);
+	border-color: var(--accent);
+	background: rgba(45, 108, 255, 0.05);
+}
+
+.related-post h3,
+.related-post p {
+	margin: 0;
+}
+
+.related-post p {
+	color: var(--ink-dim);
+	line-height: 1.6;
 }
 
 .footer {

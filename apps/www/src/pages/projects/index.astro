@@ -11,19 +11,53 @@ for (const project of projects) {
 	for (const stackItem of project.stack) stackSet.add(stackItem);
 }
 const stacks = Array.from(stackSet).sort((a, b) => a.localeCompare(b));
+const pageUrl = Astro.site ? new URL("/projects/", Astro.site).toString() : "/projects/";
+const jsonLd = JSON.stringify(
+	[
+		{
+			"@context": "https://schema.org",
+			"@type": "CollectionPage",
+			name: "02Labs Projects",
+			description:
+				"Systems, data, security, embedded, and tooling projects from the 02Labs portfolio.",
+			url: pageUrl,
+			isPartOf: {
+				"@type": "WebSite",
+				name: "02Labs",
+				url: Astro.site ? new URL("/", Astro.site).toString() : "/",
+			},
+		},
+		{
+			"@context": "https://schema.org",
+			"@type": "ItemList",
+			name: "02Labs Project Directory",
+			itemListElement: projects.map((project, index) => ({
+				"@type": "ListItem",
+				position: index + 1,
+				name: project.title,
+				url: Astro.site
+					? new URL(`/projects/${project.slug}/`, Astro.site).toString()
+					: `/projects/${project.slug}/`,
+			})),
+		},
+	],
+	null,
+	0
+);
 ---
 
 <BaseLayout
-	title="Projects"
-	description="All projects in the 02Labs portfolio, sourced from static JSON at build time."
+	title="Systems, Data, Security, and Embedded Projects"
+	description="Browse all 02Labs projects across systems engineering, data work, security experiments, embedded systems, and developer tooling."
 	ogType="website"
+	jsonLd={jsonLd}
 >
 	<Navbar forceScrolled />
 
 	<main id="main" class="projects-page">
 		<div class="projects-shell">
 			<div class="section-head">
-				<h2>Projects</h2>
+				<h1>Projects</h1>
 				<p>
 					<a class="btn" href="/#featured">Featured</a>
 				</p>
@@ -66,7 +100,7 @@ const stacks = Array.from(stackSet).sort((a, b) => a.localeCompare(b));
 						data-stack={project.stack.join("|").toLowerCase()}
 						data-featured={project.featured ? "true" : "false"}
 					>
-						<ProjectCard project={project} detailsHref={`/projects/${project.slug}`} />
+						<ProjectCard project={project} detailsHref={`/projects/${project.slug}/`} />
 					</div>
 				))}
 			</div>

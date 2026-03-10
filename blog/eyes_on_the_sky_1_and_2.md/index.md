@@ -2,6 +2,7 @@
 title: "Batman's kitchen CTF 2026 OSINT Writeup — Eye on the Sky / Eye on the Sky 2"
 description: "Goal: Determine the aircraft’s marketed flight number (operating airline) and the baggage carousel number."
 pubDate: 2026-02-22
+tags: ["ctf", "osint", "aviation", "writeup"]
 featuredImage: "2.png"
 ---
 
