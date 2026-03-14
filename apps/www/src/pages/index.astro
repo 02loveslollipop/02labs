@@ -54,13 +54,18 @@ const jsonLd = JSON.stringify(
 			"@type": "Person",
 			name: "02loveslollipop",
 			jobTitle: "Computer and systems engineer & Data science engineer",
-			url: "https://02labs.me/",
+			url: "https://02loveslollipop.uk/",
+			sameAs: [
+				"https://github.com/02loveslollipop",
+				"https://ctftime.org/team/408704",
+			],
 		},
 		{
 			"@context": "https://schema.org",
 			"@type": "WebSite",
-			name: "02Labs",
-			url: "https://02labs.me/",
+			name: "02loveslollipop / 02Labs",
+			alternateName: ["02loveslollipop", "02Labs"],
+			url: "https://02loveslollipop.uk/",
 		},
 	],
 	null,
@@ -126,10 +131,10 @@ try {
 ---
 
 <BaseLayout
-	title="Systems, Data, Projects, and CTF Writeups"
-	description="02Labs is the portfolio of 02loveslollipop, featuring systems engineering projects, data work, security experiments, and technical writeups."
+	title="02loveslollipop | Systems, Data, Projects, and CTF Writeups"
+	description="02loveslollipop's portfolio and lab, featuring systems engineering projects, data work, security experiments, and technical writeups from 02Labs."
 	ogType="website"
-	canonical="https://02labs.me/"
+	canonical="https://02loveslollipop.uk/"
 	jsonLd={jsonLd}
 >
 	<Navbar />
@@ -141,12 +146,12 @@ try {
 		<section class="snap-section" id="intro" data-snap-section>
 			<div class="panel intro">
 				<div class="intro-grid">
-					<div>
-						<h2>Introduction</h2>
-						<p>
-							Hi, I'm 02loveslollipop. I love technology, engineering, and building things in general. Even tough I'm a Computer and systems engineer &amp; Data science engineer, I have a wide range of interests and like to explore different areas. This is a personal portfolio site where I share projects, writeups, and other content related to my interests and work.
-						</p>
-					</div>
+						<div>
+							<h2>Introduction</h2>
+							<p>
+								Hi, I'm 02loveslollipop. I love technology, engineering, and building things in general. Even tough I'm a Computer and systems engineer &amp; Data science engineer, I have a wide range of interests and like to explore different areas. 02Labs is my personal portfolio site, where I share projects, writeups, and other content related to my interests and work.
+							</p>
+						</div>
 					<div class="intro-divider" aria-hidden="true"></div>
 					<div>
 						<h2>Focus (Or lack thereof)</h2>
@@ -308,7 +313,7 @@ try {
 	<footer class="site-footer" aria-label="Footer">
 		<div class="site-footer__inner">
 			<p class="site-footer__copy">
-				© {new Date().getFullYear()} 02Labs. Built with Astro.
+				© {new Date().getFullYear()} 02loveslollipop / 02Labs. Built with Astro.
 			</p>
 			<p class="site-footer__meta">
 				<a href="/#top">Back to top</a>

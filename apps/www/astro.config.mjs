@@ -5,9 +5,13 @@ import cloudflare from '@astrojs/cloudflare';
 
 // https://astro.build/config
 export default defineConfig({
-	site: 'https://02labs.me',
+	site: 'https://02loveslollipop.uk',
 	output: 'static',
-	adapter: cloudflare({ platformProxy: { enabled: true }, imageService: "compile" }),
+	adapter: cloudflare({
+		platformProxy: { enabled: true },
+		imageService: "compile",
+		workerEntryPoint: { path: "./src/worker.ts" },
+	}),
 	trailingSlash: 'always',
 	integrations: [sitemap()],
 });

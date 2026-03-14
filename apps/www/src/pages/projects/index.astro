@@ -17,20 +17,20 @@ const jsonLd = JSON.stringify(
 		{
 			"@context": "https://schema.org",
 			"@type": "CollectionPage",
-			name: "02Labs Projects",
+			name: "02loveslollipop Projects",
 			description:
-				"Systems, data, security, embedded, and tooling projects from the 02Labs portfolio.",
+				"Systems, data, security, embedded, and tooling projects from the 02loveslollipop / 02Labs portfolio.",
 			url: pageUrl,
 			isPartOf: {
 				"@type": "WebSite",
-				name: "02Labs",
+				name: "02loveslollipop / 02Labs",
 				url: Astro.site ? new URL("/", Astro.site).toString() : "/",
 			},
 		},
 		{
 			"@context": "https://schema.org",
 			"@type": "ItemList",
-			name: "02Labs Project Directory",
+			name: "02loveslollipop Project Directory",
 			itemListElement: projects.map((project, index) => ({
 				"@type": "ListItem",
 				position: index + 1,
@@ -48,7 +48,7 @@ const jsonLd = JSON.stringify(
 
 <BaseLayout
 	title="Systems, Data, Security, and Embedded Projects"
-	description="Browse all 02Labs projects across systems engineering, data work, security experiments, embedded systems, and developer tooling."
+	description="Browse all projects from 02loveslollipop across systems engineering, data work, security experiments, embedded systems, and developer tooling."
 	ogType="website"
 	jsonLd={jsonLd}
 >

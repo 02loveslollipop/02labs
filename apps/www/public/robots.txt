@@ -1,5 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://02labs.me/sitemap-index.xml
-
+Sitemap: https://02loveslollipop.uk/sitemap-index.xml

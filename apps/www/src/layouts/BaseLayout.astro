@@ -10,9 +10,10 @@ export interface Props {
 	canonical?: string;
 }
 
+const siteBrand = "02loveslollipop / 02Labs";
 const {
-	title = "02Labs",
-	description = "02Labs portfolio: projects, writing, and experiments in systems and data.",
+	title = siteBrand,
+	description = "02loveslollipop's portfolio: projects, writing, and experiments in systems, data, and security.",
 	ogType = "website",
 	jsonLd,
 	canonical,
@@ -20,7 +21,7 @@ const {
 
 const site = Astro.site;
 const canonicalUrl = canonical ?? (site ? new URL(Astro.url.pathname, site).toString() : Astro.url.toString());
-const fullTitle = title === "02Labs" ? title : `${title} | 02Labs`;
+const fullTitle = title === siteBrand ? title : `${title} | ${siteBrand}`;
 ---
 
 <html lang="en">
@@ -36,7 +37,7 @@ const fullTitle = title === "02Labs" ? title : `${title} | 02Labs`;
 		<meta name="robots" content="index,follow" />
 		<meta name="theme-color" content="#0b0b10" />
 
-		<meta property="og:site_name" content="02Labs" />
+		<meta property="og:site_name" content={siteBrand} />
 		<meta property="og:title" content={fullTitle} />
 		<meta property="og:description" content={description} />
 		<meta property="og:type" content={ogType} />
