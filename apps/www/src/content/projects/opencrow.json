@@ -1,0 +1,28 @@
+{
+  "slug": "opencrow",
+  "title": "OpenCROW",
+  "summary": "Offensive-workflow workstation bootstrap for Codex agents with a dedicated Conda environment and domain-specific tooling.",
+  "description": "OpenCROW is an offensive-workflow workstation bootstrap for Codex agents that provisions a dedicated Conda environment, installs native and Python tooling for pwn, reversing, cryptography, and protocol analysis, and syncs vendored skills into ~/.codex/skills for tighter, domain-specific agent routing. It is designed to reduce setup friction during CTFs and security research by giving both the user and the agent a reproducible, modular, ready-to-use environment.",
+  "featured": true,
+  "order": 0,
+  "stack": [
+    "Bash",
+    "Python",
+    "Codex Skills",
+    "Agents",
+    "Cybersecurity"
+  ],
+  "highlights": [
+    "Modular toolbox design with separated crypto, pwn, reversing, network, and async workflow skills",
+    "Bootstrap installer for Conda-based CTF environments on Ubuntu and Debian systems",
+    "Integrated native tooling for exploitation, debugging, symbolic execution, disassembly, and analysis",
+    "Vendored Codex skills for persistent SSH, TCP, SageMath, and Minecraft-based challenge workflows"
+  ],
+  "links": {
+    "repo": "https://github.com/02loveslollipop/ctf-toolkit-bootstrap",
+    "detailsLabel": "View details"
+  },
+  "card": {
+    "badge": "Featured"
+  }
+}
