@@ -389,7 +389,9 @@ try {
 			}
 		}
 
-		// Kick off the first client refresh after 10 minutes, then repeat.
+		// Refresh once on load so visitors do not stay on the baked fallback,
+		// then keep the data warm with periodic polling.
+		void poll();
 		const id = setInterval(poll, POLL_MS);
 		// Clean up if the page is torn down (e.g. SPA navigation).
 		document.addEventListener("astro:before-swap", () => clearInterval(id), { once: true });
