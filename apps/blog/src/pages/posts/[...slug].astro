@@ -3,8 +3,10 @@ import PostLayout from "../../layouts/PostLayout.astro";
 import { getCollection } from "astro:content";
 import {
 	BLOG_AUTHOR,
+	BLOG_LOCALE,
 	BLOG_NAME,
 	BLOG_PUBLISHER,
+	countMarkdownWords,
 	getPostFirstImageSrc,
 	getPostSlug,
 	getRelatedPosts,
@@ -40,6 +42,7 @@ const imageUrl = (() => {
 
 const url = resolveSiteUrl(`/posts/${slug}/`, Astro.site);
 const blogUrl = resolveSiteUrl("/", Astro.site);
+const wordCount = countMarkdownWords(entry.body);
 const breadcrumbJsonLd = {
 	"@context": "https://schema.org",
 	"@type": "BreadcrumbList",
@@ -65,11 +68,13 @@ const articleJsonLd = {
 	description: descriptionPlain,
 	datePublished: entry.data.pubDate.toISOString(),
 	dateModified: (entry.data.updatedDate ?? entry.data.pubDate).toISOString(),
+	inLanguage: BLOG_LOCALE,
 	mainEntityOfPage: {
 		"@type": "WebPage",
 		"@id": url,
 	},
 	...(imageUrl ? { image: imageUrl } : {}),
+	...(imageUrl ? { thumbnailUrl: imageUrl } : {}),
 	author: {
 		"@type": "Person",
 		name: BLOG_AUTHOR.name,
@@ -86,6 +91,8 @@ const articleJsonLd = {
 		},
 	},
 	keywords: entry.data.tags.join(", "),
+	articleSection: entry.data.tags[0],
+	wordCount,
 	isPartOf: {
 		"@type": "Blog",
 		name: BLOG_NAME,
@@ -103,7 +110,7 @@ const jsonLd = JSON.stringify([articleJsonLd, breadcrumbJsonLd], null, 0);
 	updatedDate={entry.data.updatedDate}
 	tags={entry.data.tags}
 	ogImage={imageUrl}
-	ogImageAlt={`${titlePlain} featured image`}
+	ogImageAlt={imageUrl ? `${titlePlain} featured image` : undefined}
 	jsonLd={jsonLd}
 	relatedPosts={relatedPosts}
 >

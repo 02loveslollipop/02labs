@@ -1,0 +1,239 @@
+---
+export const prerender = true;
+
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Navbar from "../../components/Navbar.astro";
+import {
+	BLOG_ROOT,
+	fetchLatestBlogPosts,
+	featuredBlogPosts,
+	majorBlogTags,
+} from "../../lib/blog";
+
+const latestPosts = await fetchLatestBlogPosts(6);
+const itemListEntries = [
+	...featuredBlogPosts.map((post) => ({
+		name: post.title,
+		url: post.href,
+	})),
+	...latestPosts
+		.filter((post) => !featuredBlogPosts.some((featured) => featured.href === post.link))
+		.map((post) => ({
+			name: post.title,
+			url: post.link,
+		})),
+];
+
+const pageUrl = Astro.site ? new URL("/blog/", Astro.site).toString() : "/blog/";
+const jsonLd = JSON.stringify(
+	[
+		{
+			"@context": "https://schema.org",
+			"@type": "CollectionPage",
+			name: "02loveslollipop Blog Hub",
+			description:
+				"Main-site discovery hub for CTF writeups, OSINT notes, crypto solves, and technical deep dives published on the 02loveslollipop blog.",
+			url: pageUrl,
+			isPartOf: {
+				"@type": "WebSite",
+				name: "02loveslollipop / 02Labs",
+				url: Astro.site ? new URL("/", Astro.site).toString() : "/",
+			},
+		},
+		{
+			"@context": "https://schema.org",
+			"@type": "ItemList",
+			name: "Featured and recent blog posts",
+			itemListElement: itemListEntries.map((item, index) => ({
+				"@type": "ListItem",
+				position: index + 1,
+				name: item.name,
+				url: item.url,
+			})),
+		},
+	],
+	null,
+	0
+);
+---
+
+<BaseLayout
+	title="Blog Hub: CTF Writeups, OSINT Notes, and Crypto Solves"
+	description="Discover the 02loveslollipop blog from the main site, with curated evergreen writeups, major topic hubs, and the latest posts."
+	ogType="website"
+	canonical="https://02loveslollipop.uk/blog/"
+	jsonLd={jsonLd}
+>
+	<Navbar forceScrolled />
+
+	<main id="main" class="blog-hub-page">
+		<div class="blog-hub-shell panel">
+			<section class="blog-hub-hero">
+				<p class="blog-hub-eyebrow">02loveslollipop / 02Labs</p>
+				<h1>Blog hub</h1>
+				<p class="blog-hub-copy">
+					The writeups live on <strong>blog.02loveslollipop.uk</strong>, but this page
+					acts as the main-site index for the posts, topic archives, and the latest
+					technical notes.
+				</p>
+				<div class="btn-row">
+					<a class="btn" href={BLOG_ROOT}>Open the blog home</a>
+				</div>
+			</section>
+
+			<section class="blog-hub-section" aria-labelledby="blog-hub-featured">
+				<div class="section-head">
+					<div>
+						<h2 id="blog-hub-featured">Evergreen writeups</h2>
+						<p>Cornerstone posts that represent the current shape of the blog.</p>
+					</div>
+				</div>
+				<div class="blog-hub-grid" aria-label="Featured blog posts">
+					{featuredBlogPosts.map((post) => (
+						<article class="blog-hub-card">
+							<h3><a href={post.href}>{post.title}</a></h3>
+							<p>{post.description}</p>
+						</article>
+					))}
+				</div>
+			</section>
+
+			<section class="blog-hub-section" aria-labelledby="blog-hub-topics">
+				<div class="section-head">
+					<div>
+						<h2 id="blog-hub-topics">Major topics</h2>
+						<p>Jump straight into the most important tag archives.</p>
+					</div>
+				</div>
+				<div class="blog-hub-grid" aria-label="Major blog tags">
+					{majorBlogTags.map((tag) => (
+						<article class="blog-hub-card">
+							<h3><a href={tag.href}>{tag.label}</a></h3>
+							<p>{tag.description}</p>
+						</article>
+					))}
+				</div>
+			</section>
+
+			<section class="blog-hub-section" aria-labelledby="blog-hub-latest">
+				<div class="section-head">
+					<div>
+						<h2 id="blog-hub-latest">Latest posts</h2>
+						<p>Recent entries pulled from the live blog RSS feed when available.</p>
+					</div>
+				</div>
+				{latestPosts.length > 0 ? (
+					<div class="blog-hub-list" aria-label="Latest blog posts">
+						{latestPosts.map((post) => (
+							<article class="blog-hub-list-item">
+								<div class="blog-hub-list-item__meta">
+									{post.pubDate
+										? new Date(post.pubDate).toLocaleDateString("en-US", {
+												year: "numeric",
+												month: "short",
+												day: "numeric",
+												timeZone: "UTC",
+											})
+										: "Post"}
+								</div>
+								<h3><a href={post.link}>{post.title}</a></h3>
+								<p>{post.description}</p>
+							</article>
+						))}
+					</div>
+				) : (
+					<div class="cta">
+						<p>The blog feed was unavailable during build, but the curated index above remains fully crawlable.</p>
+						<p><a class="btn" href={BLOG_ROOT}>Open the blog home</a></p>
+					</div>
+				)}
+			</section>
+		</div>
+	</main>
+</BaseLayout>
+
+<style>
+	.blog-hub-page {
+		min-height: 100dvh;
+		padding: calc(var(--nav-h, 4rem) + 2rem) var(--pad, 1.5rem) 4rem;
+		display: grid;
+		place-items: start center;
+	}
+
+	.blog-hub-shell {
+		height: auto !important;
+		width: min(1080px, calc(100vw - (var(--pad, 1.5rem) * 2)));
+		max-width: 1080px;
+		display: grid;
+		gap: 2.5rem;
+	}
+
+	.blog-hub-hero {
+		display: grid;
+		gap: 1rem;
+	}
+
+	.blog-hub-eyebrow {
+		margin: 0;
+		font-size: 0.85rem;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--color-muted, #b9b9c7);
+	}
+
+	.blog-hub-copy {
+		max-width: 62ch;
+	}
+
+	.blog-hub-section {
+		display: grid;
+		gap: 1.25rem;
+	}
+
+	.blog-hub-grid {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 1rem;
+	}
+
+	.blog-hub-card,
+	.blog-hub-list-item {
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		border-radius: 1rem;
+		padding: 1rem 1.1rem;
+		background: rgba(255, 255, 255, 0.03);
+	}
+
+	.blog-hub-card h3,
+	.blog-hub-list-item h3 {
+		margin: 0 0 0.5rem;
+	}
+
+	.blog-hub-card p,
+	.blog-hub-list-item p {
+		margin: 0;
+		color: var(--color-muted, #b9b9c7);
+	}
+
+	.blog-hub-card a,
+	.blog-hub-list-item a {
+		color: inherit;
+	}
+
+	.blog-hub-list {
+		display: grid;
+		gap: 1rem;
+	}
+
+	.blog-hub-list-item__meta {
+		margin-bottom: 0.65rem;
+		font-size: 0.85rem;
+		color: var(--color-muted, #b9b9c7);
+	}
+
+	@media (max-width: 720px) {
+		.blog-hub-grid {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

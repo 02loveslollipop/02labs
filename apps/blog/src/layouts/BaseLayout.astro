@@ -1,6 +1,6 @@
 ---
 import Background from "../components/Background.astro";
-import { BLOG_DESCRIPTION, BLOG_NAME } from "../lib/posts";
+import { BLOG_DESCRIPTION, BLOG_LOCALE, BLOG_NAME } from "../lib/posts";
 import "../styles/global.css";
 import "katex/dist/katex.min.css";
 
@@ -12,6 +12,13 @@ export interface Props {
 	ogImageAlt?: string;
 	twitterCard?: "summary" | "summary_large_image";
 	jsonLd?: string;
+	authorName?: string;
+	publishedTime?: string;
+	modifiedTime?: string;
+	articleTags?: string[];
+	ogLocale?: string;
+	twitterSite?: string;
+	twitterCreator?: string;
 }
 
 const {
@@ -22,6 +29,13 @@ const {
 	ogImageAlt,
 	twitterCard,
 	jsonLd,
+	authorName,
+	publishedTime,
+	modifiedTime,
+	articleTags = [],
+	ogLocale = BLOG_LOCALE,
+	twitterSite,
+	twitterCreator,
 } = Astro.props;
 
 const site = Astro.site;
@@ -38,6 +52,7 @@ const resolvedTwitterCard = twitterCard ?? (ogImage ? "summary_large_image" : "s
 
 		<title>{fullTitle}</title>
 		<meta name="description" content={description} />
+		{authorName ? <meta name="author" content={authorName} /> : null}
 		<link rel="canonical" href={canonicalUrl} />
 
 		<meta name="robots" content="index,follow" />
@@ -48,12 +63,19 @@ const resolvedTwitterCard = twitterCard ?? (ogImage ? "summary_large_image" : "s
 		<meta property="og:description" content={description} />
 		<meta property="og:type" content={ogType} />
 		<meta property="og:url" content={canonicalUrl} />
+		<meta property="og:locale" content={ogLocale} />
 		{ogImage ? <meta property="og:image" content={ogImage} /> : null}
 		{ogImageAlt ? <meta property="og:image:alt" content={ogImageAlt} /> : null}
+		{publishedTime ? <meta property="article:published_time" content={publishedTime} /> : null}
+		{modifiedTime ? <meta property="article:modified_time" content={modifiedTime} /> : null}
+		{authorName ? <meta property="article:author" content={authorName} /> : null}
+		{articleTags.map((tag) => <meta property="article:tag" content={tag} />)}
 
 		<meta name="twitter:card" content={resolvedTwitterCard} />
 		<meta name="twitter:title" content={fullTitle} />
 		<meta name="twitter:description" content={description} />
+		{twitterSite ? <meta name="twitter:site" content={twitterSite} /> : null}
+		{twitterCreator ? <meta name="twitter:creator" content={twitterCreator} /> : null}
 		{ogImage ? <meta name="twitter:image" content={ogImage} /> : null}
 		<link rel="alternate" type="application/rss+xml" title={`${BLOG_NAME} RSS`} href="/rss.xml" />
 

@@ -3,7 +3,7 @@
 This repo contains two static Astro apps:
 
 - `apps/www` for `02labs.me`
-- `apps/blog` for `blog.02labs.me`
+- `apps/blog` for `blog.02loveslollipop.uk`
 
 Both apps now include a `wrangler.jsonc` configured for assets-only deploys:
 

@@ -5,19 +5,19 @@ pubDate: 2026-03-24
 tags: ["AlpacaHack", "Crypto", "Writeup", "XOR", "One-Time Pad"]
 ---
 
-Daily AlpacaHack's - Bloom presents us with a One-Time Pad encryption scheme, where every byte of the plaintext is XORed with a cryptographically secure random bit (Generated from os.urandom using the secrets Python module), this made any frequency or PRNG state recovery attacks unfeasible.
+Daily AlpacaHack - Bloom presents us with a One-Time Pad encryption scheme where every byte of the plaintext is XORed with a cryptographically secure random byte (generated from os.urandom using the secrets Python module). This makes any frequency or PRNG state recovery attacks unfeasible.
 
-In the end the solution path came down from the realization that the random values were not defined in the range $0 \ldots n$ but in the range $1 \ldots n$, so the key could never be $0$, also we need to remember the property of XOR for a key $Key = 0$
+In the end, the solution path came from the realization that the random values were not defined in the range $0 \ldots n$ but in the range $1 \ldots n$, so the key could never be $0$. We also need to remember the property of XOR for a key $Key = 0$
 
 $$
 Plaintext \oplus 0 = Plaintext
 $$
 
-This means we know that the only not possible value for the cipher is the plaintext itself.
+This means we know that the only impossible value for the cipher is the plaintext itself.
 
 # Recover
 
-Let's suppose a $4$-bit $2$-block reduced system, the following would be a valid encryption:
+Let's suppose a $4$-bit $2$-block reduced system. The following would be a valid encryption:
 
 $$
 \begin{aligned}
@@ -40,7 +40,7 @@ $$
 \end{aligned}
 $$
 
-So for example for the plaintext 1001 we can collect all the 15 states:
+So, for example, for the plaintext 1001, we can collect all 15 states:
 
 $$
 \{0000, 0001, 0010, 0011, 0100, 0101, 0110, 0111, 1000, 1010, 1011, 1100, 1101, 1110, 1111\}
@@ -54,9 +54,9 @@ Therefore, if we sample the 15 unique states, then we can deduce the plaintext. 
 
 To measure the feasibility of this attack, we can model the recovery of each byte as a coupon collector problem.
 
-For each byte, we must sample $255$ unique states (all possible ciphertext values except the plaintext byte) to deduce the plaintext byte. And this condition must be satisfied for all bytes in the plaintext.
+For each byte, we must sample $255$ unique states (all possible ciphertext values except the plaintext byte) to deduce the plaintext byte. This condition must be satisfied for all bytes in the plaintext.
 
-For a single byte position we can consider the problem, as the probability of collecting $T_1$ unique states after $n$ rounds, which can be expressed as:
+For a single byte position, we can consider the probability of collecting $T_1$ unique states after $n$ rounds, which can be expressed as:
 
 $$
 \Pr(T_1 \le n) \approx e^{-e^{-(n/255-\ln 255)}}
@@ -105,7 +105,7 @@ def get_flag(ciphers: np.ndarray, sample_count: int) -> bytes:
 
 Another helper function `get_flag(ciphers: np.ndarray, sample_count: int) -> bytes` is defined to recover the plaintext once the stopping condition is met. It identifies the missing value for each byte position, which corresponds to the plaintext byte.
 
-Finally the main logic is defined in `solve_remote()` function, which first inits the connection using `pwntools`, then continuously retrieves ciphertexts until the stopping condition is met, and then recovers and prints the flag.
+Finally, the main logic is defined in `solve_remote()` function, which first initializes the connection using `pwntools`, then continuously retrieves ciphertexts until the stopping condition is met, and then recovers and prints the flag.
 
 ```python
 def solve_remote():
@@ -122,7 +122,7 @@ def solve_remote():
         try:
             cipher_bytes = extract_ciphertext_from_line(line)
         except ValueError:
-            # If the text is splitted between 2 lines
+            # If the text is split between 2 lines
             extra = r.recvline(timeout=2)
             if not extra:
                 raise

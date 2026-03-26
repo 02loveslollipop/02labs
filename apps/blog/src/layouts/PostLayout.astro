@@ -1,7 +1,10 @@
 ---
 import BaseLayout from "./BaseLayout.astro";
 import {
+	BLOG_AUTHOR,
 	BLOG_NAME,
+	BLOG_TWITTER_HANDLE,
+	formatDateIso,
 	renderInlineMarkdown,
 	slugifyTag,
 	stripMarkdownInline,
@@ -21,8 +24,8 @@ export interface Props {
 }
 
 const { title, description, pubDate, updatedDate, tags, ogImage, ogImageAlt, jsonLd, relatedPosts } = Astro.props;
-const published = pubDate.toISOString().slice(0, 10);
-const updated = updatedDate ? updatedDate.toISOString().slice(0, 10) : null;
+const published = formatDateIso(pubDate);
+const updated = updatedDate ? formatDateIso(updatedDate) : null;
 const titlePlain = stripMarkdownInline(title);
 const descriptionPlain = stripMarkdownInline(description);
 const titleHtml = renderInlineMarkdown(title);
@@ -36,6 +39,12 @@ const descriptionHtml = renderInlineMarkdown(description);
 	ogImage={ogImage}
 	ogImageAlt={ogImageAlt}
 	jsonLd={jsonLd}
+	authorName={BLOG_AUTHOR.name}
+	publishedTime={pubDate.toISOString()}
+	modifiedTime={(updatedDate ?? pubDate).toISOString()}
+	articleTags={tags}
+	twitterSite={BLOG_TWITTER_HANDLE}
+	twitterCreator={BLOG_TWITTER_HANDLE}
 >
 	<header class="header">
 		<div class="header__inner">
@@ -53,8 +62,14 @@ const descriptionHtml = renderInlineMarkdown(description);
 			<p class="lede" set:html={descriptionHtml}></p>
 
 			<div class="meta">
-				<span>Published {published}</span>
-				{updated ? <span> · Updated {updated}</span> : null}
+				<span>
+					Published <time datetime={pubDate.toISOString()}>{published}</time>
+				</span>
+				{updatedDate ? (
+					<span>
+						{" "}· Updated <time datetime={updatedDate.toISOString()}>{updated}</time>
+					</span>
+				) : null}
 			</div>
 			{Array.isArray(tags) && tags.length > 0 ? (
 				<div class="article-tags" aria-label="Tags">
@@ -78,7 +93,7 @@ const descriptionHtml = renderInlineMarkdown(description);
 								<h3>{post.title}</h3>
 								<p>{post.excerpt}</p>
 								<div class="meta">
-									<span>{post.pubDate.toISOString().slice(0, 10)}</span>
+									<time datetime={post.pubDate.toISOString()}>{formatDateIso(post.pubDate)}</time>
 								</div>
 							</a>
 						))}

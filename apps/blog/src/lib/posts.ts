@@ -3,6 +3,8 @@ import type { CollectionEntry } from "astro:content";
 export const BLOG_NAME = "02Labs Blog";
 export const BLOG_DESCRIPTION =
 	"CTF writeups, OSINT notes, crypto solves, and systems engineering deep dives.";
+export const BLOG_LOCALE = "en";
+export const BLOG_TWITTER_HANDLE = "@02loveslollipop";
 export const BLOG_AUTHOR = {
 	name: "02loveslollipop",
 	url: "https://02labs.me/",
@@ -72,6 +74,23 @@ export function stripMarkdownInline(line: string): string {
 		.replace(/[*_~]+/g, "")
 		.replace(/\s+/g, " ")
 		.trim();
+}
+
+export function countMarkdownWords(markdown: string): number {
+	const cleaned = String(markdown || "")
+		.replace(/```[\s\S]*?```/g, " ")
+		.replace(/`[^`]+`/g, " ")
+		.replace(/!\[[^\]]*]\([^)]+\)/g, " ")
+		.replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+		.replace(/[#>*_~|[\]()]/g, " ")
+		.replace(/\s+/g, " ")
+		.trim();
+	if (!cleaned) return 0;
+	return cleaned.split(" ").filter(Boolean).length;
+}
+
+export function formatDateIso(date: Date): string {
+	return date.toISOString().slice(0, 10);
 }
 
 export function renderInlineMarkdown(input: string): string {

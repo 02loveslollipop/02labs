@@ -9,6 +9,7 @@ import ProjectCard from "../components/ProjectCard.astro";
 import ProjectDetail from "../components/ProjectDetail.astro";
 import { getCollection } from "astro:content";
 import type { CTFTimeData } from "./api/ctftime.json";
+import { fetchLatestBlogPosts } from "../lib/blog";
 
 // ---------- Server-side KV read ----------
 const kv = Astro.locals?.runtime?.env?.CTFTIME_KV;
@@ -73,61 +74,7 @@ const jsonLd = JSON.stringify(
 );
 
 // ---------- Blog RSS fetch ----------
-interface BlogPost {
-	title: string;
-	description: string;
-	link: string;
-	pubDate: string;
-}
-
-function decodeHtmlEntities(input: string): string {
-	let output = String(input || "");
-	for (let i = 0; i < 2; i++) {
-		const next = output
-			.replaceAll("&amp;", "&")
-			.replaceAll("&apos;", "'")
-			.replaceAll("&#39;", "'")
-			.replaceAll("&quot;", '"')
-			.replaceAll("&lt;", "<")
-			.replaceAll("&gt;", ">");
-		if (next === output) break;
-		output = next;
-	}
-	return output;
-}
-
-function parseRssItems(xml: string): BlogPost[] {
-	const items: BlogPost[] = [];
-	const itemRe = /<item>([\s\S]*?)<\/item>/g;
-	let m: RegExpExecArray | null;
-	while ((m = itemRe.exec(xml)) !== null) {
-		const block = m[1];
-		const title = decodeHtmlEntities(
-			(block.match(/<title>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/title>/)?.[1] ?? "").trim()
-		);
-		const desc = decodeHtmlEntities(
-			(block.match(/<description>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/description>/)?.[1] ?? "").trim()
-		);
-		const link  = (block.match(/<link>([\s\S]*?)<\/link>/)?.[1] ?? "").trim();
-		const date  = (block.match(/<pubDate>([\s\S]*?)<\/pubDate>/)?.[1] ?? "").trim();
-		if (title && link) items.push({ title, description: desc, link, pubDate: date });
-	}
-	return items;
-}
-
-let blogPosts: BlogPost[] = [];
-try {
-	const rssRes = await fetch("https://blog.02labs.me/rss.xml", {
-		signal: AbortSignal.timeout(3000),
-		headers: { Accept: "application/rss+xml, application/xml, text/xml" },
-	});
-	if (rssRes.ok) {
-		const xml = await rssRes.text();
-		blogPosts = parseRssItems(xml).slice(0, 4);
-	}
-} catch {
-	// fallback — static CTA shown when RSS is unreachable
-}
+const blogPosts = await fetchLatestBlogPosts(4);
 ---
 
 <BaseLayout
@@ -235,7 +182,7 @@ try {
 							<h2>Blog</h2>
 							<p>Writeups, notes, and long-form breakdowns.</p>
 						</div>
-						<a class="btn" href="https://blog.02labs.me/" target="_blank" rel="noopener noreferrer">All posts</a>
+						<a class="btn" href="/blog/">All posts</a>
 					</div>
 					{blogPosts.length > 0 ? (
 						<div class="blog-row" aria-label="Latest posts">
@@ -263,8 +210,8 @@ try {
 						</div>
 					) : (
 						<div class="cta">
-							<p>The blog is deployed separately at <strong>blog.02labs.me</strong>.</p>
-							<p><a class="btn" href="https://blog.02labs.me/" target="_blank" rel="noopener noreferrer">Open the blog</a></p>
+							<p>The blog is deployed separately at <strong>blog.02loveslollipop.uk</strong>.</p>
+							<p><a class="btn" href="/blog/">Open the blog</a></p>
 						</div>
 					)}
 				</div>

@@ -58,10 +58,10 @@ draft: true
 
 ## Routes
 
-- Blog home: `https://blog.02labs.me/`
-- Post pages: `https://blog.02labs.me/posts/<slug>/`
-- Tag pages: `https://blog.02labs.me/tags/<tag>/`
-- RSS: `https://blog.02labs.me/rss.xml`
+- Blog home: `https://blog.02loveslollipop.uk/`
+- Post pages: `https://blog.02loveslollipop.uk/posts/<slug>/`
+- Tag pages: `https://blog.02loveslollipop.uk/tags/<tag>/`
+- RSS: `https://blog.02loveslollipop.uk/rss.xml`
 
 ## Images (Static)
 

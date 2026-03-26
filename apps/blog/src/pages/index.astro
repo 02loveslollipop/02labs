@@ -4,8 +4,10 @@ import { getCollection } from "astro:content";
 import {
 	BLOG_AUTHOR,
 	BLOG_DESCRIPTION,
+	BLOG_LOCALE,
 	BLOG_NAME,
 	BLOG_PUBLISHER,
+	formatDateIso,
 	getPostExcerpt,
 	getPostFirstImageSrc,
 	getPostSlug,
@@ -34,10 +36,19 @@ const jsonLd = JSON.stringify(
 	[
 		{
 			"@context": "https://schema.org",
+			"@type": "WebSite",
+			name: BLOG_NAME,
+			description: BLOG_DESCRIPTION,
+			url: blogUrl,
+			inLanguage: BLOG_LOCALE,
+		},
+		{
+			"@context": "https://schema.org",
 			"@type": "Blog",
 			name: BLOG_NAME,
 			description: BLOG_DESCRIPTION,
 			url: blogUrl,
+			inLanguage: BLOG_LOCALE,
 			author: {
 				"@type": "Person",
 				name: BLOG_AUTHOR.name,
@@ -109,14 +120,14 @@ const jsonLd = JSON.stringify(
 								decoding="async"
 							/>
 						) : null}
-						<div class="post-item__body">
-							<h2>{title}</h2>
-							<p class="post-item__excerpt">{excerpt}</p>
-							<div class="meta">
-								<span>{post.data.pubDate.toISOString().slice(0, 10)}</span>
+							<div class="post-item__body">
+								<h2>{title}</h2>
+								<p class="post-item__excerpt">{excerpt}</p>
+								<div class="meta">
+									<time datetime={post.data.pubDate.toISOString()}>{formatDateIso(post.data.pubDate)}</time>
+								</div>
 							</div>
-						</div>
-					</a>
+						</a>
 				))}
 			</div>
 		</section>

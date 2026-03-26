@@ -4,6 +4,7 @@ import { getCollection } from "astro:content";
 import {
 	BLOG_DESCRIPTION,
 	BLOG_NAME,
+	formatDateIso,
 	getPostExcerpt,
 	getPostFirstImageSrc,
 	getPostSlug,
@@ -116,7 +117,7 @@ const jsonLd = JSON.stringify(
 							<h2>{postTitle}</h2>
 							<p class="post-item__excerpt">{excerpt}</p>
 							<div class="meta">
-								<span>{post.data.pubDate.toISOString().slice(0, 10)}</span>
+								<time datetime={post.data.pubDate.toISOString()}>{formatDateIso(post.data.pubDate)}</time>
 							</div>
 						</div>
 					</a>
