@@ -59,7 +59,7 @@ const jsonLd = JSON.stringify(
 
 <BaseLayout
 	title="Blog Hub: CTF Writeups, OSINT Notes, and Crypto Solves"
-	description="Discover the 02loveslollipop blog from the main site, with curated evergreen writeups, major topic hubs, and the latest posts."
+	description="Discover the 02loveslollipop blog from the main site, with featured writeups, the latest posts, and tag-based topic browsing."
 	ogType="website"
 	canonical="https://02loveslollipop.uk/blog/"
 	jsonLd={jsonLd}
@@ -84,8 +84,8 @@ const jsonLd = JSON.stringify(
 			<section class="blog-hub-section" aria-labelledby="blog-hub-featured">
 				<div class="section-head">
 					<div>
-						<h2 id="blog-hub-featured">Evergreen writeups</h2>
-						<p>Cornerstone posts that represent the current shape of the blog.</p>
+						<h2 id="blog-hub-featured">Featured writeups</h2>
+						<p>A few standout posts that give a strong picture of the blog.</p>
 					</div>
 				</div>
 				<div class="blog-hub-grid" aria-label="Featured blog posts">
@@ -93,23 +93,6 @@ const jsonLd = JSON.stringify(
 						<article class="blog-hub-card">
 							<h3><a href={post.href}>{post.title}</a></h3>
 							<p>{post.description}</p>
-						</article>
-					))}
-				</div>
-			</section>
-
-			<section class="blog-hub-section" aria-labelledby="blog-hub-topics">
-				<div class="section-head">
-					<div>
-						<h2 id="blog-hub-topics">Major topics</h2>
-						<p>Jump straight into the most important tag archives.</p>
-					</div>
-				</div>
-				<div class="blog-hub-grid" aria-label="Major blog tags">
-					{majorBlogTags.map((tag) => (
-						<article class="blog-hub-card">
-							<h3><a href={tag.href}>{tag.label}</a></h3>
-							<p>{tag.description}</p>
 						</article>
 					))}
 				</div>
@@ -147,6 +130,23 @@ const jsonLd = JSON.stringify(
 						<p><a class="btn" href={BLOG_ROOT}>Open the blog home</a></p>
 					</div>
 				)}
+			</section>
+
+			<section class="blog-hub-section" aria-labelledby="blog-hub-tags">
+				<div class="section-head">
+					<div>
+						<h2 id="blog-hub-tags">Tags</h2>
+						<p>Browse the blog by the main topic archives.</p>
+					</div>
+				</div>
+				<div class="blog-hub-grid" aria-label="Blog tags">
+					{majorBlogTags.map((tag) => (
+						<article class="blog-hub-card">
+							<h3><a href={tag.href}>{tag.label}</a></h3>
+							<p>{tag.description}</p>
+						</article>
+					))}
+				</div>
 			</section>
 		</div>
 	</main>
