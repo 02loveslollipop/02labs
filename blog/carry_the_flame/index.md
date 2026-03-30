@@ -125,8 +125,4 @@ In the end, the challenge was less about finding a deep algebraic shortcut and m
 
 This challenge shows that at times the best solution is not the most elegant one, but the one that is more practical and efficient given the constraints of the problem. In this case, a lot of time was spent trying to find a cryptoanalytic shortcut, but in the end, the "simplest" solution of brute forcing the key on a GPU was the one that worked.
 
-#### Final notes
-
-This challenge was a great example of how sometimes the easiest solution is not the most elegant one, and how engineering and practical considerations can often outweigh theoretical elegance in solving real-world problems. It also highlights the importance of being flexible and willing to pivot strategies when the initial approach does not yield results. I would call this an excellent example of the `Occam's Razor` principle applied to CTF challenges — "the simplest solution is often the best one." In this case, what made the difference was understanding the practical constraints of the problem and finding that the task could be efficiently parallelized on a GPU, which was the key to solving the challenge.
-
 If you want, you can check the final notebook implementation [here](https://colab.research.google.com/drive/1p37k6aoMVxSwyNfybo3TeTGHxQk6vbA6?usp=sharing)
