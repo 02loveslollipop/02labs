@@ -1,6 +1,6 @@
 ---
 title: "TAMUctf 2026 - Forensic writeup: Phantom2"
-description: "Could private forks on Github be not as private as we think?"
+description: "Could private forks on GitHub be not as private as we think?"
 pubDate: 2026-03-27
 tags: ["ctf", "git", "github", "forensics", "writeup"]
 ---
@@ -14,7 +14,7 @@ Just as in the previous challenge, any attempt to search for the flag in the com
 ## Footprint
 
 
-This time the clue came from a leak in the repository network metadata. The main signal was a mismatch between the fork count shown in the GitHub UI, the list of forks visible on the public forks page / network-members page, and the repository events feed.
+This time the clue came from a leak in the repository network metadata. The main signal was a mismatch between the fork count shown in the GitHub UI, the list of forks visible on the public forks page / `network/members` page, and the repository events feed.
 
 First we checked the public repository page and noted the fork counter. Then we enumerated the public forks from the forks page / network members page. Finally, we inspected the repository events feed for `ForkEvent` and `PushEvent` entries.
 
@@ -38,32 +38,30 @@ That is exactly what made `cobradev4/phantom2` interesting. It was not just "ano
 
 ## Recovery
 
-This opens an interesting path, as in GitHub forks are implemented as references to the same underlying git objects, so in the end all forks share a same "space" where commits and other objects are stored. So this allows us to access to a private fork's commits if we can find the SHA of the commit containing the flag, even if that commit is not visible in the public repository.
+This opens an interesting path. If GitHub resolves commit objects across the repository's fork network, then a commit pushed to a private fork might still be retrievable from the public repository's commit patch endpoint, provided we know a matching SHA prefix.
 
 The working hypothesis was:
 
 * The author pushed a commit with the flag into their private fork.
-* GitHub still stored that object in the shared cross-fork repository storage, even if the commit was not visible in the public repository.
+* GitHub still resolved that object through the fork network, even if the commit was not visible in the public repository.
 
-If this was the case, there was a recovery path: if we knew the SHA prefix of the commit containing the flag, we used the GitHub commit patch endpoint on the standard Github URL:
+If that hypothesis was correct, we could test it with GitHub's standard commit patch endpoint:
 
 ```bash
 https://github.com/tamuctf/phantom2/commit/<prefix>.patch
 ```
 
-This behaved as a prefix oracle: if the prefix matched a commit object in the repository, we got an `http:200` response with the patch. If it did not match, we got an `http:404` response. We also had to handle responses like `http 429` and `http:5XX` to prevent misclassifying possible matches as non-matches.
+This behaved as a prefix oracle: if the prefix matched a commit object in the repository, we got an `HTTP 200` response with the patch. If it did not match, we got an `HTTP 404` response. We also had to handle `HTTP 429` and `HTTP 5xx` responses to avoid misclassifying possible matches as non-matches.
 
 ## Feasibility
 
-The feasibility of this attack relies on the fact that GitHub stores all objects in shared storage across forks, even private ones. This means that if we can find the SHA prefix of the commit containing the flag, we can recover it using the Github patch/diff endpoint.
+The remaining question was whether that recovery path was practical.
 
-Then the question of whether this attack is feasible comes down to how easy it is to find the SHA prefix of the commit containing the flag.
-
-We can search prefixes of 4 hex characters, which means our search space is $16^4 = 65536$ possible prefixes. The important point is that we were not brute-forcing full commit hashes. We were enumerating a small short-prefix space against a route that GitHub was willing to resolve.
+Using 4 hex characters gives a search space of $16^4 = 65,536$ prefixes, which is small enough to enumerate in practice. The important point is that we were not brute-forcing full commit hashes. We were enumerating a small short-prefix space against a route that GitHub was willing to resolve.
 
 ## Solution
 
-The solution we executed was to brute-force search for the commit containing the flag. We used the GitHub commit patch endpoint on the standard Github URL, the solver iterated over the possible 4-hex prefixes and checked the responses to identify which prefixes corresponded to existing commits in the repository.
+The solution we executed was to brute-force search for the commit containing the flag. We used the GitHub commit patch endpoint on the standard GitHub URL, and the solver iterated over all 4-hex prefixes to identify which ones corresponded to existing commits in the repository.
 
 ```python
 from __future__ import annotations
@@ -136,7 +134,7 @@ if __name__ == "__main__":
 
 ```
 
-> Note: The use of `urllib` instead of `requests` was a deliberate choice as the solver only had to handle simple `HTTP GET` requests without any meaningful header/cookie management and the only responses of interest was the status code, which made `urllib` a lightweight and sufficient choice for this task.
+> Note: The use of `urllib` instead of `requests` was because the solver only needed simple GET requests and HTTP status codes.
 
 After iterating through the possible prefixes, we found the following commits:
 
@@ -145,7 +143,7 @@ After iterating through the possible prefixes, we found the following commits:
 * `d3ca`
 * `dd21`
 
-We knew `454b` resolved to the initial commit in the public repository, so we focused on the other three commits. After analyzing the patches, we found that the commit with prefix `d3ca` contained the flag in its patch, and we were able to recover it by accessing: [https://github.com/tamuctf/phantom2/commit/d3ca.patch](https://github.com/tamuctf/phantom2/commit/d3ca.patch)
+We knew `454b` resolved to the initial commit in the public repository, so we focused on the other three commits. After analyzing the patches, we found that the commit with prefix `d3ca` exposed the flag in its patch, and we were able to recover it by accessing: [https://github.com/tamuctf/phantom2/commit/d3ca.patch](https://github.com/tamuctf/phantom2/commit/d3ca.patch)
 
 The content of the patch was:
 
@@ -178,4 +176,4 @@ And with that, we were able to recover the flag: `gigem{57up1d_917hu8_3v3n7_4p1_
 
 ## Conclusion
 
-Both `Phantom1` and `Phantom2` present us with an important lesson about how Github handles forks and specifically private forks, even if a fork is private, the objects in it are still stored in the shared storage of GitHub, which means that if we can find the SHA prefix of a commit containing sensitive information, we can recover it using the GitHub API. This concept, technically defined as Cross Fork Object Reference (CFOR) was identified by [Truffle Security](https://trufflesecurity.com/) in  July 2024, if you want to learn more about it, check their blog post: [Anyone can Access Deleted and Private Repository Data on GitHub](https://trufflesecurity.com/blog/anyone-can-access-deleted-and-private-repo-data-github).
+Both `Phantom1` and `Phantom2` highlight an important lesson about how GitHub can expose hidden repository history. This challenge appears to rely on GitHub resolving commit objects across fork-related storage in a way that made hidden fork activity recoverable via short SHA prefixes. In this case, enumerating 4-character prefixes against the commit patch endpoint was enough to recover the flag-bearing commit. This concept, technically defined as Cross Fork Object Reference (CFOR), was identified by [Truffle Security](https://trufflesecurity.com/) in July 2024. If you want to learn more about it, check their blog post: [Anyone can Access Deleted and Private Repository Data on GitHub](https://trufflesecurity.com/blog/anyone-can-access-deleted-and-private-repo-data-github).
