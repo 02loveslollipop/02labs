@@ -3,27 +3,10 @@ title: "DiceCTF 2026 Crypto Writeup — Carry the Flame"
 description: "Goal: recover the 40-bit per-session key for the remote 1024-round SPN, submit it on the same connection, and obtain the flag."
 pubDate: 2026-03-08
 tags: ["ctf", "crypto", "gpu", "writeup"]
-featuredImage: "1.jpg"
+featuredImage: "figures/spn-structure.svg"
 ---
 
-## Challenge statement
-
-### `crypto/carry-the-flame`
-
-**Goal:** interact with the remote service, recover the 5-byte secret key used by the cipher, submit it through the `guess` path, and get the flag.
-
-**Flag format:** `dice{<flag>}`
-
----
-
-## Inputs
-
-* `crypto_carry-the-flame.tar.gz`
-* netcat connection to `carry-the-flame.chals.dicec.tf` on port `1337`
-
----
-
-## Challenge code and structure
+# Overview
 
 This challenge presents us with a 1024-round SPN (Rijndael S-box, fixed 40-bit permutation) with a 40-bit key. The key is sampled separately for each connection, so the final guess must be submitted on the same live connection used to collect ciphertexts.
 
@@ -36,7 +19,7 @@ for _ in range(ROUNDS):
 
 > The core round function from `challenge.py`
 
-![SPN structure](1.jpg)
+![SPN structure](figures/spn-structure.svg)
 
 The challenge gave a netcat interface to encrypt arbitrary plaintexts, but there were some constraints that made large data collection unfeasible:
 

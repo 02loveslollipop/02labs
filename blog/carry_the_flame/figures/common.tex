@@ -1,0 +1,36 @@
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{tikz}
+\usetikzlibrary{
+  arrows.meta,
+  calc,
+  positioning,
+  shapes.geometric,
+  shapes.misc
+}
+\usepackage{xcolor}
+
+\definecolor{regiongreen}{HTML}{DCEFD9}
+\definecolor{regiongray}{HTML}{ECECEC}
+\definecolor{regionyellow}{HTML}{F7EFCB}
+
+\tikzset{
+  >=Latex,
+  line/.style={draw=black, thick, -Latex},
+  conn/.style={draw=black, thick},
+  block/.style={
+    draw=black,
+    fill=white,
+    rectangle,
+    rounded corners=1.5pt,
+    align=center,
+    inner sep=5pt
+  },
+  stage/.style={block, minimum width=26mm, minimum height=22mm},
+  longstage/.style={block, minimum width=38mm, minimum height=22mm},
+  keyblock/.style={block, minimum width=32mm, minimum height=18mm},
+  sum/.style={draw=black, fill=white, circle, inner sep=0pt, minimum size=10mm, line width=1pt},
+  explabel/.style={font=\small\bfseries, align=center},
+  sublabel/.style={font=\small, align=center},
+  tinylabel/.style={font=\footnotesize, align=center}
+}
