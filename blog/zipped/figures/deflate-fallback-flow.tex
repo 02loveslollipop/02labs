@@ -1,0 +1,27 @@
+\documentclass[tikz,border=6pt]{standalone}
+\input{common.tex}
+
+\begin{document}
+\begin{tikzpicture}[node distance=12mm and 13mm]
+  \node[block, minimum width=26mm] (input) {PNG file\\bytes};
+  \node[block, minimum width=30mm, right=of input] (method) {ZIP entry method:\\Deflate};
+  \node[wideblock, minimum width=36mm, right=of method] (probe) {For each block:\\try LZ77 + Huffman};
+  \node[diamond, draw=black, fill=white, aspect=2, inner sep=2pt, right=16mm of probe] (decision) {smaller?};
+  \node[goodblock, minimum width=30mm, above=12mm of decision] (compressed) {Emit compressed\\Deflate block};
+  \node[warnblock, minimum width=34mm, below=12mm of decision] (stored) {Emit stored block\\raw bytes + 5-byte header};
+  \node[block, minimum width=32mm, right=18mm of decision] (stream) {Deflate\\byte stream};
+  \node[block, minimum width=28mm, right=of stream] (encrypt) {ZipCrypto\\encrypts stream};
+  \node[block, minimum width=30mm, right=of encrypt] (output) {Encrypted PNG\\entry bytes};
+
+  \draw[line] (input) -- (method);
+  \draw[line] (method) -- (probe);
+  \draw[line] (probe) -- (decision);
+  \draw[line] (decision) -- node[mathlabel, above left] {yes} (compressed);
+  \draw[line] (decision) -- node[mathlabel, right] {no} (stored);
+  \draw[conn] (compressed.east) -| ($(stream.west)+(-6mm,3.5mm)$);
+  \draw[conn] (stored.east) -| ($(stream.west)+(-6mm,-3.5mm)$);
+  \draw[line] ($(stream.west)+(-6mm,0)$) -- (stream.west);
+  \draw[line] (stream) -- (encrypt);
+  \draw[line] (encrypt) -- (output);
+\end{tikzpicture}
+\end{document}

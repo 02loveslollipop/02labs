@@ -1,0 +1,22 @@
+\documentclass[tikz,border=6pt]{standalone}
+\input{common.tex}
+
+\begin{document}
+\begin{tikzpicture}[node distance=12mm and 14mm]
+  \node[wideblock] (plain) {Known plaintext\\PNG header @ offset 5};
+  \node[wideblock, below=18mm of plain] (cipher) {Ciphertext\\same offsets};
+  \node[sum, right=20mm of $(plain)!0.5!(cipher)$] (xor) {$\oplus$};
+  \node[wideblock, right=16mm of xor] (stream) {Recovered keystream\\16 contiguous bytes};
+  \node[wideblock, right=16mm of stream] (filter) {Filter candidate\\$Z$ states};
+  \node[keyblock, right=16mm of filter] (keys) {Recover\\$(X,Y,Z)$};
+
+  \draw[line] (plain.east) -- (xor.north west);
+  \draw[line] (cipher.east) -- (xor.south west);
+  \draw[line] (xor) -- (stream);
+  \draw[line] (stream) -- (filter);
+  \draw[line] (filter) -- (keys);
+
+  \node[note, above=6mm of stream] {$16 \ge 12$ known bytes};
+  \draw[dashedline] ($(stream.north)+(0,4mm)$) -- (stream.north);
+\end{tikzpicture}
+\end{document}

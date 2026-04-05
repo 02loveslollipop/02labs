@@ -1,0 +1,17 @@
+\documentclass[tikz,border=6pt]{standalone}
+\input{common.tex}
+
+\begin{document}
+\begin{tikzpicture}[node distance=12mm and 14mm]
+  \node[keyblock] (keys) {Recovered keys};
+  \node[block, below=18mm of keys] (flagenc) {\texttt{flag.txt}\\stored entry};
+  \node[longblock, right=24mm of $(keys)!0.5!(flagenc)$] (dec) {\texttt{bkcrack -d decrypted\_flag.txt}};
+  \node[block, right=16mm of dec] (plainfile) {\texttt{decrypted\_flag.txt}};
+  \node[keyblock, right=16mm of plainfile, minimum width=44mm] (flag) {\texttt{RS\{F41ling\_4t\_z1p\_and\_Crypt0\}}};
+
+  \draw[line] (keys.east) -- (dec.north west);
+  \draw[line] (flagenc.east) -- (dec.south west);
+  \draw[line] (dec) -- (plainfile);
+  \draw[line] (plainfile) -- (flag);
+\end{tikzpicture}
+\end{document}

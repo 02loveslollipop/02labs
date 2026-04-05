@@ -1,0 +1,22 @@
+\documentclass[tikz,border=6pt]{standalone}
+\input{common.tex}
+
+\begin{document}
+\begin{tikzpicture}
+  \node[byteheader, anchor=west] (header) at (0,0) {5-byte\\stored header};
+  \node[byteknown, anchor=west] (known) at (header.east) {PNG header\\\texttt{89 50 4E 47 0D 0A 1A 0A 00 00 00 0D 49 48 44 52}};
+  \node[byteother, anchor=west] (other) at (known.east) {raw PNG\\bytes};
+
+  \draw[conn] (header.north west) rectangle (other.south east);
+
+  \draw[conn] (header.south west) -- ++(0,-5mm);
+  \draw[conn] (known.south west) -- ++(0,-5mm);
+  \draw[conn] (known.south east) -- ++(0,-5mm);
+  \draw[conn] (other.south east) -- ++(0,-5mm);
+
+  \node[mathlabel, anchor=north] at ($(header.south west)+(0,-5mm)$) {$0$};
+  \node[mathlabel, anchor=north] at ($(known.south west)+(0,-5mm)$) {$5$};
+  \node[mathlabel, anchor=north] at ($(known.south east)+(0,-5mm)$) {$21$};
+  \node[mathlabel, anchor=north] at ($(other.south east)+(0,-5mm)$) {$\ldots$};
+\end{tikzpicture}
+\end{document}

@@ -1,0 +1,21 @@
+\documentclass[tikz,border=6pt]{standalone}
+\input{common.tex}
+
+\begin{document}
+\begin{tikzpicture}[node distance=12mm and 14mm]
+  \node[block] (archive) {\texttt{zipped.zip}};
+  \node[block, below=18mm of archive] (header) {PNG header\\offset $5$};
+  \node[longblock, right=24mm of $(archive)!0.5!(header)$] (bk) {\texttt{bkcrack -x 5 \dots}};
+  \node[block, right=16mm of bk] (zred) {$Z$ reduction};
+  \node[block, right=16mm of zred] (attack) {Attack at\\index $12$};
+  \node[keyblock, right=16mm of attack] (keys) {\texttt{171fd011}\\\texttt{67f44485}\\\texttt{3b7e96f9}};
+
+  \draw[line] (archive.east) -- (bk.north west);
+  \draw[line] (header.east) -- (bk.south west);
+  \draw[line] (bk) -- (zred);
+  \draw[line] (zred) -- (attack);
+  \draw[line] (attack) -- (keys);
+
+  \node[note, below=6mm of zred] {$796{,}688$ candidate $Z$ values};
+\end{tikzpicture}
+\end{document}

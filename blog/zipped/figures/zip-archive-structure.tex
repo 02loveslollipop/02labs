@@ -1,0 +1,29 @@
+\documentclass[tikz,border=6pt]{standalone}
+\input{common.tex}
+
+\begin{document}
+\begin{tikzpicture}[node distance=8mm and 12mm]
+  \fill[regionpeach] (0,0) rectangle (11.4,6.2);
+  \draw[conn] (0,0) rectangle (11.4,6.2);
+
+  \node[grouplabel] at (5.7,5.75) {\Large\texttt{zipped.zip}};
+
+  \node[block, minimum width=34mm] (pngfile) at (3.2,4.45) {\texttt{BeautifulDetailedSunset.png}};
+  \node[smallblock, below=of pngfile] (pngcomp) {Deflate};
+  \node[smallblock, below=of pngcomp] (pngenc) {ZipCrypto};
+  \node[block, fill=regiongreen, minimum width=34mm, below=11mm of pngenc] (pngnote) {Known plaintext\\after stored-block fallback};
+
+  \node[block, minimum width=24mm] (flagfile) at (8.5,4.45) {\texttt{flag.txt}};
+  \node[smallblock, below=of flagfile] (flagcomp) {Store};
+  \node[smallblock, below=of flagcomp] (flagenc) {ZipCrypto};
+  \node[block, minimum width=27mm, below=11mm of flagenc] (flagnote) {Only \texttt{RS\{}\\is immediately known};
+
+  \draw[line] (pngfile) -- (pngcomp);
+  \draw[line] (pngcomp) -- (pngenc);
+  \draw[line] (pngenc) -- (pngnote);
+
+  \draw[line] (flagfile) -- (flagcomp);
+  \draw[line] (flagcomp) -- (flagenc);
+  \draw[line] (flagenc) -- (flagnote);
+\end{tikzpicture}
+\end{document}

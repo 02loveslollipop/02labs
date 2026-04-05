@@ -1,0 +1,26 @@
+\documentclass[tikz,border=6pt]{standalone}
+\input{common.tex}
+
+\begin{document}
+\begin{tikzpicture}[node distance=10mm and 12mm]
+  \node[block] (unzip) {\texttt{unzip -v}\\PNG entry};
+  \node[point, right=8mm of unzip] (split) {};
+  \node[block, right=18mm of split, yshift=9mm] (length) {Length\\$2{,}391{,}493$};
+  \node[block, below=7mm of length] (packed) {Packed size\\$2{,}391{,}858$};
+  \node[warnblock, right=24mm of $(length)!0.5!(packed)$] (delta) {$+365$ bytes\\overhead};
+  \node[keyblock, right=18mm of delta] (blocks) {$73$ stored blocks\\$\times\ 5$ bytes each};
+  \coordinate (deltaTopIn) at ($(delta.west)+(0,3.5mm)$);
+  \coordinate (deltaBotIn) at ($(delta.west)+(0,-3.5mm)$);
+  \coordinate (deltaTopJoin) at ($(deltaTopIn)+(-8mm,0)$);
+  \coordinate (deltaBotJoin) at ($(deltaBotIn)+(-8mm,0)$);
+
+  \draw[line] (unzip.east) -- (split);
+  \draw[conn] (split) |- (length.west);
+  \draw[conn] (split) |- (packed.west);
+  \draw[conn] (length.east) -| (deltaTopJoin);
+  \draw[conn] (packed.east) -| (deltaBotJoin);
+  \draw[line] (deltaTopJoin) -- (deltaTopIn);
+  \draw[line] (deltaBotJoin) -- (deltaBotIn);
+  \draw[line] (delta.east) -- (blocks.west);
+\end{tikzpicture}
+\end{document}
