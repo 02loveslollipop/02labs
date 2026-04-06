@@ -5,51 +5,67 @@ pubDate: 2026-04-06
 tags: ["AlpacaHack", "Crypto", "Writeup", "SP Networks", "Block ciphers"]
 ---
 
-This time we are presented with a "familiar" setting, just as in [Carry the Flame](https://blog.02labs.me/posts/carry-the-flame/) we are given an "SPN"-style block cipher, but this time with some twists. First of all we are working with a 256-bit block/key size instead of the 40-bit block/key size of Carry the Flame. The second twist is the number of rounds, which is 32 instead of the "insane" 1024 rounds of Carry the Flame, which makes the cipher much more manageable. The third twist is that we are limited in the number of oracle/guess queries we can make (210 at most), and the last and most important twist is that the cipher is not actually an SPN, because the S-box went missing. As such, a major weakness appears: since the S-box is the only non-linear element of an SPN, all of these rounds, XORs, and permutations collapse into a simple linear problem. So we can recover the key by solving a linear system over $GF(2)$ for the key by taking a plain/cipher pair and solving for the key with something like Gaussian elimination.
+This time we are presented with a "familiar" setting, just as in [Carry the Flame](https://blog.02labs.me/posts/carry-the-flame/) we are given an "SPN"-style block cipher, but this time with some twists. First of all we are working with a 256-bit block/key size instead of the 40-bit block/key size of Carry the Flame. The second twist is the number of rounds, which is 32 instead of the "insane" 1024 rounds of Carry the Flame, which makes the cipher much more manageable. The third twist is that we are limited in the number of oracle/guess queries we can make (210 at most), and the last and most important twist is that the cipher is not actually an SPN, because the S-box went missing. As such, a major weakness appears: since the S-box is the only non-linear element of an SPN, all of these rounds, XORs, and permutations collapse into a simple linear problem. So we can recover the key by solving a linear system over ((GF(2))) for the key by taking a plain/cipher pair and solving for the key with something like Gaussian elimination.
 
 ## Modeling the cipher as a linear system
 
-In this challenge we have a 32-byte (256-bit) bytewise permutation, so we need to convert that into a bit-equivalent matrix in $GF(2)^{256\times 256}$ that maps each input bit position to its corresponding output bit position.
+In this challenge we have a 32-byte (256-bit) bytewise permutation, so we need to convert that into a bit-equivalent matrix in ((GF(2)^{256\times 256})) that maps each input bit position to its corresponding output bit position.
 
-We'll define that matrix as $P$. Then let:
+We'll define that matrix as ((P)). Then let:
 
-* $C_n$: Cipher after $n$ rounds
+* ((C_n)): Cipher after ((n)) rounds
 
-* $k$: Key
+* ((k)): Key
 
-* $p_t$: Plaintext
+* ((p_t)): Plaintext
 
 Then we can define the first cipher round as:
 
-$$ C_1 = P(k \oplus p_t) $$
+[
+C_1 = P(k \oplus p_t)
+]
 
 And the next rounds as:
 
-$$ C_2 = P(k \oplus C_1) = P(k \oplus P(k \oplus p_t)) = P^2 k \oplus P^2 p_t \oplus P k$$
+[
+C_2 = P(k \oplus C_1) = P(k \oplus P(k \oplus p_t)) = P^2 k \oplus P^2 p_t \oplus P k
+]
 
-$$ C_3 = P(k \oplus C_2) = P(k \oplus P^2 k \oplus P^2 p_t \oplus P k) = P^3 k \oplus P^3 p_t \oplus P^2 k \oplus P k $$
+[
+C_3 = P(k \oplus C_2) = P(k \oplus P^2 k \oplus P^2 p_t \oplus P k) = P^3 k \oplus P^3 p_t \oplus P^2 k \oplus P k
+]
 
 We end up with the following general form:
 
-$$ C_n = \left(\sum_{i=1}^n P^i\right) k \oplus P^n p_t $$
+[
+C_n = \left(\sum_{i=1}^n P^i\right) k \oplus P^n p_t
+]
 
 And for the full 32 rounds:
 
-$$ C_{32} = \left(\sum_{i=1}^{32} P^i\right) k \oplus P^{32} p_t $$
+[
+C_{32} = \left(\sum_{i=1}^{32} P^i\right) k \oplus P^{32} p_t
+]
 
-Now let's define $M = \sum_{i=1}^{32} P^i$, then we can rewrite the cipher as:
+Now let's define ((M = \sum_{i=1}^{32} P^i)), then we can rewrite the cipher as:
 
-$$ C_{32} = M k \oplus P^{32} p_t $$
+[
+C_{32} = M k \oplus P^{32} p_t
+]
 
 Let's reorder the equation to isolate the key:
 
-$$ M k = C_{32} \oplus P^{32} p_t $$
+[
+M k = C_{32} \oplus P^{32} p_t
+]
 
-> Here both $M$ and $C_{32} \oplus P^{32} p_t$ are known constants.
+> Here both ((M)) and ((C_{32} \oplus P^{32} p_t)) are known constants.
 
 This is equal to a linear system of the form:
 
-$$ A x = b $$
+[
+A x = b
+]
 
 We can solve this system for a known plain/cipher pair to derive the key, then we can use the Inverse of the PBOX to decrypt the challenge ciphertext. To do so, we can easily derive it by inverting the inputs and outputs. We can do so in Python like this:
 
@@ -134,9 +150,9 @@ Now with all of the required pieces, the solve becomes the following workflow:
 
 2. Pass a known (obviously) plaintext and retrieve the corresponding ciphertext.
 
-3. Solve $M k = C_{32} \oplus P^{32} p_t$ for $k$.
+3. Solve ((M k = C_{32} \oplus P^{32} p_t)) for ((k)).
 
-4. With the known $k$, decrypt the challenge ciphertext.
+4. With the known ((k)), decrypt the challenge ciphertext.
 
 5. Submit the decrypted challenge as a "guess" in the remote instance and hopefully get the flag.
 
