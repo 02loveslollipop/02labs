@@ -7,9 +7,11 @@
     "workers/*"
   ],
   "scripts": {
+    "build": "npm run build:blog",
     "dev:www": "npm -w apps/www run dev",
     "dev:blog": "npm -w apps/blog run dev",
     "dev:ctftime-sync": "npm -w ctftime-sync run dev",
+    "sync:blog": "./scripts/sync-blog.sh",
     "build:www": "npm -w apps/www run build",
     "build:blog": "npm -w apps/blog run build",
     "preview:www": "npm -w apps/www run preview",
