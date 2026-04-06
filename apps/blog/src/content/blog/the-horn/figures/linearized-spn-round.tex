@@ -1,0 +1,49 @@
+\documentclass[tikz,border=6pt]{standalone}
+\input{common.tex}
+
+\begin{document}
+\begin{tikzpicture}[node distance=10mm and 12mm]
+  \node[stage] (input) {\textbf{INPUT}\\\textbf{STATE}\\(256-bit)};
+  \node[sum, right=14mm of input] (xor) {\Large $+$};
+  \node[keyblock, above=16mm of xor] (key) {\textbf{ROUND KEY}\\$k$ (256-bit)};
+
+  \node[block, fill=regionred, minimum width=34mm, minimum height=15mm, right=14mm of xor] (subbox) {\textbf{S-box layer}\\\textbf{missing}};
+
+  \node[block, fill=regiongray, minimum width=34mm, minimum height=15mm, right=14mm of subbox] (perm) {\textbf{P-box layer}};
+
+  \node[stage, right=14mm of perm] (output) {\textbf{ROUND}\\\textbf{STATE}\\\textbf{OUTPUT}};
+
+  \draw[line] (input) -- (xor);
+  \draw[line] (key.south) -- (xor.north);
+  \draw[dashedline] (xor) -- (subbox);
+  \draw[line] (subbox) -- (perm);
+  \draw[line] (perm) -- (output);
+
+  \coordinate (loopRightStem) at ($(output.north)+(0,24mm)$);
+  \coordinate (loopRightTop) at ($(output.north)+(-8mm,32mm)$);
+  \coordinate (loopLeftTop) at ($(input.north)+(8mm,32mm)$);
+  \coordinate (loopLeftStem) at ($(input.north)+(0,24mm)$);
+  \draw[line, line width=1.4pt]
+    (output.north) -- (loopRightStem)
+    (loopRightStem) to[out=90,in=0] (loopRightTop)
+    (loopRightTop) -- (loopLeftTop)
+    (loopLeftTop) to[out=180,in=90] (loopLeftStem)
+    (loopLeftStem) -- (input.north);
+  \node[font=\Large] at ($(loopLeftTop)!0.5!(loopRightTop)+(0,8mm)$) {32 rounds};
+
+  \node[explabel, below=8mm of xor] {ADDROUNDKEY};
+  \node[sublabel, below=13mm of xor] {(XOR)};
+
+  \node[explabel, below=8mm of subbox] {SUBBYTES};
+  \node[sublabel, below=13mm of subbox] {(missing non-linearity)};
+  \node[tinylabel, below=19mm of subbox] {(cipher becomes linear)};
+
+  \node[explabel, below=8mm of perm] {PERMUTEBYTES};
+  \node[sublabel, below=13mm of perm] {(32-byte P-box)};
+  \node[tinylabel, below=19mm of perm] {(fixed permutation)};
+
+  \node[block, fill=regionyellow, minimum width=54mm, minimum height=12mm, below=31mm of $(subbox)!0.5!(perm)$] (collapse) {\textbf{Equivalent linear form:} $C_{32} = Mk \oplus P^{32}p_t$};
+
+  \draw[line] ($(perm.south)+(0,-1mm)$) -- ($(collapse.north)+(0,1mm)$);
+\end{tikzpicture}
+\end{document}
