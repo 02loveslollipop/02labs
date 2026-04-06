@@ -1,5 +1,5 @@
 ---
-title: "RITSEC CTF - ZipCrypto Forensic Challenge Writeup"
+title: "RITSEC CTF - Zipped Forensic Challenge Writeup"
 description: "Why the hell are ZIP challenges always so hard?"
 pubDate: 2026-04-04
 tags: ["RITSEC", "Crypto", "Forensic", "Known-Plaintext Attack"]
@@ -66,8 +66,6 @@ Another way to look at it is that the compressed size is exactly 365 bytes large
 
 # Attack Vector: Biham-Kocher Known-Plaintext Attack
 
-<!-- The stored blocks fallback entirely breaks the opacity of the `Deflate` compression in this case. Normally, the compressed bitstream is a chaotic mix of Huffman codes, making it impossible to align known plaintext (like a PNG header) with the encrypted byte stream without having the full, original uncompressed image to re-compress. -->
-
 The stored-block fallback completely breaks the opacity of the compressed stream for this file. Normally, the compressed bitstream would be a chaotic mix of Huffman codes, making it impossible to align the known PNG header with the encrypted byte stream without having the full original image and recompressing it. However, because the compressor emitted the PNG as stored blocks, the raw bytes of the PNG are present in the compressed stream, only offset by the 5-byte block header. That means the PNG header sits intact at a predictable offset inside the encrypted stream. In other words, the compressed stream looks like this:
 
 ![Stored-block byte layout showing the 5-byte header and the 16-byte PNG header](figures/stored-block-layout.svg)
@@ -82,13 +80,11 @@ The standard PNG header is exactly 16 bytes long: `89 50 4E 47 0D 0A 1A 0A 00 00
 
 At this point, the attack vector is clear. The PNG header is a known, fixed sequence of bytes that must be present in the compressed stream, and we know the offset needed to align it with the encrypted bytes, so we can use it as known plaintext against ZipCrypto.
 
-<!-- This also explains why our earlier "generic PNG header" attempts with `bkcrack` failed. The failure was not because some parts of the PNG were still genuinely compressed while others were stored. The size math strongly suggests the payload was emitted entirely as stored blocks, so the PNG bytes were present raw inside the Deflate stream. The problem was alignment: `bkcrack` needs plaintext at the exact offsets that were fed into ZipCrypto, and the encrypted Deflate stream does **not** begin with `89 50 4E 47 ...`. It begins with the 5-byte stored-block header, and only then the PNG signature. So a naive known-plaintext attempt at offset ((0)) is wrong by exactly ((5)) bytes, and `bkcrack` will reject it even though the PNG header is indeed present in the stream. -->
-
 This also explains why the earlier "generic PNG header" attempts with `bkcrack` failed. The problem was not that some parts of the PNG were encoded with Huffman codes while others were stored raw. The size math strongly suggests that the payload was emitted entirely as stored blocks, so the PNG bytes were present raw inside the Deflate stream. The real issue was alignment: `bkcrack` needs plaintext at the exact offsets that were fed into ZipCrypto, and the encrypted Deflate stream does **not** begin with `89 50 4E 47 ...`. It begins with the 5-byte stored-block header, and only then the PNG signature. So the naive known-plaintext attempt at offset ((0)) was wrong by exactly ((5)) bytes, and `bkcrack` rejected it even though the PNG header was indeed present in the stream.
 
 ![Known-plaintext attack flow from plaintext and ciphertext to recovered keys](figures/biham-kocher-attack.svg)
 
-The attack vector here is not guessing the password directly, nor is it breaking PNG compression. The real weakness is that ZipCrypto leaks its state when we can align known plaintext with the encrypted byte stream. As shown in the diagram, once we align the plaintext and ciphertext at the same offsets, we can recover the keystream, because XORing the plaintext with the ciphertext yields the keystream.
+The attack vector here is not guessing the password directly, nor is it reversing the weak RNG of the ZipCrypto compression. The real weakness is that ZipCrypto leaks its state when we can align known plaintext with the encrypted byte stream. As shown in the diagram, once we align the plaintext and ciphertext at the same offsets, we can recover the keystream, because XORing the plaintext with the ciphertext yields the keystream.
 
 [
 \text{Keystream} = \text{Plaintext} \oplus \text{Ciphertext}
