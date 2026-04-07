@@ -1,8 +1,9 @@
 ---
-title: "Daily AlpacaHack - The horn Crypto Challenge Writeup"
+title: "Daily AlpacaHack: The horn Writeup"
 description: "The failures in previous challenges become the solution for this one."
 pubDate: 2026-04-06
 tags: ["AlpacaHack", "Crypto", "Writeup", "SP Networks", "Block ciphers"]
+featuredImage: "figures/pn-structure.svg"
 ---
 
 This time we are presented with a "familiar" setting, just as in [Carry the Flame](https://blog.02labs.me/posts/carry-the-flame/) we are given an "SPN"-style block cipher, but this time with some twists. First of all we are working with a 256-bit block/key size instead of the 40-bit block/key size of Carry the Flame. The second twist is the number of rounds, which is 32 instead of the "insane" 1024 rounds of Carry the Flame, which makes the cipher much more manageable. The third twist is that we are limited in the number of oracle/guess queries we can make (210 at most), and the last and most important twist is that the cipher is not actually an SPN, because the S-box went missing. As such, a major weakness appears: since the S-box is the only non-linear element of an SPN, all of these rounds, XORs, and permutations collapse into a simple linear problem. So we can recover the key by solving a linear system over $GF(2$) for the key by taking a plain/cipher pair and solving for the key with something like Gaussian elimination.

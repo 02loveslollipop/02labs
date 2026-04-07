@@ -1,5 +1,5 @@
 ---
-title: "RITSEC CTF - Zipped Forensic Challenge Writeup"
+title: "RITSEC CTF: Zipped Writeup"
 description: "Why the hell are ZIP challenges always so hard?"
 pubDate: 2026-04-04
 tags: ["RITSEC", "Crypto", "Forensic", "Known-Plaintext Attack"]

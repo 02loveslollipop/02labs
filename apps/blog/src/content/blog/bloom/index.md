@@ -1,5 +1,5 @@
 ---
-title: "Daily AlpacaHack - Bloom Crypto Challenge Writeup"
+title: "Daily AlpacaHack: Bloom Writeup"
 description: "How does a single number convert a perfect secrecy encryption scheme into a completely insecure one?"
 pubDate: 2026-03-24
 tags: ["AlpacaHack", "Crypto", "Writeup", "XOR", "One-Time Pad"]

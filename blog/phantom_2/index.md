@@ -1,5 +1,5 @@
 ---
-title: "TAMUctf 2026 - Forensic writeup: Phantom2"
+title: "TAMUctf 2026: Phantom2 Writeup"
 description: "Could private forks on GitHub be not as private as we think?"
 pubDate: 2026-03-27
 tags: ["ctf", "git", "github", "forensics", "writeup"]
