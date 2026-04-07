@@ -187,4 +187,4 @@ This challenge shows a completly different flavor of block cipher challenges com
 
 ## Greetings
 
-As always, thanks to the Daily AlpacaHack team for hosting these amazing daily challenges and to kanon for creating this interesting challenge. It was an interesting "evolution" of the Carry the flame challenge, almost the same setting but with a completely different attack vector.
+As always, thanks to the Daily AlpacaHack team for hosting these amazing daily challenges and to Kanon for creating this interesting challenge. It was an amazing "evolution" of the Carry the flame challenge, almost the same setting but with a completely different attack vector.
