@@ -1,0 +1,25 @@
+\documentclass[tikz,border=6pt]{standalone}
+\input{common.tex}
+
+\begin{document}
+\begin{tikzpicture}[node distance=12mm and 16mm]
+  \node[wideblock] (space) {Enumerate prefixes\\\texttt{0000 .. ffff}};
+  \node[longblock, right=18mm of space] (probe) {Probe endpoint\\\texttt{/commit/prefix.patch}};
+  \node[block, right=18mm of probe, minimum width=32mm] (status) {HTTP response};
+  \node[block, right=30mm of status] (miss) {HTTP 404\\continue};
+  \node[goodblock, above=16mm of miss, minimum width=36mm] (hit) {HTTP 200\\record hit};
+  \node[warnblock, below=16mm of miss, minimum width=40mm] (retry) {HTTP 429 / 5xx\\retry with backoff};
+  \node[keyblock, right=18mm of hit, minimum width=42mm] (cands) {Collect hits\\candidate commit prefixes};
+  \coordinate (branch) at ($(status.east)!0.45!(miss.west)$);
+
+  \draw[line] (space) -- (probe);
+  \draw[line] (probe) -- (status);
+  \draw[line] (status.east) -- (branch);
+  \draw[line] (branch) -- (miss.west);
+  \draw[line] (branch) |- (hit.west);
+  \draw[line] (branch) |- (retry.west);
+  \draw[line] (hit.east) -- (cands.west);
+
+  \node[note, below=10mm of status] {different HTTP codes drive different actions in the scan loop};
+\end{tikzpicture}
+\end{document}

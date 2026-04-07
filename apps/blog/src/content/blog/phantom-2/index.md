@@ -51,6 +51,8 @@ If that hypothesis was correct, we could test it with GitHub's standard commit p
 https://github.com/tamuctf/phantom2/commit/<prefix>.patch
 ```
 
+![CFOR public path oracle showing a private-fork object resolved through the public commit patch route](figures/cfor-public-path-oracle.svg)
+
 This behaved as a prefix oracle: if the prefix matched a commit object in the repository, we got an `HTTP 200` response with the patch. If it did not match, we got an `HTTP 404` response. We also had to handle `HTTP 429` and `HTTP 5xx` responses to avoid misclassifying possible matches as non-matches.
 
 ## Feasibility
@@ -62,6 +64,8 @@ Using 4 hex characters gives a search space of $16^4 = 65,536$ prefixes, which i
 ## Solution
 
 The solution we executed was to brute-force search for the commit containing the flag. We used the GitHub commit patch endpoint on the standard GitHub URL, and the solver iterated over all 4-hex prefixes to identify which ones corresponded to existing commits in the repository.
+
+![4-hex brute-force flow showing prefix enumeration, patch probing, status classification, and hit collection](figures/four-hex-bruteforce-flow.svg)
 
 ```python
 from __future__ import annotations

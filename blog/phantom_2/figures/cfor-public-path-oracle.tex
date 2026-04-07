@@ -1,0 +1,28 @@
+\documentclass[tikz,border=6pt]{standalone}
+\input{common.tex}
+
+\begin{document}
+\begin{tikzpicture}[node distance=12mm and 16mm]
+  \node[wideblock] (public) {Public repo\\\texttt{tamuctf/phantom2}};
+  \node[warnblock, below=18mm of public, minimum width=36mm] (fork) {Private fork\\\texttt{cobradev4/phantom2}};
+  \node[longblock, right=26mm of $(public)!0.5!(fork)$] (cfor) {Fork-network object resolution\\(CFOR)};
+  \node[longblock, right=18mm of cfor] (route) {Public route\\\texttt{/commit/prefix.patch}};
+  \node[block, right=18mm of route, minimum width=30mm] (resp) {HTTP response};
+  \node[block, right=30mm of resp, minimum width=36mm] (miss) {HTTP 404\\no object match};
+  \node[goodblock, above=16mm of miss, minimum width=36mm] (hit) {HTTP 200\\patch returned\\object resolves};
+  \node[warnblock, below=16mm of miss, minimum width=40mm] (retry) {HTTP 429 / 5xx\\retry carefully};
+  \coordinate (branch) at ($(resp.east)!0.45!(miss.west)$);
+
+  \draw[line] (public.east) -- (cfor.north west);
+  \draw[line] (fork.east) -- (cfor.south west);
+  \draw[line] (cfor) -- (route);
+  \draw[line] (route) -- (resp);
+  \draw[line] (resp.east) -- (branch);
+  \draw[line] (branch) -- (miss.west);
+  \draw[line] (branch) |- (hit.west);
+  \draw[line] (branch) |- (retry.west);
+
+  \node[note, above=6mm of route] {private-fork object reached through a public path};
+  \draw[dashedline] ($(route.north)+(0,4mm)$) -- (route.north);
+\end{tikzpicture}
+\end{document}
