@@ -1,0 +1,25 @@
+\documentclass[tikz,border=6pt]{standalone}
+\input{common.tex}
+
+\begin{document}
+\begin{tikzpicture}
+  \node[byteheader, anchor=west, minimum height=22mm] (file) at (0,0) {14-byte BMP\\file header};
+  \node[byteknown, anchor=west, minimum width=60mm, minimum height=22mm, inner sep=5pt] (dib) at (file.east) {40-byte DIB header\\size, width, height,\\bit depth, data offset};
+  \node[byteoptional, anchor=west, minimum height=22mm] (table) at (dib.east) {optional color table\\or bit masks};
+  \node[byteother, anchor=west, minimum height=22mm] (pixels) at (table.east) {pixel array\\BGR rows + padding};
+
+  \draw[conn] (file.north west) rectangle (pixels.south east);
+
+  \draw[conn] (file.south west) -- ++(0,-6mm);
+  \draw[conn] (dib.south west) -- ++(0,-6mm);
+  \draw[conn] (table.south west) -- ++(0,-6mm);
+  \draw[conn] (pixels.south west) -- ++(0,-6mm);
+  \draw[conn] (pixels.south east) -- ++(0,-6mm);
+
+  \node[mathlabel, anchor=north] at ($(file.south west)+(0,-6mm)$) {$0$};
+  \node[mathlabel, anchor=north] at ($(dib.south west)+(0,-6mm)$) {$14$};
+  \node[mathlabel, anchor=north] at ($(table.south west)+(0,-6mm)$) {$54$};
+  \node[mathlabel, anchor=north] at ($(pixels.south west)+(0,-6mm)$) {$\texttt{bfOffBits}$};
+  \node[mathlabel, anchor=north] at ($(pixels.south east)+(0,-6mm)$) {$\ldots$};
+\end{tikzpicture}
+\end{document}
