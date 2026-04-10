@@ -1,0 +1,43 @@
+\documentclass[tikz,border=6pt]{standalone}
+\input{common.tex}
+
+\begin{document}
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \node[font=\bfseries] at (10.1,2.45) {ECB: identical plaintext blocks encrypt identically};
+  \node[font=\bfseries] at (10.1,-0.85) {CBC: each block is mixed before encryption};
+
+  \node[block, fill=regionyellow, minimum width=18mm] (ep1) at (1.3,1.4) {$P_1$\\\texttt{A}};
+  \node[smallblock, minimum width=16mm] (ea1) at (4.0,1.4) {AES\\$K$};
+  \node[goodblock, minimum width=18mm] (ec1) at (6.8,1.4) {$C_1$};
+
+  \node[block, fill=regionyellow, minimum width=18mm] (ep2) at (11.4,1.4) {$P_2$\\\texttt{A}};
+  \node[smallblock, minimum width=16mm] (ea2) at (14.1,1.4) {AES\\$K$};
+  \node[goodblock, minimum width=22mm] (ec2) at (17.0,1.4) {$C_2$\\$= C_1$};
+
+  \draw[line] (ep1) -- (ea1);
+  \draw[line] (ea1) -- (ec1);
+  \draw[line] (ep2) -- (ea2);
+  \draw[line] (ea2) -- (ec2);
+
+  \node[smallblock, fill=regiongray, minimum width=12mm] (iv) at (3.7,-1.35) {IV};
+  \node[block, fill=regionyellow, minimum width=18mm] (cp1) at (1.3,-2.95) {$P_1$\\\texttt{A}};
+  \node[sum] (xor1) at (3.7,-2.95) {$\oplus$};
+  \node[smallblock, minimum width=16mm] (ca1) at (6.0,-2.95) {AES\\$K$};
+  \node[block, fill=regiongray, minimum width=18mm] (cc1) at (8.8,-2.95) {$C_1$};
+
+  \node[block, fill=regionyellow, minimum width=18mm] (cp2) at (11.9,-2.95) {$P_2$\\\texttt{A}};
+  \node[sum] (xor2) at (14.3,-2.95) {$\oplus$};
+  \node[smallblock, minimum width=16mm] (ca2) at (16.6,-2.95) {AES\\$K$};
+  \node[block, fill=regiongray, minimum width=22mm] (cc2) at (19.2,-2.95) {$C_2$\\$\neq C_1$};
+
+  \draw[line] (cp1) -- (xor1);
+  \draw[line] (iv.south) -- (xor1.north);
+  \draw[line] (xor1) -- (ca1);
+  \draw[line] (ca1) -- (cc1);
+
+  \draw[line] (cp2) -- (xor2);
+  \draw[line] (xor2) -- (ca2);
+  \draw[line] (ca2) -- (cc2);
+  \draw[line] (cc1.north) |- ($(xor2.north)+(0,7mm)$) -- (xor2.north);
+\end{tikzpicture}
+\end{document}
