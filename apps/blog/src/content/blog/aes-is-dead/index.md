@@ -16,24 +16,7 @@ A BMP file is a bitmap (raster graphics) file format that stores image data in t
 
 ![BMP byte layout showing the 14-byte file header, 40-byte DIB header, optional color table or bit masks, and the pixel array](figures/bmp-layout.svg)
 
-As we can see in the diagram the first 14 bytes are the file header, which contains metadata about the file, such as the file size and the offset where the pixel data starts. The next 40 bytes are the DIB header, which contains more detailed information about the image, such as its width, height, color depth, and compression method. After that we have an optional color table (used for indexed color images) or bit masks (used for certain types of images), and finally we have the pixel array, which contains the actual image data.
-
-```python
-# Generate image
-font = ImageFont.truetype("DejaVuSans.ttf", 128)
-draw = ImageDraw.Draw(Image.new("RGB", (1, 1), "white"))
-left, top, right, bottom = draw.textbbox((0, 0), flag, font=font)
-
-img = Image.new("RGB", (right - left, bottom - top), "white")
-draw = ImageDraw.Draw(img)
-draw.text((-left, -top), flag, fill="black", font=font)
-
-img.save("flag.bmp")
-```
-
-Now we need to check a bit the implementation of the `PIL` to see how it saves the image. As shown in the [Pillow source code](https://github.com/python-pillow/Pillow/blob/main/src/PIL/BmpImagePlugin.py), when saving an RGB image into the `BMP` format, it writes a 14-byte File Header (containing the magic number and file size) followed immediately by a 40-byte DIB Header (specifically a `BITMAPINFOHEADER` which holds the width, height, color depth, and compression method). Since RGB images do not use a color palette, the pixel data begins precisely after these 54 bytes.
-
-## ECB cipher mode and why it 
+## ECB cipher mode
 
 Now let's see the other part, ECB (Electronic Codebook) is a mode of operation for block ciphers. ECB is the simplest and "less effective" mode of operation, where each block of plaintext is encrypted independently using the same key. This means that identical plaintext blocks will produce identical ciphertext blocks, which allows some attack vectors, block replay attacks (Checking if a block is the same as another one) and also (and important for us this time) it allows to see patterns from the relation between blocks that were present in the plaintext.
 
@@ -41,13 +24,6 @@ Let's see it with an example. Here the same plaintext block appears twice: in EC
 
 ![ECB versus CBC block diagram showing repeated plaintext blocks producing repeated ciphertext in ECB but different ciphertext in CBC because of IV and chaining](figures/ecb-vs-cbc.svg)
 
-In the following image we can see an example of how the same image looks when encrypted with ECB and CBC. In the ECB version we can faintly see the structure (mostly because is a highly entropic image, but still) while in the CBC version it looks like pure noise. In a much simpler image, like the text image we have in this challenge, the structure would be way more evident, allowing us to easily read the flag even without decrypting it. 
+The classic visual demo makes the same point even more clearly. If we take the raw RGB bytes of an image and encrypt them block-by-block, ECB still leaks the large-scale structure of the cat, while CBC destroys that pattern and turns the result into noise.
 
 ![Original square crop of the cat photo next to AES-ECB and AES-CBC visualizations, showing ECB leaking structure while CBC looks like noise](figures/ecb-cbc-image-example.png)
-
-## Recover
-
-# References
-
-- Pillow source code (BmpImagePlugin): https://github.com/python-pillow/Pillow/blob/main/src/PIL/BmpImagePlugin.py
-- Microsoft BITMAPINFOHEADER documentation: https://learn.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-bitmapinfoheader
