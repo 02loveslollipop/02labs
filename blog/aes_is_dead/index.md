@@ -7,7 +7,7 @@ tags: ["AlpacaHack", "Crypto", "Writeup", "ECB", "AES", "cipher mode"]
 
 This challenge presents us with quite a different scenario than most cryptography challenges. We are given a Python script that encrypts data using the Python `Crypto` library's AES implementation. It generates a random key using `os.urandom` and encrypts a BMP file containing a rendered image of the flag. The vulnerability lies in the choice of the ECB cipher mode. Because ECB provides no diffusion across blocks, we can still observe meaningful structural patterns in the resulting ciphertext, even though the data itself is encrypted.
 
-# Why ECB+BMP Completely Breaks the Cipher
+# Why ECB Leaks Structure in BMP Images
 
 To understand why this works, we need to review both how ECB mode works and how a BMP file is structured.
 
@@ -41,7 +41,7 @@ Let's see it with an example. Here the same plaintext block appears twice: in EC
 
 ![ECB versus CBC block diagram showing repeated plaintext blocks producing repeated ciphertext in ECB but different ciphertext in CBC because of IV and chaining](figures/ecb-vs-cbc.svg)
 
-In the following image we can see an example of how the same image looks when encrypted with ECB and CBC. In the ECB version we can faintly see the structure (mostly because it is a highly entropic image, but still), while in the CBC version it looks like pure noise. In a much simpler image, like the text image we have in this challenge, the structure would be much more evident, allowing us to easily read the flag even without decrypting it.
+In the following image we can see an example of how the same image looks when encrypted with ECB and CBC. In the ECB version we can faintly see the structure (mostly because it is a highly entropic image, but still), while in the CBC version it looks like pure noise. In a simpler, high contrast image, the structure probaly will be much more evident, allowing us to easily read the flag even without decrypting it.
 
 ![Original square crop of the cat photo next to AES-ECB and AES-CBC visualizations, showing ECB leaking structure while CBC looks like noise](figures/ecb-cbc-image-example.png)
 
@@ -248,7 +248,7 @@ As we can see once again, even if the content of the independent blocks is clear
 
 # Conclusion
 
-This challenge is a clear and almost textbook example of why cipher modes are important for block ciphers, and how using a weak mode like ECB can lead to a theoretical "good" ciphertext that is actually completely broken in practice. While individual blocks maintain secure properties, the lack of diffusion, due to the absence of chaining or other mechanisms to mix the output of one block into the input of the next, makes the cipher susceptible to block-level attacks. In this case, this flaw is enough to leak the structure of the plaintext and reveal the flag without even decrypting it.
+This challenge is a clear and almost textbook example of why cipher modes are important for block ciphers, and how using a weak mode like ECB can lead to a theoretical "good" ciphertext get severely compromised for practical use. While individual blocks maintain secure properties, the lack of diffusion, due to the absence of chaining or other mechanisms to mix the output of one block into the input of the next, makes the cipher susceptible to block-level attacks. In this case, this flaw is enough to leak the structure of the plaintext and reveal the flag without even decrypting it.
 
 # References
 
