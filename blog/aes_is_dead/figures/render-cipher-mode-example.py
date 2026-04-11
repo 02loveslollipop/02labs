@@ -97,8 +97,8 @@ def main() -> None:
 
     panels = [
         (original, "Original"),
-        (ecb, "AES-ECB\nstructure still visible"),
-        (cbc, "AES-CBC\nlooks like noise"),
+        (ecb, "AES-ECB"),
+        (cbc, "AES-CBC"),
     ]
 
     for axis, (image, title) in zip(axes, panels):
