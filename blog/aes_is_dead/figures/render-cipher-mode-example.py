@@ -96,7 +96,7 @@ def main() -> None:
     fig, axes = plt.subplots(1, 3, figsize=(11.5, 4.1), dpi=220)
 
     panels = [
-        (original, "Original\n(pixelated + quantized)"),
+        (original, "Original"),
         (ecb, "AES-ECB\nstructure still visible"),
         (cbc, "AES-CBC\nlooks like noise"),
     ]
@@ -111,8 +111,7 @@ def main() -> None:
         0.5,
         0.04,
         (
-            "Same AES key in both cases; CBC uses an IV and chains blocks, "
-            "while ECB preserves repeated plaintext patterns."
+            "Same AES key in both cases"
         ),
         ha="center",
         fontsize=10,

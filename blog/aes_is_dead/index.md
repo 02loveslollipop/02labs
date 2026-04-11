@@ -2,6 +2,7 @@
 title: "Daily AlpacaHack: AES is dead Writeup"
 description: "AES probably not, ECB definitely."
 pubDate: 2026-04-10
+featuredImage: "figures/ecb-cbc-image-example.png"
 tags: ["AlpacaHack", "Crypto", "Writeup", "ECB", "AES", "cipher mode"]
 ---
 
