@@ -1,0 +1,163 @@
+[
+  {
+    "name": "Welcome to CTF-UPB",
+    "tag": "Welcome",
+    "points": 50,
+    "author": "N/A",
+    "description_md": "# Welcome to CTF-UPB 👾\r\n\r\nWelcome to **CTF-UPB**.\r\n\r\nBefore starting the competition, make sure you read the official rules carefully.\r\n\r\n## Your first task\r\nThe flag for this challenge is hidden somewhere inside the **reglas-ctfupb**.\r\n\r\n<a href=\"https://discord.gg/d6E9ATkcZ3\">Discord</a> : https://discord.gg/d6E9ATkcZ3\r\n\r\nYou can find them in the event information / rules section.\r\n\r\n**Flag format:** `CTFUPB{...}`\r\n\r\nGood luck, have fun, and hack responsibly. 🚀"
+  },
+  {
+    "name": "Guardian del pergamino prohibido",
+    "tag": "Web",
+    "points": 500,
+    "author": "INFINITYPAIIN",
+    "description_md": "El pergamino secreto de la Aldea procesa tu mensaje dentro de un conjuro JavaScript\r\n\r\nhttp://chall.ch0wn3rs.ninja:8004\r\n\r\nAutor:INFINITYPAIIN\r\n\r\nFormato flag: ctfupb{4lg0_4s1_4m1g0}"
+  },
+  {
+    "name": "Boring Corp",
+    "tag": "Web",
+    "points": 300,
+    "author": "02Loveslollipop",
+    "description_md": "**Boring Corp** is a corporate consultancy whose internal employee portal is\r\nprotected with JWT.\r\n\r\n<a href=\"http://chall.ch0wn3rs.ninja:8002/\">http://chall.ch0wn3rs.ninja:8002/</a>\r\n\r\nAuthor: 02Loveslollipop"
+  },
+  {
+    "name": "Research Portal: Early Access",
+    "tag": "Web",
+    "points": 300,
+    "author": "_hrcamilo",
+    "description_md": "## Contexto\r\nLa Universidad ha lanzado una versión preliminar de su nuevo portal de investigadores. Algunos becarios han reportado que la función de personalización del dashboard permite inyectar contenido arbitrario, pero el equipo de TI ha implementado un \"Filtro de Seguridad Avanzado\" para evitar ataques. ¿Podrás evadir el filtro y encontrar el secreto guardado en el servidor?\r\n\r\n## Objetivo\r\nLeer el archivo `flag.txt` que se encuentra en el servidor.\r\n\r\nIngresa: http://chall.ch0wn3rs.ninja:8006\r\n\r\nFormato flag: UPB{JEJE_asi_es}\r\n\r\nAutor: _hrcamilo"
+  },
+  {
+    "name": "Link Checker",
+    "tag": "Web",
+    "points": 250,
+    "author": "_hrcamilo",
+    "description_md": "## Contexto\r\nEl departamento de comunicaciones utiliza una herramienta interna para verificar que los enlaces externos en sus boletines no estén rotos. Sin embargo, un investigador de seguridad notó que la herramienta no valida correctamente las peticiones. ¿Podrás acceder al servicio secreto interno?\r\n\r\n## Objetivo\r\nAcceder a `http://127.0.0.1:5000/admin/flag` desde el propio servidor.\r\n\r\n\r\naccede a: http://chall.ch0wn3rs.ninja:8007\r\n\r\nFormato: UPB{Flag_Exampl3}\r\n\r\n- Autor: _hrcamilo"
+  },
+  {
+    "name": "Portal ninja",
+    "tag": "Web",
+    "points": 250,
+    "author": "INFINITYPAIIN",
+    "description_md": "La empresa asegura que el sistema es seguro… pero algo huele mal en el servidor.\r\n\r\nhttp://chall.ch0wn3rs.ninja:8005/\r\n\r\nAutor: INFINITYPAIIN\r\n\r\nFormato flag: ctfupb{4lg0_4s1_4m1g0}"
+  },
+  {
+    "name": "OpenML",
+    "tag": "Web",
+    "points": 200,
+    "author": "02loveslollipop",
+    "description_md": "OpenML is a platform that claims to *\"secure AI by providing free resources to build and train models\"*. Upload `.pkl` files and test your own ML models\r\n\r\n[http://chall.ch0wn3rs.ninja:8003/](http://chall.ch0wn3rs.ninja:8003/)\r\n\r\nAuthor: 02loveslollipop"
+  },
+  {
+    "name": "Senpai no kioku",
+    "tag": "IA",
+    "points": 200,
+    "author": "02loveslollipop",
+    "description_md": "&gt; *\"Only a true otaku can enter the sacred vault.\"*\r\n\r\nA self-proclaimed anime master locked their personal collection behind a neural\r\nnetwork that recognises a secret 22-character passphrase.  The model outputs a\r\nconfidence score: 0 means *\"Who are you, normie?\"*, 1 means *\"Senpai noticed you!\"*.\r\n\r\nThe vault's owner disappeared right after uploading the model to a public repo.\r\nThe passphrase is gone — but the model weights are not.\r\n\r\nCan you invert the network and recover the passphrase to claim the flag?\r\n\r\nAuthor: 02loveslollipop\r\n\r\nDownload: [senpai_no_kioku](https://cggppdg2u5hiuomw.public.blob.vercel-storage.com/senpai_no_kioku.zip)"
+  },
+  {
+    "name": "The Python Jar",
+    "tag": "IA",
+    "points": 150,
+    "author": "02loveslollipop",
+    "description_md": "Doña Pepinillo runs the most famous artisan pickle shop in town.\r\nLast week she replaced her paper quality-control log with an AI model.\r\n\r\nThe model takes **4 brine measurements** — salt concentration, acidity (pH),\r\nfermentation temperature, and curing time — and outputs **2 quality scores**\r\n(crunchiness index and flavour rating). Classic regression, nothing fancy.\r\n\r\nShe asked her primo, a budding data scientist, to train the model and save it, but she feels there's something tangy about the file he gave her...\r\n\r\n## Flag format\r\n\r\n`ctfupb{...}`\r\n\r\nAuthor: 02loveslollipop\r\n\r\n<a href=\"https://cggppdg2u5hiuomw.public.blob.vercel-storage.com/the_python_jar.zip\">The_python_jar.py</a>\r\n\r\n"
+  },
+  {
+    "name": "Echoes in the Wire",
+    "tag": "forensic",
+    "points": 500,
+    "author": "_hrcamilo",
+    "description_md": "Se ha detectado tráfico extraño saliendo de la red de Nexus-Tech. Los analistas creen que un ex-empleado está utilizando protocolos básicos para evadir la detección y extraer información sensible poco a poco. Hemos capturado una muestra de este tráfico en un archivo `.pcap`.\r\n\r\n\r\n[capture.pcap](https://drive.google.com/file/d/12SwcUsQPD3LR-OX55WQtDw-DPOd2Ubcn/view?usp=sharing)\r\n\r\n- Autor: _hrcamilo"
+  },
+  {
+    "name": "Synthesized Signal",
+    "tag": "forensic",
+    "points": 500,
+    "author": "_hrcamilo",
+    "description_md": "Hemos interceptado una transmisión de datos que parece ser una imagen, pero al intentar abrirla, el sistema arroja errores. Los analistas sugieren que las dimensiones de la imagen fueron manipuladas durante la transferencia para ocultar el contenido.\r\n\r\n<a href=\"https://drive.google.com/file/d/1Cmd3k1CfsxRw2rZkmccV-3koHkhsOYDV/view?usp=sharing\">Signal.png</a>\r\n\r\n- Autor: _hrcamilo"
+  },
+  {
+    "name": "Territorio Chown3rs",
+    "tag": "forensic",
+    "points": 500,
+    "author": "INFINITYPAIIN",
+    "description_md": "Los Chown3rs dejaron su marca en esta imagen. A primera vista parece un simple degradado... pero los que saben mirar encuentran mensajes donde otros solo ven píxeles. ¿Puedes recuperar el mensaje oculto en `territorio.png`?\r\n\r\nAutor: INFINITYPAIIN\r\n\r\n[territorio.zip](https://vercel.com/02loveslollipop-projects/~/stores/blob/store_CgGPPDG2U5HIuOMW/browser?file_url=https%253A%252F%252Fcggppdg2u5hiuomw.public.blob.vercel-storage.com%252Fterritorio.zip)\r\n\r\nformato flag: ctfupb{4lg0_4s1_4m1g0}"
+  },
+  {
+    "name": "Ninja en las Sombras",
+    "tag": "forensic",
+    "points": 250,
+    "author": "INFINITYPAIIN",
+    "description_md": "Un ninja siempre deja una pista falsa para confundir a sus enemigos. Se encontró este binario en un servidor comprometido. Se cree que contiene información sensible, pero todo lo que imprime parece demasiado fácil...\r\n\r\n[ninja_binario.zip](https://vercel.com/02loveslollipop-projects/~/stores/blob/store_CgGPPDG2U5HIuOMW/browser?file_url=https%253A%252F%252Fcggppdg2u5hiuomw.public.blob.vercel-storage.com%252Fninja_binario.zip)\r\n\r\nAutor: INFINITYPAIIN"
+  },
+  {
+    "name": "Lucky Spin™ Casino Revenge",
+    "tag": "Crypto",
+    "points": 600,
+    "author": "02loveslollipop",
+    "description_md": "&gt; *\"Welcome back to Lucky Spin™ - now with a quantum-resistant, provably fair(TM) upgrade.\"*\r\n\r\nAfter the first Lucky Spin incident, the casino \"fixed\" its RNG.\r\nThe new backend no longer uses a tiny linear congruential generator. Instead, it runs a custom\r\nMersenne-prime, twist-based state machine that looks suspiciously like a Mersenne Twister built\r\ninside a finite field.\r\n\r\nThe public interface offers two games:\r\n\r\n- **Quick Spin**: cheap, flashy, and almost useless. It only reveals a tiny modulo-37 result.\r\n- **Precision Spin**: expensive, but it leaks the **upper bits** of a tempered internal word.\r\n\r\nBoth actions consume RNG state.\r\n\r\nYour goal is to recover enough information from the casino's \"Precision Spin\" outputs to predict\r\nthe **next Precision Spin** exactly and drain the jackpot.\r\n\r\n```\r\nnc chall.ch0wn3rs.ninja 8010\r\n```\r\n\r\nAuthor: 02loveslollipop"
+  },
+  {
+    "name": "(AAES) - Almost Advanced Encryption System",
+    "tag": "Crypto",
+    "points": 200,
+    "author": "02loveslollipop",
+    "description_md": "&gt; *\"Why use a 256-entry lookup table when you could save CPU cycles and just skip it?\"*\r\n\r\nA junior developer at CryptoStartup™ decided to optimise AES-128 by replacing the\r\nS-box with the **identity function** — after all, the rest of the cipher should be\r\n\"random enough\", right?\r\n\r\nThe result: **AAES™ (Almost Advanced Encryption System)**.\r\n\r\nYou have:\r\n- The full source code of AAES (`chall.py`)  \r\n- 4 known plaintext/ciphertext pairs  \r\n- An encrypted flag (`output.txt`)\r\n\r\nRecover the **128-bit secret key** and decrypt the flag.\r\n\r\nflag: ctfupb{...}\r\n\r\n\r\n[aaes.zip](https://cggppdg2u5hiuomw.public.blob.vercel-storage.com/aaes.zip)\r\n\r\nAuthor: 02loveslollipop"
+  },
+  {
+    "name": "Lucky Spin™ Casino",
+    "tag": "Crypto",
+    "points": 100,
+    "author": "02loveslollipop",
+    "description_md": "&gt; *\"Welcome to Lucky Spin™ – the only provably fair online casino in the dark web.\"*\r\n\r\nThe casino's RNG is \"transparent\": the algorithm, modulus, multiplier, and\r\nincrement are all published. What they keep secret is the **seed**, refreshed\r\neach session.\r\n\r\nThere's a catch — for \"performance reasons\", only **1 in every 100 internal\r\nticks** is shown to players, and only the **top 32 bits** of the 61-bit internal\r\nstate are revealed as the spin result.\r\n\r\nYou are given **10 consecutive spin results**. Predict the 11th spin to beat the house.\r\n\r\n```\r\nnc chall.ch0wn3rs.ninja 8001\r\n```\r\n"
+  },
+  {
+    "name": "The Eye of the Ancestor",
+    "tag": "OSINT",
+    "points": 250,
+    "author": "_hrcamilo",
+    "description_md": "Se ha encontrado un manuscrito antiguo que habla del \"Ombligo del Mundo\". En él, se describe a un guardián solitario que es el único capaz de ver el regreso de los navegantes. Quien encuentre su nombre, encontrará la paz.\r\n\r\nManuscrito:\r\nEn el ombligo del mundo, donde el viento no cesa,\r\ngigantes de piedra vigilan el mar.\r\nSolo uno de ellos recuperó la mirada,\r\ny con ojos de coral nos vuelve a observar.\r\n\r\nBusca al solitario, el que lleva sombrero,\r\ncuya espalda al abismo el tiempo entregó.\r\nDime su nombre, viajero certero,\r\nen la plataforma de piedra que el ancestro labró.\r\n\r\nFormato flag: ´CTFUPB{JEJE_Flag_Generica}´\r\n\r\n- Autor:_hrcamilo"
+  },
+  {
+    "name": "The Geometer's Secret",
+    "tag": "OSINT",
+    "points": 250,
+    "author": "_hrcamilo",
+    "description_md": "Un antiguo profesor de la UPB dejó un poema cifrado que describe un lugar icónico del campus en Medellín. Se dice que el nombre de la persona que vigila la entrada de este lugar es la clave para acceder a los archivos secretos de la universidad.\r\n\r\nPoema: \r\n\r\nEn la ciudad de la primavera eterna,\r\ndonde el saber se abraza en un jardín.\r\nUna concha de concreto, blanca y terna,\r\nguarda un secreto que no tiene fin.\r\n\r\nBusca el busto de aquel que dio vida,\r\na este templo de ciencia y de fe.\r\nSu nombre es la llave, la meta querida,\r\nen Google Street View lo encontrarás, ya lo sé.\r\n\r\nTres palabras en bronce, grabadas con paz,\r\ndel fundador que esta obra trazó.\r\nSu legado es la flag, no mires atrás,\r\nque en la UPB su historia empezó.\r\n\r\n\r\nFormato flag: ´CTFUPB{JEJE_Flag_Generica}´\r\n\r\n- Autor:_hrcamilo"
+  },
+  {
+    "name": "WhatIsThis",
+    "tag": "Steg",
+    "points": 500,
+    "author": "Fu11shoot",
+    "description_md": "Mi amigo me pasó un comprimido un tanto sospechoso y mencionó algo de una estructura parecida a las de las muñecas rusas pero no entiendo a qué se refiere.\r\n¿Serás capaz de encontrar el contenido oculto en este archivo?\r\n\r\n[Descargar archivo](https://drive.google.com/file/d/1_uypVBCeGmYqF0T1hgSqI7WVLZsiAZlN/view?usp=sharing)\r\n\r\nFormato de la flag: CTFUPB{3j3mpl0_f0rm4t0}\r\n\r\n- Autor: Fu11shoot"
+  },
+  {
+    "name": "Faro",
+    "tag": "Steg",
+    "points": 250,
+    "author": "Fu11shoot",
+    "description_md": "He interceptado la señal de un viejo faro.\r\nNo sé qué mensaje está enviando pero algo importante debe esconder en ella.\r\n\r\n[Descargar archivo](https://drive.google.com/file/d/1yio5ZIF-p3GvPHqyxLM9k3gNKuumRRx7/view?usp=sharing)\r\n\r\nFormato de la flag: CTFUPB{3j3mpl0_f0rm4t0}\r\n\r\n\r\n- Autor: Fu11shoot"
+  },
+  {
+    "name": "Hidden Core",
+    "tag": "Misc",
+    "points": 500,
+    "author": "_hrcamilo",
+    "description_md": "Has obtenido una imagen del núcleo de un sistema cuántico. Los analistas creen que hay información sensible oculta en esta imagen, protegida por una clave que solo el sistema conoce. ¿Podrás extraer el secreto?\r\n\r\n<a href=\"https://drive.google.com/file/d/1xbhwHy_qDyFnpvKbjGJagr8A1mDimR0r/view?usp=sharing\">Core.jpg</a>\r\n\r\n- Autor: _hrcamilo"
+  },
+  {
+    "name": "Neural Guard",
+    "tag": "Misc",
+    "points": 500,
+    "author": "_hrcamilo",
+    "description_md": "Has obtenido acceso a un evaluador de expresiones matemáticas protegido por una \"IA de seguridad\". Sin embargo, parece que el filtro es puramente sintáctico y bloquea palabras clave específicas. Tu misión es evadir al Guardián Neural y leer el archivo `flag.txt`.\r\n\r\nIngresa a través de terminal: nc chall.ch0wn3rs.ninja 8008\r\n\r\n- Autor: _hrcamilo"
+  },
+  {
+    "name": "Nightshift VM",
+    "tag": "Reversing",
+    "points": 250,
+    "author": "Fu11shoot",
+    "description_md": "Un proveedor de control industrial liberó un "validador offline" para activar estaciones nocturnas. Aseguran que el secreto no se puede extraer con `strings` y que "hasta las IAs se pierden" entre bytecode y ruido.\r\nRecupera el secreto del binario.\r\n\r\n[Descargar archivo](https://drive.google.com/file/d/1iF8dGl9yKorwm3BFty1POpejBnVponlo/view?usp=sharing)\r\n\r\n\r\nFormato de la flag: CTFUPB{f0rm4t0_d3_3j3mpl0}\r\n\r\n- Autor: Fu11shoot"
+  }
+]
