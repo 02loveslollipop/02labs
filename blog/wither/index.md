@@ -113,7 +113,7 @@ Evaluating this:
 
 This means that with 14 samples we can be 97.1% confident that we have recovered all bits of the plaintext, even in the worst-case scenario where all bits are $1$. For an average case, where we expect a lot more $0$ bits, we can be confident with even fewer samples. But as each oracle query is very cheap, we can just go with 14 samples to be safe.
 
-# Solver (almost exactly the same as the one we used for [Bloom](https://blog.02loveslollipop.uk/posts/bloom/))
+# Solver
 
 The solver was implemented in Python, using the `pwntools` library to perform the remote retrieval of the ciphertexts. 
 
