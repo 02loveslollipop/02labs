@@ -11,42 +11,42 @@
     "tag": "Web",
     "points": 500,
     "author": "INFINITYPAIIN",
-    "description_md": "El pergamino secreto de la Aldea procesa tu mensaje dentro de un conjuro JavaScript\r\n\r\nhttp://chall.ch0wn3rs.ninja:8004\r\n\r\nAutor:INFINITYPAIIN\r\n\r\nFormato flag: ctfupb{4lg0_4s1_4m1g0}"
+    "description_md": "El pergamino secreto de la Aldea procesa tu mensaje dentro de un conjuro JavaScript\r\n\r\nAutor:INFINITYPAIIN\r\n\r\nFormato flag: ctfupb{4lg0_4s1_4m1g0}"
   },
   {
     "name": "Boring Corp",
     "tag": "Web",
     "points": 300,
     "author": "02Loveslollipop",
-    "description_md": "**Boring Corp** is a corporate consultancy whose internal employee portal is\r\nprotected with JWT.\r\n\r\n<a href=\"http://chall.ch0wn3rs.ninja:8002/\">http://chall.ch0wn3rs.ninja:8002/</a>\r\n\r\nAuthor: 02Loveslollipop"
+    "description_md": "**Boring Corp** is a corporate consultancy whose internal employee portal is\r\nprotected with JWT.\r\n\r\nAuthor: 02Loveslollipop"
   },
   {
     "name": "Research Portal: Early Access",
     "tag": "Web",
     "points": 300,
     "author": "_hrcamilo",
-    "description_md": "## Contexto\r\nLa Universidad ha lanzado una versión preliminar de su nuevo portal de investigadores. Algunos becarios han reportado que la función de personalización del dashboard permite inyectar contenido arbitrario, pero el equipo de TI ha implementado un \"Filtro de Seguridad Avanzado\" para evitar ataques. ¿Podrás evadir el filtro y encontrar el secreto guardado en el servidor?\r\n\r\n## Objetivo\r\nLeer el archivo `flag.txt` que se encuentra en el servidor.\r\n\r\nIngresa: http://chall.ch0wn3rs.ninja:8006\r\n\r\nFormato flag: UPB{JEJE_asi_es}\r\n\r\nAutor: _hrcamilo"
+    "description_md": "## Contexto\r\nLa Universidad ha lanzado una versión preliminar de su nuevo portal de investigadores. Algunos becarios han reportado que la función de personalización del dashboard permite inyectar contenido arbitrario, pero el equipo de TI ha implementado un \"Filtro de Seguridad Avanzado\" para evitar ataques. ¿Podrás evadir el filtro y encontrar el secreto guardado en el servidor?\r\n\r\n## Objetivo\r\nLeer el archivo `flag.txt` que se encuentra en el servidor.\r\n\r\nFormato flag: UPB{JEJE_asi_es}\r\n\r\nAutor: _hrcamilo"
   },
   {
     "name": "Link Checker",
     "tag": "Web",
     "points": 250,
     "author": "_hrcamilo",
-    "description_md": "## Contexto\r\nEl departamento de comunicaciones utiliza una herramienta interna para verificar que los enlaces externos en sus boletines no estén rotos. Sin embargo, un investigador de seguridad notó que la herramienta no valida correctamente las peticiones. ¿Podrás acceder al servicio secreto interno?\r\n\r\n## Objetivo\r\nAcceder a `http://127.0.0.1:5000/admin/flag` desde el propio servidor.\r\n\r\n\r\naccede a: http://chall.ch0wn3rs.ninja:8007\r\n\r\nFormato: UPB{Flag_Exampl3}\r\n\r\n- Autor: _hrcamilo"
+    "description_md": "## Contexto\r\nEl departamento de comunicaciones utiliza una herramienta interna para verificar que los enlaces externos en sus boletines no estén rotos. Sin embargo, un investigador de seguridad notó que la herramienta no valida correctamente las peticiones. ¿Podrás acceder al servicio secreto interno?\r\n\r\n## Objetivo\r\nAcceder a `http://127.0.0.1:5000/admin/flag` desde el propio servidor.\r\n\r\nFormato: UPB{Flag_Exampl3}\r\n\r\n- Autor: _hrcamilo"
   },
   {
     "name": "Portal ninja",
     "tag": "Web",
     "points": 250,
     "author": "INFINITYPAIIN",
-    "description_md": "La empresa asegura que el sistema es seguro… pero algo huele mal en el servidor.\r\n\r\nhttp://chall.ch0wn3rs.ninja:8005/\r\n\r\nAutor: INFINITYPAIIN\r\n\r\nFormato flag: ctfupb{4lg0_4s1_4m1g0}"
+    "description_md": "La empresa asegura que el sistema es seguro… pero algo huele mal en el servidor.\r\n\r\nAutor: INFINITYPAIIN\r\n\r\nFormato flag: ctfupb{4lg0_4s1_4m1g0}"
   },
   {
     "name": "OpenML",
     "tag": "Web",
     "points": 200,
     "author": "02loveslollipop",
-    "description_md": "OpenML is a platform that claims to *\"secure AI by providing free resources to build and train models\"*. Upload `.pkl` files and test your own ML models\r\n\r\n[http://chall.ch0wn3rs.ninja:8003/](http://chall.ch0wn3rs.ninja:8003/)\r\n\r\nAuthor: 02loveslollipop"
+    "description_md": "OpenML is a platform that claims to *\"secure AI by providing free resources to build and train models\"*. Upload `.pkl` files and test your own ML models\r\n\r\nAuthor: 02loveslollipop"
   },
   {
     "name": "Senpai no kioku",
@@ -95,7 +95,7 @@
     "tag": "Crypto",
     "points": 600,
     "author": "02loveslollipop",
-    "description_md": "&gt; *\"Welcome back to Lucky Spin™ - now with a quantum-resistant, provably fair(TM) upgrade.\"*\r\n\r\nAfter the first Lucky Spin incident, the casino \"fixed\" its RNG.\r\nThe new backend no longer uses a tiny linear congruential generator. Instead, it runs a custom\r\nMersenne-prime, twist-based state machine that looks suspiciously like a Mersenne Twister built\r\ninside a finite field.\r\n\r\nThe public interface offers two games:\r\n\r\n- **Quick Spin**: cheap, flashy, and almost useless. It only reveals a tiny modulo-37 result.\r\n- **Precision Spin**: expensive, but it leaks the **upper bits** of a tempered internal word.\r\n\r\nBoth actions consume RNG state.\r\n\r\nYour goal is to recover enough information from the casino's \"Precision Spin\" outputs to predict\r\nthe **next Precision Spin** exactly and drain the jackpot.\r\n\r\n```\r\nnc chall.ch0wn3rs.ninja 8010\r\n```\r\n\r\nAuthor: 02loveslollipop"
+    "description_md": "&gt; *\"Welcome back to Lucky Spin™ - now with a quantum-resistant, provably fair(TM) upgrade.\"*\r\n\r\nAfter the first Lucky Spin incident, the casino \"fixed\" its RNG.\r\nThe new backend no longer uses a tiny linear congruential generator. Instead, it runs a custom\r\nMersenne-prime, twist-based state machine that looks suspiciously like a Mersenne Twister built\r\ninside a finite field.\r\n\r\nThe public interface offers two games:\r\n\r\n- **Quick Spin**: cheap, flashy, and almost useless. It only reveals a tiny modulo-37 result.\r\n- **Precision Spin**: expensive, but it leaks the **upper bits** of a tempered internal word.\r\n\r\nBoth actions consume RNG state.\r\n\r\nYour goal is to recover enough information from the casino's \"Precision Spin\" outputs to predict\r\nthe **next Precision Spin** exactly and drain the jackpot.\r\n\r\nAuthor: 02loveslollipop"
   },
   {
     "name": "(AAES) - Almost Advanced Encryption System",
@@ -109,7 +109,7 @@
     "tag": "Crypto",
     "points": 100,
     "author": "02loveslollipop",
-    "description_md": "&gt; *\"Welcome to Lucky Spin™ – the only provably fair online casino in the dark web.\"*\r\n\r\nThe casino's RNG is \"transparent\": the algorithm, modulus, multiplier, and\r\nincrement are all published. What they keep secret is the **seed**, refreshed\r\neach session.\r\n\r\nThere's a catch — for \"performance reasons\", only **1 in every 100 internal\r\nticks** is shown to players, and only the **top 32 bits** of the 61-bit internal\r\nstate are revealed as the spin result.\r\n\r\nYou are given **10 consecutive spin results**. Predict the 11th spin to beat the house.\r\n\r\n```\r\nnc chall.ch0wn3rs.ninja 8001\r\n```\r\n"
+    "description_md": "&gt; *\"Welcome to Lucky Spin™ – the only provably fair online casino in the dark web.\"*\r\n\r\nThe casino's RNG is \"transparent\": the algorithm, modulus, multiplier, and\r\nincrement are all published. What they keep secret is the **seed**, refreshed\r\neach session.\r\n\r\nThere's a catch — for \"performance reasons\", only **1 in every 100 internal\r\nticks** is shown to players, and only the **top 32 bits** of the 61-bit internal\r\nstate are revealed as the spin result.\r\n\r\nYou are given **10 consecutive spin results**. Predict the 11th spin to beat the house.\r\n"
   },
   {
     "name": "The Eye of the Ancestor",
@@ -151,13 +151,13 @@
     "tag": "Misc",
     "points": 500,
     "author": "_hrcamilo",
-    "description_md": "Has obtenido acceso a un evaluador de expresiones matemáticas protegido por una \"IA de seguridad\". Sin embargo, parece que el filtro es puramente sintáctico y bloquea palabras clave específicas. Tu misión es evadir al Guardián Neural y leer el archivo `flag.txt`.\r\n\r\nIngresa a través de terminal: nc chall.ch0wn3rs.ninja 8008\r\n\r\n- Autor: _hrcamilo"
+    "description_md": "Has obtenido acceso a un evaluador de expresiones matemáticas protegido por una \"IA de seguridad\". Sin embargo, parece que el filtro es puramente sintáctico y bloquea palabras clave específicas. Tu misión es evadir al Guardián Neural y leer el archivo `flag.txt`.\r\n\r\n- Autor: _hrcamilo"
   },
   {
     "name": "Nightshift VM",
     "tag": "Reversing",
     "points": 250,
     "author": "Fu11shoot",
-    "description_md": "Un proveedor de control industrial liberó un "validador offline" para activar estaciones nocturnas. Aseguran que el secreto no se puede extraer con `strings` y que "hasta las IAs se pierden" entre bytecode y ruido.\r\nRecupera el secreto del binario.\r\n\r\n[Descargar archivo](https://drive.google.com/file/d/1iF8dGl9yKorwm3BFty1POpejBnVponlo/view?usp=sharing)\r\n\r\n\r\nFormato de la flag: CTFUPB{f0rm4t0_d3_3j3mpl0}\r\n\r\n- Autor: Fu11shoot"
+    "description_md": "Un proveedor de control industrial liberó un \"validador offline\" para activar estaciones nocturnas. Aseguran que el secreto no se puede extraer con `strings` y que \"hasta las IAs se pierden\" entre bytecode y ruido.\r\nRecupera el secreto del binario.\r\n\r\n[Descargar archivo](https://drive.google.com/file/d/1iF8dGl9yKorwm3BFty1POpejBnVponlo/view?usp=sharing)\r\n\r\n\r\nFormato de la flag: CTFUPB{f0rm4t0_d3_3j3mpl0}\r\n\r\n- Autor: Fu11shoot"
   }
 ]
