@@ -15,7 +15,7 @@ Plaintext \oplus 0 = Plaintext
 
 This means we know that the only impossible value for the cipher is the plaintext itself.
 
-# Recover
+# Recovery
 
 Let's suppose a ((4))-bit ((2))-block reduced system. The following would be a valid encryption:
 
