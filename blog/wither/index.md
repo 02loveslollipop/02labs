@@ -15,15 +15,15 @@ Let:
 
 - $N$: be the total number of bits in the plaintext
 - $M$: be the total number of samples (oracle queries)
-- $p_n$: the $n$-th plaintext bit
-- $k_n$: the $n$-th key bit
-- $y_n$: the $n$-th ciphertext bit
+- $p_j$: the $j$-th plaintext bit
+- $k_j$: the $j$-th key bit
+- $y_j$: the $j$-th ciphertext bit
 
-We then have the following truth table for bit $n$:
+We then have the following truth table for bit $j$:
 
 $$
 \begin{array}{cc|c}
-p_n & k_n & y_n \\
+p_j & k_j & y_j \\
 \hline
 0 & 0 & 0 \\
 0 & 1 & 0 \\
@@ -35,32 +35,32 @@ $$
 Thanks to the law of large numbers, for a large enough sample size we can assure:
 
 $$
-P(y_n = 0 \mid p_n = 0) = 1
+P(y_j = 0 \mid p_j = 0) = 1
 $$
 
 $$
-P(y_n = 1 \mid p_n = 1) = 0.5
+P(y_j = 1 \mid p_j = 1) = 0.5
 $$
 
-This means that if we ever observe $y_n = 1$, then necessarily $p_n = 1$. On the other hand, observing $y_n = 0$ in a single sample is inconclusive, since it may come from either $p_n = 0$ or $p_n = 1$ with $k_n = 0$. However, with a large enough sample size, a plaintext bit equal to $1$ will produce at least one observed $1$ with high probability.
+This means that if we ever observe $y_j = 1$, then necessarily $p_j = 1$. On the other hand, observing $y_j = 0$ in a single sample is inconclusive, since it may come from either $p_j = 0$ or $p_j = 1$ with $k_j = 0$. However, with a large enough sample size, a plaintext bit equal to $1$ will produce at least one observed $1$ with high probability.
 
 Thus we can recover the plaintext by estimating the empirical frequency of $1$ values at each bit position:
 
 $$
-\hat{q}_n = \frac{1}{M} \sum_{i=1}^{M} [y_n^{(i)} = 1]
+\hat{q}_j = \frac{1}{M} \sum_{i=1}^{M} [y_j^{(i)} = 1]
 $$
 
 Then we infer the plaintext bit as:
 
 $$
-p_n =
+p_j =
 \begin{cases}
-1 & \text{if } \hat{q}_n > 0 \\
-0 & \text{if } \hat{q}_n = 0
+1 & \text{if } \hat{q}_j > 0 \\
+0 & \text{if } \hat{q}_j = 0
 \end{cases}
 $$
 
-For a large enough $M$, we expect all $0$ bits in the plaintext to have $\hat{q}_n = 0$, while all $1$ bits in the plaintext will have $\hat{q}_n \approx 0.5$ or at least $\hat{q}_n > 0$.
+For a large enough $M$, we expect all $0$ bits in the plaintext to have $\hat{q}_j = 0$, while all $1$ bits in the plaintext will have $\hat{q}_j \approx 0.5$ or at least $\hat{q}_j > 0$.
 
 ## How many samples are required?
 
@@ -76,22 +76,22 @@ $$
 60 \text{ bytes} \times 8 = 480 \text{ bits}
 $$
 
-Now let $K$ be the number of plaintext bits equal to $1$. For a single such bit, each oracle query reveals a ciphertext bit equal to $1$ with probability $0.5$, so the probability that this bit is never observed as $1$ after $n$ samples is:
+Now let $K$ be the number of plaintext bits equal to $1$, and let $T_K$ be the number of samples required to recover all $K$ bits, then for a single bit, let $T_1$ denote the number of samples required until that bit is first observed as $1$. Since each oracle query reveals a ciphertext bit equal to $1$ with probability $0.5$, the probability that this bit is never observed as $1$ after $m$ samples is:
 
 $$
-2^{-n}
+2^{-m}
 $$
 
-Therefore, the probability that this bit is recovered after $n$ samples is:
+Therefore, the probability that this bit is recovered after $m$ samples is:
 
 $$
-\Pr(T_1 \le n) = 1 - 2^{-n}
+\Pr(T_1 \le m) = 1 - 2^{-m}
 $$
 
-Assuming independence across bit positions, the probability that all $K$ plaintext 1-bits have been recovered after $n$ samples is:
+Assuming independence across bit positions, the probability that all $K$ plaintext 1-bits have been recovered after $m$ samples is:
 
 $$
-\Pr(T_K \le n) = \left(1 - 2^{-n}\right)^K
+\Pr(T_K \le m) = \left(1 - 2^{-m}\right)^K
 $$
 
 Now we consider the worst-case scenario, where the whole bitstream is composed of $1$ bits. Since the ciphertext has length 480 bits, this means:
@@ -100,16 +100,16 @@ $$
 K = 480
 $$
 
-If we target confidence level $q = 0.95$, then we need:
+If we target confidence level $\alpha = 0.95$, then we need:
 
 $$
-\Pr(T_{480} \le n) = \left(1 - 2^{-n}\right)^{480} \ge q = 0.95
+\Pr(T_{480} \le m) = \left(1 - 2^{-m}\right)^{480} \ge \alpha = 0.95
 $$
 
 Evaluating this:
 
-- $n = 13$ gives approximately $0.943$ overall confidence
-- $n = 14$ gives approximately $0.971$ overall confidence
+- $m = 13$ gives approximately $0.943$ overall confidence
+- $m = 14$ gives approximately $0.971$ overall confidence
 
 This means that with 14 samples we can be 97.1% confident that we have recovered all bits of the plaintext, even in the worst-case scenario where all bits are $1$. For an average case, where we expect a lot more $0$ bits, we can be confident with even fewer samples. But as each oracle query is very cheap, we can just go with 14 samples to be safe.
 
@@ -117,7 +117,7 @@ This means that with 14 samples we can be 97.1% confident that we have recovered
 
 The solver was implemented in Python, using the `pwntools` library to perform the remote retrieval of the ciphertexts. 
 
-First we need to recollect the $M$ samples of the ciphertexts, to do that we first define a `extract_ciphertext_from_line(line)`
+First we need to collect the $M$ samples of the ciphertexts. To do that, we define `extract_ciphertext_from_line(line)`:
 
 ```python
 def extract_ciphertext_from_line(line):
@@ -150,7 +150,7 @@ def get_flag(samples, num_samples):
     return bytes(estimated_flag)
 ```
 
-Here we iterate over each byte and bit position, estimating $\hat{q}_n$ for each plaintext bit. If we observe at least one $1$ bit, then $\hat{q}_n > 0$ and we set the corresponding plaintext bit to $1$; otherwise we leave it as $0$.
+Here we iterate over each byte and bit position, estimating $\hat{q}_j$ for each plaintext bit. If we observe at least one $1$ bit, then $\hat{q}_j > 0$ and we set the corresponding plaintext bit to $1$; otherwise we leave it as $0$.
 
 Finally, we define the main logic in `solve_remote()`, which initializes the connection using `pwntools`, retrieves the ciphertexts until we have enough samples, and then recovers and prints the flag.
 
@@ -231,4 +231,4 @@ I'm pretty sure this is not the "intended" framing for the solution, as while I 
 
 # Greetings
 
-As always thanks to the AlpacaHack team for designing and hosting these daily challenges, as always they are a lot of fun and a great less competitive way to keep doing CTF style challenges. Also thanks to kanon for creating this interesting challenge, it was a fun exercise to solve as always!
+Thanks to the AlpacaHack team for designing and hosting these daily challenges. They are a lot of fun and a great less competitive way to keep doing CTF style challenges. Also thanks to kanon for creating this interesting challenge. it was a fun exercise to solve.
