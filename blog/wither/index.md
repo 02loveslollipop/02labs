@@ -42,13 +42,25 @@ $$
 P(y_n = 1 \mid p_n = 1) = 0.5
 $$
 
-This means that all $0$ bits in the ciphertext correspond to a $0$ bit in the plaintext, and, with a large enough sample size, all $1$ bits in the plaintext will have a $P(y_n = 1 \mid p_n = 1) \approx 0.5$ chance of being observed as $1$ in the ciphertext at least once.
+This means that if we ever observe $y_n = 1$, then necessarily $p_n = 1$. On the other hand, observing $y_n = 0$ in a single sample is inconclusive, since it may come from either $p_n = 0$ or $p_n = 1$ with $k_n = 0$. However, with a large enough sample size, a plaintext bit equal to $1$ will produce at least one observed $1$ with high probability.
 
-Thus we can recover the plaintext by checking the frequency of $1$ bits over the sample size.
+Thus we can recover the plaintext by estimating the empirical frequency of $1$ values at each bit position:
 
-$$ P(p_n = 1) = \frac{\sum_{i=1}^{M} [y_{n}^{(i)} = 1]}{M} $$
+$$
+\hat{q}_n = \frac{1}{M} \sum_{i=1}^{M} [y_n^{(i)} = 1]
+$$
 
-For a large enough $M$, we expect all $0$ bits in the plaintext to have $P(p_n = 1) = 0$, while all $1$ bits in the plaintext will have $P(p_n = 1) \approx 0.5$ or at least $P(p_n = 1) > 0$.
+Then we infer the plaintext bit as:
+
+$$
+p_n =
+\begin{cases}
+1 & \text{if } \hat{q}_n > 0 \\
+0 & \text{if } \hat{q}_n = 0
+\end{cases}
+$$
+
+For a large enough $M$, we expect all $0$ bits in the plaintext to have $\hat{q}_n = 0$, while all $1$ bits in the plaintext will have $\hat{q}_n \approx 0.5$ or at least $\hat{q}_n > 0$.
 
 ## How many samples are required?
 
