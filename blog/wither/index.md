@@ -225,7 +225,7 @@ Recovered flag: Alpaca{Bebe_skyscraper,_night_draper,_I_inhaling_vapor,_huh}
 ```
 # Conclusion
 
-In comparison to bloom, which I consider similar in the sense that both relied on bitwise operations as the basis of the "encryption", this challenge allowed for a much easier recovery, mostly because of the heavy unbalance the AND operation has in its output probabilities. In Bloom, the imbalance was much more subtle and introduced by leaving out the 0 key, which made recovering enough samples to be able to distinguish the plaintext bits much more difficult. In Wither, the imbalance is very strong and allows for a very easy recovery with a very small number of samples, which is what we expected from our theoretical analysis.
+In comparison to Bloom, which I consider similar in the sense that both relied on bitwise operations as the basis of the "encryption", this challenge allowed for a much easier recovery, mostly because of the heavy unbalance the AND operation has in its output probabilities. In Bloom, the imbalance was much more subtle and introduced by leaving out the 0 key, which made recovering enough samples to be able to distinguish the plaintext bits much more difficult. In Wither, the imbalance is very strong and allows for a very easy recovery with a very small number of samples, which is what we expected from our theoretical analysis.
 
 I'm pretty sure this is not the "intended" framing for the solution, as while I was writing this post I realized you could simply OR each bit on the ciphertext samples and get the plaintext directly, but if you think about it this is the same thing with some extra steps in between (LOL).
 
