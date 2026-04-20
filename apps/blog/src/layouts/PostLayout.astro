@@ -165,7 +165,59 @@ const articleNavLinks = relatedPosts.slice(0, 2).map((post, index) => ({
 		(() => {
 			const article = document.getElementById("articleContent");
 			const toc = document.getElementById("toc");
-			if (!(article instanceof HTMLElement) || !(toc instanceof HTMLElement)) return;
+			if (!(article instanceof HTMLElement)) return;
+
+			const fitProseImages = () => {
+				const viewportMaxHeight = window.innerHeight * 0.7;
+				const images = Array.from(article.querySelectorAll("img"));
+
+				for (const image of images) {
+					if (!(image instanceof HTMLImageElement)) continue;
+					if (image.closest("figure")) continue;
+
+					const parent = image.parentElement;
+					if (!(parent instanceof HTMLElement)) continue;
+					if (image.naturalWidth <= 0 || image.naturalHeight <= 0) continue;
+
+					const availableWidth = parent.clientWidth;
+					if (availableWidth <= 0) continue;
+
+					const widthScale = availableWidth / image.naturalWidth;
+					const heightScale = viewportMaxHeight / image.naturalHeight;
+					const targetScale = Math.max(0.01, Math.min(widthScale, heightScale));
+					const targetWidth = Math.max(1, Math.floor(image.naturalWidth * targetScale));
+
+					image.style.width = `${targetWidth}px`;
+					image.style.height = "auto";
+					image.dataset.autofitReady = "true";
+				}
+			};
+
+			const initProseImages = () => {
+				const images = Array.from(article.querySelectorAll("img"));
+				for (const image of images) {
+					if (!(image instanceof HTMLImageElement)) continue;
+					if (image.closest("figure")) continue;
+					if (image.complete) continue;
+					image.addEventListener("load", fitProseImages, { once: true });
+				}
+				fitProseImages();
+			};
+
+			let resizeRaf = 0;
+			const onResize = () => {
+				if (resizeRaf) cancelAnimationFrame(resizeRaf);
+				resizeRaf = requestAnimationFrame(() => {
+					fitProseImages();
+					resizeRaf = 0;
+				});
+			};
+
+			window.addEventListener("resize", onResize, { passive: true });
+			window.addEventListener("orientationchange", onResize, { passive: true });
+			initProseImages();
+
+			if (!(toc instanceof HTMLElement)) return;
 
 			const links = Array.from(toc.querySelectorAll("[data-toc-link]"));
 			const headings = Array.from(article.querySelectorAll("h1, h2, h3"));

@@ -906,13 +906,17 @@ h1.title {
 
 .prose img {
 	display: block;
-	width: 100%;
+	width: auto;
 	height: auto;
 	max-width: 100%;
 	max-height: 70vh;
 	margin: 28px auto;
+	background: transparent;
+	object-fit: contain;
+}
+
+.prose img[data-autofit-ready="true"] {
 	background: var(--media-bg);
-	object-fit: fit;
 }
 
 .prose figure {
