@@ -1,18 +1,18 @@
 ---
-import BaseLayout from "../../layouts/BaseLayout.astro";
 import { getCollection } from "astro:content";
+import ArchiveTagBar from "../../components/ArchiveTagBar.astro";
+import EmptyFeaturedMedia from "../../components/EmptyFeaturedMedia.astro";
+import tagLookup from "../../data/tag-lookup.json";
+import SiteHeader from "../../components/SiteHeader.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
 import {
 	BLOG_DESCRIPTION,
 	BLOG_NAME,
-	formatDateIso,
-	getPostExcerpt,
-	getPostFirstImageSrc,
-	getPostSlug,
-	resolvePostImageSrc,
+	getTagSummaries,
 	resolveSiteUrl,
 	slugifyTag,
 	sortBlogEntries,
-	stripMarkdownInline,
+	toBlogIndexPost,
 } from "../../lib/posts";
 
 export async function getStaticPaths() {
@@ -33,23 +33,22 @@ export async function getStaticPaths() {
 }
 
 const { tagSlug, tagLabel } = Astro.props;
-const entries = sortBlogEntries((await getCollection("blog")).filter((entry) => !entry.data.draft));
-const posts = entries
-	.filter((post) => post.data.tags.some((tag) => slugifyTag(tag) === tagSlug))
-	.map((post) => {
-		const slug = getPostSlug(post);
-		return {
-			post,
-			slug,
-			title: stripMarkdownInline(post.data.title),
-			excerpt: getPostExcerpt(post.body, stripMarkdownInline(post.data.description)),
-			imageSrc:
-				resolvePostImageSrc(post.data.featuredImage, slug) ??
-				getPostFirstImageSrc(post.body, slug),
-		};
-	});
+const allEntries = sortBlogEntries((await getCollection("blog")).filter((entry) => !entry.data.draft));
+const tagSummaries = getTagSummaries(allEntries);
+const posts = allEntries
+	.filter((entry) => entry.data.tags.some((tag) => slugifyTag(tag) === tagSlug))
+	.map((entry) => ({ entry, preview: toBlogIndexPost(entry, Astro.site) }));
+const featured = posts[0] ?? null;
+const archivePosts = posts.slice(featured ? 1 : 0);
+const lookupDescription =
+	tagLookup[tagSlug as keyof typeof tagLookup]?.description?.trim() || "";
 const title = `Posts tagged ${tagLabel}`;
-const description = `Browse ${posts.length} ${tagLabel} post${posts.length === 1 ? "" : "s"} on ${BLOG_NAME}. ${BLOG_DESCRIPTION}`;
+const description = lookupDescription
+	? lookupDescription
+	: `Browse ${posts.length} ${tagLabel} post${posts.length === 1 ? "" : "s"} on ${BLOG_NAME}. ${BLOG_DESCRIPTION}`;
+const summary = lookupDescription
+	? `${description} ${posts.length} post${posts.length === 1 ? "" : "s"} in this archive.`
+	: description;
 const pageUrl = resolveSiteUrl(`/tags/${tagSlug}/`, Astro.site);
 const jsonLd = JSON.stringify(
 	[
@@ -57,7 +56,7 @@ const jsonLd = JSON.stringify(
 			"@context": "https://schema.org",
 			"@type": "CollectionPage",
 			name: title,
-			description,
+			description: summary,
 			url: pageUrl,
 			isPartOf: {
 				"@type": "Blog",
@@ -69,11 +68,11 @@ const jsonLd = JSON.stringify(
 			"@context": "https://schema.org",
 			"@type": "ItemList",
 			name: `${tagLabel} posts`,
-			itemListElement: posts.map(({ slug, title: postTitle }, index) => ({
+			itemListElement: posts.map(({ preview }, index) => ({
 				"@type": "ListItem",
 				position: index + 1,
-				name: postTitle,
-				url: resolveSiteUrl(`/posts/${slug}/`, Astro.site),
+				name: preview.title,
+				url: preview.url,
 			})),
 		},
 	],
@@ -82,47 +81,80 @@ const jsonLd = JSON.stringify(
 );
 ---
 
-<BaseLayout title={title} description={description} ogType="website" jsonLd={jsonLd}>
-	<header class="header">
-		<div class="header__inner">
-			<a class="brand" href="/">{BLOG_NAME}</a>
-			<nav class="header__links" aria-label="Site">
-				<a href="/rss.xml">RSS</a>
-				<a href="https://02labs.me/" rel="noopener noreferrer">Main site</a>
-			</nav>
-		</div>
-	</header>
+<BaseLayout title={title} description={summary} ogType="website" jsonLd={jsonLd}>
+	<SiteHeader />
 
 	<main class="wrap">
-		<section class="paper" aria-label={`Posts tagged ${tagLabel}`}>
-			<header class="archive-hero">
-				<p class="archive-hero__eyebrow">Tag archive</p>
-				<h1>{tagLabel}</h1>
-				<p>{description}</p>
-			</header>
-
-			<div class="post-list">
-				{posts.map(({ post, slug, title: postTitle, excerpt, imageSrc }) => (
-					<a class={`post-item ${imageSrc ? "" : "post-item--no-image"}`} href={`/posts/${slug}/`}>
-						{imageSrc ? (
-							<img
-								class="post-item__thumb"
-								src={imageSrc}
-								alt={`${postTitle} preview`}
-								loading="lazy"
-								decoding="async"
-							/>
-						) : null}
-						<div class="post-item__body">
-							<h2>{postTitle}</h2>
-							<p class="post-item__excerpt">{excerpt}</p>
-							<div class="meta">
-								<time datetime={post.data.pubDate.toISOString()}>{formatDateIso(post.data.pubDate)}</time>
-							</div>
-						</div>
-					</a>
-				))}
+		<section class="arc-hero">
+			<div class="eyebrow">
+				<span>02Labs</span>
+				<span class="dot"></span>
+				<span>TAG ARCHIVE</span>
+				<span class="dot"></span>
+				<span>{String(posts.length).padStart(2, "0")} POSTS</span>
 			</div>
+			<h1>{tagLabel}</h1>
+			<p>{summary}</p>
 		</section>
+
+		<ArchiveTagBar allCount={allEntries.length} activeTagSlug={tagSlug} tagSummaries={tagSummaries} />
+
+		{featured ? (
+			<a class="featured" href={`/posts/${featured.preview.slug}/`}>
+				<div class="featured__img">
+					{featured.preview.imageSrc ? (
+						<img
+							src={featured.preview.imageSrc}
+							alt={`${featured.preview.title} preview`}
+							loading="eager"
+							decoding="async"
+						/>
+					) : (
+						<EmptyFeaturedMedia />
+					)}
+				</div>
+				<div class="featured__body">
+					<div>
+						<div class="featured__tags">
+							{featured.preview.tags.slice(0, 3).map((tag, index) => (
+								<span class={index === 0 ? "tag-a" : "tag-g"}>{tag}</span>
+							))}
+						</div>
+						<div style="height: 18px" aria-hidden="true"></div>
+						<h2>{featured.preview.title}</h2>
+						<div style="height: 14px" aria-hidden="true"></div>
+						<p>{featured.preview.excerpt}</p>
+					</div>
+					<div class="featured__foot">
+						<span>{featured.preview.pubDateDisplay} · {featured.preview.readTimeLabel}</span>
+						<span class="cta">READ POST →</span>
+					</div>
+				</div>
+			</a>
+		) : null}
+
+		<div class="list" role="list">
+			{archivePosts.map(({ preview }, index) => (
+				<a class="post-row" href={`/posts/${preview.slug}/`} role="listitem">
+					<span class="pr-num">
+						{String(index + 1).padStart(2, "0")} · {preview.pubDateCode}
+					</span>
+					<span class="pr-cat">
+						{preview.tags.slice(0, 2).map((tag) => tag.toUpperCase()).join(" · ")}
+					</span>
+					<span class="pr-title">{preview.title}</span>
+					<span class="pr-meta">
+						<span>{preview.readTimeLabel}</span>
+						<span>{preview.pubDateDisplay.replace(",", "")}</span>
+					</span>
+					<span class="pr-arrow">→</span>
+				</a>
+			))}
+		</div>
+
+		<footer class="arc-foot">
+			<span>END OF TAG ARCHIVE · {String(posts.length).padStart(2, "0")} POSTS</span>
+			<a href="/">ALL POSTS →</a>
+		</footer>
 	</main>
 </BaseLayout>

@@ -15,6 +15,7 @@
     "@astrojs/cloudflare": "^12.6.12",
     "@astrojs/rss": "^4.0.15",
     "@astrojs/sitemap": "^3.7.0",
+    "animejs": "^4.3.6",
     "astro": "^5.17.1",
     "katex": "^0.16.32",
     "rehype-katex": "^7.0.1",

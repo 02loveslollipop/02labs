@@ -7,8 +7,11 @@ import {
 	BLOG_NAME,
 	BLOG_PUBLISHER,
 	countMarkdownWords,
+	extractTocHeadings,
+	formatReadTime,
 	getPostFirstImageSrc,
 	getPostSlug,
+	getReadingMinutes,
 	getRelatedPosts,
 	resolvePostImageSrc,
 	resolveSiteUrl,
@@ -30,6 +33,7 @@ const slug = getPostSlug(entry);
 const titlePlain = stripMarkdownInline(entry.data.title);
 const descriptionPlain = stripMarkdownInline(entry.data.description);
 const relatedPosts = getRelatedPosts(entry, await getCollection("blog"));
+const heroImageSrc = resolvePostImageSrc(entry.data.featuredImage, slug) ?? undefined;
 const imageSrc =
 	resolvePostImageSrc(entry.data.featuredImage, slug) ??
 	getPostFirstImageSrc(entry.body, slug);
@@ -43,6 +47,8 @@ const imageUrl = (() => {
 const url = resolveSiteUrl(`/posts/${slug}/`, Astro.site);
 const blogUrl = resolveSiteUrl("/", Astro.site);
 const wordCount = countMarkdownWords(entry.body);
+const readTimeLabel = formatReadTime(getReadingMinutes(wordCount));
+const tocItems = extractTocHeadings(entry.body);
 const breadcrumbJsonLd = {
 	"@context": "https://schema.org",
 	"@type": "BreadcrumbList",
@@ -111,8 +117,12 @@ const jsonLd = JSON.stringify([articleJsonLd, breadcrumbJsonLd], null, 0);
 	tags={entry.data.tags}
 	ogImage={imageUrl}
 	ogImageAlt={imageUrl ? `${titlePlain} featured image` : undefined}
+	heroImageSrc={heroImageSrc}
+	heroImageAlt={heroImageSrc ? `${titlePlain} featured image` : undefined}
 	jsonLd={jsonLd}
 	relatedPosts={relatedPosts}
+	readTimeLabel={readTimeLabel}
+	tocItems={tocItems}
 >
 	<Content />
 </PostLayout>

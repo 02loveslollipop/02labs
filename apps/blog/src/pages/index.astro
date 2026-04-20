@@ -1,20 +1,33 @@
 ---
-import BaseLayout from "../layouts/BaseLayout.astro";
 import { getCollection } from "astro:content";
+import archiveSettings from "../data/archive-settings.json";
+import ArchiveTagBar from "../components/ArchiveTagBar.astro";
+import EmptyFeaturedMedia from "../components/EmptyFeaturedMedia.astro";
+import SiteHeader from "../components/SiteHeader.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
 import {
 	BLOG_AUTHOR,
 	BLOG_DESCRIPTION,
 	BLOG_LOCALE,
 	BLOG_NAME,
 	BLOG_PUBLISHER,
-	formatDateIso,
+	getTagSummaries,
 	resolveSiteUrl,
 	sortBlogEntries,
 	toBlogIndexPost,
 } from "../lib/posts";
 
-const entries = sortBlogEntries((await getCollection("blog")).filter((p) => !p.data.draft));
-const posts = entries.map((post) => ({ entry: post, preview: toBlogIndexPost(post, Astro.site) }));
+const entries = sortBlogEntries((await getCollection("blog")).filter((entry) => !entry.data.draft));
+const posts = entries.map((entry) => ({ entry, preview: toBlogIndexPost(entry, Astro.site) }));
+const configuredFeaturedSlug = String(archiveSettings.featuredSlug || "").trim();
+const featured =
+	posts.find(({ preview }) => preview.slug === configuredFeaturedSlug) ??
+	posts[0] ??
+	null;
+const archivePosts = featured
+	? posts.filter(({ preview }) => preview.slug !== featured.preview.slug)
+	: posts;
+const tagSummaries = getTagSummaries(entries);
 const blogUrl = resolveSiteUrl("/", Astro.site);
 const jsonLd = JSON.stringify(
 	[
@@ -66,54 +79,80 @@ const jsonLd = JSON.stringify(
 );
 ---
 
-<BaseLayout
-	title="02loveslollipop's Blog, mostly Crypto CTF writeups/deep dives and whatever I feel like writing about"
-	description={BLOG_DESCRIPTION}
-	ogType="website"
-	jsonLd={jsonLd}
->
-	<header class="header">
-		<div class="header__inner">
-			<a class="brand" href="/">{BLOG_NAME}</a>
-			<nav class="header__links" aria-label="Site">
-				<a href="/rss.xml">RSS</a>
-				<a href="https://02labs.me/" rel="noopener noreferrer">Main site</a>
-			</nav>
-		</div>
-	</header>
+<BaseLayout title="Blog" description={BLOG_DESCRIPTION} ogType="website" jsonLd={jsonLd}>
+	<SiteHeader />
 
 	<main class="wrap">
-		<section class="paper" aria-label="Posts">
-			<header class="archive-hero">
-				<p class="archive-hero__eyebrow">{BLOG_NAME}</p>
-				<h1>02loveslollipop's Blog, mostly Crypto CTF writeups/deep dives and whatever I feel like writing about</h1>
-				<p>
-					Long-form breakdowns from 02Labs, authored by 02loveslollipop, covering
-					security challenges, investigations, and engineering work.
-				</p>
-			</header>
-			<div class="post-list">
-				{posts.map(({ entry, preview }) => (
-					<a class={`post-item ${preview.imageSrc ? "" : "post-item--no-image"}`} href={`/posts/${preview.slug}/`}>
-						{preview.imageSrc ? (
-							<img
-								class="post-item__thumb"
-								src={preview.imageSrc}
-								alt={`${preview.title} preview`}
-								loading="lazy"
-								decoding="async"
-							/>
-						) : null}
-							<div class="post-item__body">
-								<h2>{preview.title}</h2>
-								<p class="post-item__excerpt">{preview.excerpt}</p>
-								<div class="meta">
-									<time datetime={entry.data.pubDate.toISOString()}>{formatDateIso(entry.data.pubDate)}</time>
-								</div>
-							</div>
-						</a>
-				))}
+		<section class="arc-hero">
+			<div class="eyebrow">
+				<span>02Labs</span>
+				<span class="dot"></span>
+				<span>THE BLOG</span>
 			</div>
+			<h1>02loveslollipop's Blog</h1>
+			<p>
+				Mostly Crypto CTF writeups/deep dives and whatever I feel like writing about
+			</p>
 		</section>
+
+		<ArchiveTagBar allCount={posts.length} tagSummaries={tagSummaries} />
+
+		{featured ? (
+			<a class="featured" href={`/posts/${featured.preview.slug}/`}>
+				<div class="featured__img">
+					{featured.preview.imageSrc ? (
+						<img
+							src={featured.preview.imageSrc}
+							alt={`${featured.preview.title} preview`}
+							loading="eager"
+							decoding="async"
+						/>
+					) : (
+						<EmptyFeaturedMedia />
+					)}
+				</div>
+				<div class="featured__body">
+					<div>
+						<div class="featured__tags">
+							{featured.preview.tags.slice(0, 3).map((tag, index) => (
+								<span class={index === 0 ? "tag-a" : "tag-g"}>{tag}</span>
+							))}
+						</div>
+						<div style="height: 18px" aria-hidden="true"></div>
+						<h2>{featured.preview.title}</h2>
+						<div style="height: 14px" aria-hidden="true"></div>
+						<p>{featured.preview.excerpt}</p>
+					</div>
+					<div class="featured__foot">
+						<span>{featured.preview.pubDateDisplay} · {featured.preview.readTimeLabel}</span>
+						<span class="cta">READ POST →</span>
+					</div>
+				</div>
+			</a>
+		) : null}
+
+		<div class="list" role="list">
+			{archivePosts.map(({ preview }, index) => (
+				<a class="post-row" href={`/posts/${preview.slug}/`} role="listitem">
+					<span class="pr-num">
+						{String(index + 1).padStart(2, "0")} · {preview.pubDateCode}
+					</span>
+					<span class="pr-cat">
+						{preview.tags.slice(0, 2).map((tag) => tag.toUpperCase()).join(" · ")}
+					</span>
+					<span class="pr-title">{preview.title}</span>
+					<span class="pr-meta">
+						<span>{preview.readTimeLabel}</span>
+						<span>{preview.pubDateDisplay.replace(",", "")}</span>
+					</span>
+					<span class="pr-arrow">→</span>
+				</a>
+			))}
+		</div>
+
+		<footer class="arc-foot">
+			<span>END OF ARCHIVE · {String(posts.length).padStart(2, "0")} POSTS</span>
+			<a href="/rss.xml">RSS FEED →</a>
+		</footer>
 	</main>
 </BaseLayout>

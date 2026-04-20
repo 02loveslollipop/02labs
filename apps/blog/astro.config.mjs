@@ -4,6 +4,7 @@ import cloudflare from '@astrojs/cloudflare';
 import remarkMath from 'remark-math';
 import remarkGfm from 'remark-gfm';
 import rehypeKatex from 'rehype-katex';
+import oneMonokaiTheme from './src/styles/one-monokai-theme.json' with { type: 'json' };
 
 // https://astro.build/config
 export default defineConfig({
@@ -17,5 +18,8 @@ export default defineConfig({
 	markdown: {
 		remarkPlugins: [remarkGfm, remarkMath],
 		rehypePlugins: [rehypeKatex],
+		shikiConfig: {
+			theme: oneMonokaiTheme,
+		},
 	},
 });

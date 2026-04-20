@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>02Labs Blog Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #0b0b10;
+    --bg-ink: #07070b;
+    --fg: rgba(255,255,255,0.92);
+    --fg-mute: rgba(255,255,255,0.62);
+    --fg-dim: rgba(255,255,255,0.42);
+    --line: rgba(255,255,255,0.10);
+    --line-strong: rgba(255,255,255,0.18);
+    --line-accent: rgba(45,108,255,0.55);
+    --accent: #2d6cff;
+    --accent-wash: rgba(45,108,255,0.06);
+    --pad: clamp(20px, 3.2vw, 44px);
+    --f-display: "Archivo Black", "Arial Black", sans-serif;
+    --f-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
+    --f-mono: "JetBrains Mono", ui-monospace, monospace;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--f-sans);
+  }
+  .bg {
+    position: fixed; inset: 0; z-index: -1;
+    background:
+      radial-gradient(880px 620px at 24% 18%, rgba(16,35,90,0.46), transparent 62%),
+      radial-gradient(980px 740px at 78% 20%, rgba(25,75,180,0.34), transparent 64%),
+      radial-gradient(1100px 820px at 58% 82%, rgba(20,58,150,0.26), transparent 66%),
+      var(--bg-ink);
+    filter: saturate(1.05);
+  }
+  .site {
+    position: sticky; top: 0; z-index: 10;
+    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    background: rgba(7,7,11,0.72);
+    border-bottom: 1px solid var(--line);
+  }
+  .site__inner {
+    max-width: 1320px; margin: 0 auto;
+    padding: 18px var(--pad);
+    display: grid; grid-template-columns: auto 1fr auto;
+    gap: 32px; align-items: center;
+  }
+  .brand {
+    color: var(--fg);
+    text-decoration: none;
+    font-family: var(--f-display);
+    font-size: 16px;
+    letter-spacing: 0.04em;
+  }
+  .nav {
+    display: flex; justify-content: center; gap: 32px;
+    font-family: var(--f-mono); font-size: 12px;
+    letter-spacing: 0.14em; text-transform: uppercase;
+  }
+  .nav a {
+    color: var(--fg-mute); text-decoration: none; position: relative; padding: 8px 2px;
+  }
+  .nav a[aria-current] { color: var(--fg); }
+  .nav a[aria-current]::after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: var(--accent);
+  }
+  .gh-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 9px 14px;
+    border: 1px solid var(--line-strong);
+    color: var(--fg); text-decoration: none;
+    font-family: var(--f-mono); font-size: 12px;
+    letter-spacing: 0.12em; text-transform: uppercase;
+  }
+  .wrap {
+    max-width: 1160px; margin: 0 auto;
+    padding: 56px var(--pad) 120px;
+    display: grid; gap: 56px;
+  }
+  .hero {
+    display: grid; gap: 24px; padding-bottom: 42px;
+    border-bottom: 1px solid var(--line);
+  }
+  .eyebrow, .micro {
+    font-family: var(--f-mono); font-size: 11px;
+    letter-spacing: 0.14em; text-transform: uppercase; color: var(--fg-mute);
+  }
+  .eyebrow { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
+  .dot { width: 5px; height: 5px; background: var(--accent); }
+  h1, h2, h3 { margin: 0; font-family: var(--f-display); letter-spacing: -0.01em; }
+  h1 { font-size: clamp(42px, 6vw, 82px); line-height: 0.96; max-width: 18ch; }
+  h2 { font-size: clamp(28px, 3.4vw, 42px); line-height: 1.02; }
+  p { margin: 0; color: var(--fg-mute); line-height: 1.75; }
+  .grid {
+    display: grid; grid-template-columns: 240px 1fr; gap: 40px;
+  }
+  .label {
+    font-family: var(--f-mono); font-size: 11px;
+    letter-spacing: 0.14em; text-transform: uppercase; color: var(--fg-dim);
+  }
+  .panel, .spec, .token, .row, .nav-link {
+    border: 1px solid var(--line);
+    background: rgba(255,255,255,0.02);
+  }
+  .spec, .row, .nav-link { padding: 20px; }
+  .tokens {
+    display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 12px;
+  }
+  .token-swatch { height: 90px; border-bottom: 1px solid var(--line); }
+  .token-body { padding: 12px; display: grid; gap: 4px; }
+  .token-name {
+    font-family: var(--f-mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+  }
+  .row { display: grid; gap: 12px; }
+  .tagline {
+    display: flex; flex-wrap: wrap; gap: 10px;
+  }
+  .tag-solid, .tag-ghost {
+    display: inline-flex; align-items: center; padding: 6px 12px;
+    font-family: var(--f-mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+  }
+  .tag-solid { background: var(--accent); color: #fff; }
+  .tag-ghost { border: 1px solid var(--line-strong); color: var(--fg-mute); }
+  .archive-row {
+    display: grid; grid-template-columns: 100px 160px 1fr 110px;
+    gap: 20px; align-items: center;
+    padding: 18px 0; border-bottom: 1px solid var(--line);
+  }
+  .article {
+    display: grid; grid-template-columns: 220px 1fr; gap: 40px;
+  }
+  .toc {
+    border-top: 1px solid var(--line);
+    padding-top: 14px;
+    display: grid; gap: 10px;
+  }
+  .toc a { color: var(--fg-mute); text-decoration: none; border-left: 1px solid var(--line); padding-left: 12px; }
+  .toc a.on { color: var(--fg); border-left-color: var(--accent); }
+  .prose {
+    display: grid; gap: 18px;
+  }
+  .code {
+    border: 1px solid var(--line);
+    overflow: hidden;
+  }
+  .code .head {
+    padding: 10px 14px; border-bottom: 1px solid var(--line);
+    background: rgba(255,255,255,0.02);
+  }
+  .code pre {
+    margin: 0; padding: 18px; overflow: auto; color: var(--fg);
+    font-family: var(--f-mono); font-size: 13px; line-height: 1.7;
+  }
+  .figure {
+    border: 1px solid var(--line);
+  }
+  .figure .img {
+    min-height: 180px;
+    display: grid; place-items: center;
+    background:
+      repeating-linear-gradient(135deg, rgba(255,255,255,0.03) 0, rgba(255,255,255,0.03) 1px, transparent 1px, transparent 10px),
+      var(--bg-ink);
+  }
+  .figure .cap {
+    padding: 12px 16px; border-top: 1px solid var(--line);
+  }
+  .nav-links {
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px;
+  }
+  @media (max-width: 900px) {
+    .site__inner { grid-template-columns: auto auto; }
+    .nav { display: none; }
+    .grid, .article, .nav-links, .tokens { grid-template-columns: 1fr; }
+    .archive-row { grid-template-columns: 80px 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="bg" aria-hidden="true"></div>
+
+<header class="site">
+  <div class="site__inner">
+    <a class="brand" href="#">02Labs</a>
+    <nav class="nav" aria-label="Main">
+      <a href="#">Home</a>
+      <a href="#">Featured</a>
+      <a href="#" aria-current="page">Blog</a>
+      <a href="#">Projects</a>
+    </nav>
+    <a class="gh-btn" href="https://github.com/02loveslollipop" target="_blank" rel="noopener noreferrer">GitHub</a>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <div class="eyebrow">
+      <span>02Labs</span>
+      <span class="dot" aria-hidden="true"></span>
+      <span>BLOG SYSTEM</span>
+      <span class="dot" aria-hidden="true"></span>
+      <span>LIVE SPEC</span>
+    </div>
+    <h1>A dark, contour-first system for long-form technical writing.</h1>
+    <p>The shipped blog uses one design language across the archive, tag pages, and post pages: mono metadata, oversized display headlines, hairline structure, and a single cobalt accent over an atmospheric ink background.</p>
+  </section>
+
+  <section class="grid">
+    <div class="label">Typography</div>
+    <div class="spec">
+      <div class="row">
+        <div class="micro">Display · Archivo Black</div>
+        <h2>CTF writeups, OSINT notes, crypto solves, and systems deep dives.</h2>
+      </div>
+      <div class="row">
+        <div class="micro">Prose · Outfit</div>
+        <p>Use Outfit for all reading surfaces, excerpts, descriptions, ledes, and technical body content. It should feel calm and highly legible at long-form reading lengths.</p>
+      </div>
+      <div class="row">
+        <div class="micro">Meta · JetBrains Mono</div>
+        <div class="tagline">
+          <span class="tag-solid">WRITEUP</span>
+          <span class="tag-ghost">CRYPTO</span>
+          <span class="tag-ghost">APR 06, 2026</span>
+          <span class="tag-ghost">07 MIN</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="grid">
+    <div class="label">Tokens</div>
+    <div class="tokens">
+      <div class="token">
+        <div class="token-swatch" style="background:#0b0b10"></div>
+        <div class="token-body">
+          <div class="token-name">BG</div>
+          <div class="micro">#0B0B10</div>
+        </div>
+      </div>
+      <div class="token">
+        <div class="token-swatch" style="background:#07070b"></div>
+        <div class="token-body">
+          <div class="token-name">BG INK</div>
+          <div class="micro">#07070B</div>
+        </div>
+      </div>
+      <div class="token">
+        <div class="token-swatch" style="background:rgba(255,255,255,0.10)"></div>
+        <div class="token-body">
+          <div class="token-name">LINE</div>
+          <div class="micro">WHITE / 10%</div>
+        </div>
+      </div>
+      <div class="token">
+        <div class="token-swatch" style="background:#2d6cff"></div>
+        <div class="token-body">
+          <div class="token-name">ACCENT</div>
+          <div class="micro">#2D6CFF</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="grid">
+    <div class="label">Archive</div>
+    <div class="panel" style="padding:24px">
+      <div class="row">
+        <div class="micro">Featured block</div>
+        <h2>Daily AlpacaHack: The horn Writeup</h2>
+        <p>The first post in sorted order becomes the featured archive item. It may use a preview image, but the text structure remains dominant.</p>
+      </div>
+      <div class="row">
+        <div class="micro">Linear archive rows</div>
+        <div class="archive-row">
+          <span class="micro">01 · 26.04.06</span>
+          <span class="micro">WRITEUP · CRYPTO</span>
+          <strong style="font-family:var(--f-display);font-size:20px">The horn Writeup</strong>
+          <span class="micro" style="text-align:right">07 MIN</span>
+        </div>
+        <div class="archive-row">
+          <span class="micro">02 · 26.03.24</span>
+          <span class="micro">WRITEUP · CRYPTO</span>
+          <strong style="font-family:var(--f-display);font-size:20px">Bloom Writeup</strong>
+          <span class="micro" style="text-align:right">04 MIN</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="grid">
+    <div class="label">Article</div>
+    <div class="panel" style="padding:24px; display:grid; gap:28px;">
+      <div class="tagline">
+        <span class="tag-solid">WRITEUP</span>
+        <span class="tag-ghost">CRYPTO</span>
+        <span class="tag-ghost">ALPACAHACK</span>
+      </div>
+      <h2>Hero, metadata, optional featured figure, TOC, and technical prose.</h2>
+      <div class="article">
+        <aside class="toc">
+          <div class="micro">Contents</div>
+          <a class="on" href="#">Modeling</a>
+          <a href="#">Solve</a>
+          <a href="#">Results</a>
+        </aside>
+        <div class="prose">
+          <p>Posts rely on `h2` headings for table-of-contents generation and section numbering. `featuredImage` controls the hero figure; if it is absent, the hero figure is omitted rather than replaced with filler content.</p>
+          <div class="figure">
+            <div class="img"><span class="micro">Featured figure area</span></div>
+            <div class="cap">Featured image caption / alt-derived label</div>
+          </div>
+          <div class="code">
+            <div class="head micro">Python</div>
+            <pre>def solve():
+    return gaussian_elimination(matrix, vector)</pre>
+          </div>
+          <div class="nav-links">
+            <div class="nav-link">
+              <div class="micro">Related post</div>
+              <strong style="font-family:var(--f-display);font-size:18px">Carry the Flame</strong>
+            </div>
+            <div class="nav-link">
+              <div class="micro">Keep reading</div>
+              <strong style="font-family:var(--f-display);font-size:18px">AES is dead</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="grid">
+    <div class="label">Authoring Notes</div>
+    <div class="spec">
+      <div class="row">
+        <div class="micro">Schema stability</div>
+        <p>No content schema changes are required for this system. The design is driven entirely from existing fields: <code>title</code>, <code>description</code>, <code>pubDate</code>, <code>updatedDate</code>, <code>tags</code>, <code>featuredImage</code>, and markdown structure.</p>
+      </div>
+      <div class="row">
+        <div class="micro">Critical content hooks</div>
+        <p>`featuredImage` powers the article hero figure. The first body image remains a fallback for archive/social previews. `h2` headings power the table of contents. Word count drives read-time labels across archive and article surfaces.</p>
+      </div>
+    </div>
+  </section>
+</main>
+</body>
+</html>

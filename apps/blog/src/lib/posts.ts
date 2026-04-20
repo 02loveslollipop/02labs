@@ -23,8 +23,13 @@ export interface BlogIndexPost {
 	excerpt: string;
 	url: string;
 	pubDate: string;
+	pubDateDisplay: string;
+	pubDateCode: string;
 	imageSrc: string | null;
 	tags: string[];
+	primaryTag: string | null;
+	readMinutes: number;
+	readTimeLabel: string;
 }
 
 export interface RelatedPostPreview {
@@ -33,6 +38,32 @@ export interface RelatedPostPreview {
 	excerpt: string;
 	pubDate: Date;
 }
+
+export interface BlogTagSummary {
+	slug: string;
+	label: string;
+	count: number;
+}
+
+export interface TocHeading {
+	depth: number;
+	id: string;
+	text: string;
+}
+
+const DOCUMENT_TYPE_TAG_SLUGS = new Set([
+	"writeup",
+	"post",
+	"deep-dive",
+	"deep-dive",
+	"deep",
+	"dive",
+	"essay",
+	"analysis",
+	"note",
+	"notes",
+]);
+
 
 export function getPostSlug(entry: CollectionEntry<"blog">): string {
 	// Normalize "folder posts" like `my-post/index.md` to slug `my-post`.
@@ -60,6 +91,22 @@ export function slugifyTag(input: string): string {
 		.replace(/[\s_]+/g, "-")
 		.replace(/-+/g, "-")
 		.replace(/^-|-$/g, "");
+}
+
+function getDisplayTagPriority(input: string): number {
+	const slug = slugifyTag(input);
+	if (!slug) return 99;
+	if (slug === "ctf") return 0;
+	if (DOCUMENT_TYPE_TAG_SLUGS.has(slug)) return 2;
+	return 1;
+}
+
+export function orderDisplayTags(tags: string[]): string[] {
+	return [...tags].sort((a, b) => {
+		const priorityDiff = getDisplayTagPriority(a) - getDisplayTagPriority(b);
+		if (priorityDiff !== 0) return priorityDiff;
+		return 0;
+	});
 }
 
 function truncate(text: string, max = 190): string {
@@ -102,6 +149,30 @@ export function countMarkdownWords(markdown: string): number {
 
 export function formatDateIso(date: Date): string {
 	return date.toISOString().slice(0, 10);
+}
+
+export function formatDisplayDate(date: Date): string {
+	return date
+		.toLocaleDateString("en-US", {
+			year: "numeric",
+			month: "short",
+			day: "2-digit",
+			timeZone: "UTC",
+		})
+		.toUpperCase();
+}
+
+export function formatDateCode(date: Date): string {
+	return date.toISOString().slice(2, 10).replaceAll("-", ".");
+}
+
+export function getReadingMinutes(input: string | number): number {
+	const words = typeof input === "number" ? input : countMarkdownWords(input);
+	return Math.max(1, Math.ceil(words / 200));
+}
+
+export function formatReadTime(minutes: number): string {
+	return `${String(minutes).padStart(2, "0")} MIN`;
 }
 
 export function renderInlineMarkdown(input: string): string {
@@ -185,14 +256,70 @@ export function getRelatedPosts(
 	}));
 }
 
+export function getTagSummaries(entries: CollectionEntry<"blog">[]): BlogTagSummary[] {
+	const tagMap = new Map<string, BlogTagSummary>();
+
+	for (const entry of entries) {
+		for (const tag of entry.data.tags ?? []) {
+			const slug = slugifyTag(tag);
+			if (!slug) continue;
+			const existing = tagMap.get(slug);
+			if (existing) {
+				existing.count += 1;
+				continue;
+			}
+			tagMap.set(slug, {
+				slug,
+				label: tag,
+				count: 1,
+			});
+		}
+	}
+
+	return Array.from(tagMap.values()).sort((a, b) => {
+		if (b.count !== a.count) return b.count - a.count;
+		return a.label.localeCompare(b.label);
+	});
+}
+
+export function slugifyHeading(input: string): string {
+	return stripMarkdownInline(String(input || ""))
+		.normalize("NFKD")
+		.replace(/[\u0300-\u036f]/g, "")
+		.toLowerCase()
+		.trim()
+		.replace(/[^a-z0-9\s-]/g, "")
+		.replace(/\s+/g, "-")
+		.replace(/-+/g, "-")
+		.replace(/^-|-$/g, "");
+}
+
+export function extractTocHeadings(markdownBody: string, depth = 2): TocHeading[] {
+	const prefix = "#".repeat(depth);
+	return String(markdownBody || "")
+		.split(/\r?\n/)
+		.map((line) => line.trim())
+		.filter((line) => line.startsWith(`${prefix} `))
+		.map((line) => stripMarkdownInline(line.slice(prefix.length + 1)))
+		.filter(Boolean)
+		.map((text) => ({
+			depth,
+			id: slugifyHeading(text),
+			text,
+		}));
+}
+
 export function toBlogIndexPost(
 	entry: CollectionEntry<"blog">,
 	site?: URL
 ): BlogIndexPost {
 	const slug = getPostSlug(entry);
+	const orderedTags = orderDisplayTags(entry.data.tags);
 	const imageSrc =
 		resolvePostImageSrc(entry.data.featuredImage, slug) ??
 		getPostFirstImageSrc(entry.body, slug);
+	const wordCount = countMarkdownWords(entry.body);
+	const readMinutes = getReadingMinutes(wordCount);
 	return {
 		slug,
 		title: stripMarkdownInline(entry.data.title),
@@ -200,7 +327,12 @@ export function toBlogIndexPost(
 		excerpt: getPostExcerpt(entry.body, stripMarkdownInline(entry.data.description)),
 		url: resolveSiteUrl(`/posts/${slug}/`, site),
 		pubDate: entry.data.pubDate.toISOString(),
+		pubDateDisplay: formatDisplayDate(entry.data.pubDate),
+		pubDateCode: formatDateCode(entry.data.pubDate),
 		imageSrc: imageSrc ? resolveSiteUrl(imageSrc, site) : null,
-		tags: [...entry.data.tags],
+		tags: orderedTags,
+		primaryTag: orderedTags[0] ?? null,
+		readMinutes,
+		readTimeLabel: formatReadTime(readMinutes),
 	};
 }

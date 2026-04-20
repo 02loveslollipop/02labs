@@ -1,16 +1,18 @@
 # Blog Authoring (apps/blog)
 
-## Location
+## Source of Truth
 
-- Source of truth (edit here):
+- Edit posts in:
   - `blog/<post-folder>/index.md`
-  - Put post images next to the markdown file in the same folder.
-- Build sync (Astro expects content under `src/content`):
-  - Synced to `apps/blog/src/content/blog/<slug>/index.md` on dev/build/check.
+- Put post images next to the markdown file in the same folder.
+- Build sync copies content into:
+  - `apps/blog/src/content/blog/<slug>/index.md`
 
-Notes:
+`<slug>` is derived from the folder name:
 
-- `<slug>` is derived from the folder name (lowercased, underscores/spaces to hyphens, `.md` suffix stripped).
+- lowercased
+- underscores and spaces become hyphens
+- trailing `.md` suffix is removed
 
 ## Frontmatter Schema
 
@@ -18,7 +20,7 @@ Validated by:
 
 - `apps/blog/src/content/config.ts`
 
-Required frontmatter:
+Required:
 
 ```yaml
 ---
@@ -29,32 +31,87 @@ tags: ["ctf", "writeup"]
 ---
 ```
 
-Optional frontmatter:
+Optional:
 
 ```yaml
+---
 updatedDate: 2026-02-23
 featuredImage: "1.jpg"
 draft: true
+---
 ```
 
-`tags` are mandatory:
+## How Content Maps to the Redesigned UI
 
-- Every post must have at least one tag.
-- Tags are used for:
-  - tag archive pages at `/tags/<slug>/`
-  - linked tags on post pages
-  - related-post discovery
-  - `keywords` in post JSON-LD
+### Archive Home / Tag Archives
 
-`featuredImage` rules:
+- `title`
+  - archive row title
+  - featured-card title
+- `description`
+  - used for metadata and fallback summary
+- first substantial paragraph in body
+  - used for archive excerpt when available
+- `pubDate`
+  - shown in archive metadata
+- markdown word count
+  - converted to read time in the archive and post hero
+- `tags`
+  - first tag becomes the primary category treatment
+  - all tags contribute to the tag-chip archive bar and tag archive routing
+- image selection:
+  - archive preview uses `featuredImage` first
+  - if `featuredImage` is missing, the first markdown image becomes the archive/social fallback
 
-- Used by the blog home card thumbnail.
-- Used for social link previews (`og:image` and `twitter:image`) on post pages.
-- If omitted, the first image found in the markdown body is used as fallback.
-- Accepted formats:
-  - Relative path from post folder (recommended): `featuredImage: "1.jpg"`
-  - Absolute site path: `featuredImage: "/posts/<slug>/1.jpg"`
-  - External URL: `featuredImage: "https://..."`.
+### Post Pages
+
+- `title`
+  - main display title
+  - SEO title
+- `description`
+  - lede paragraph
+  - SEO description
+- `featuredImage`
+  - controls the hero figure at the top of the article
+  - if absent, the hero figure is omitted entirely
+- first markdown image
+  - may still be used for social/archive fallback when `featuredImage` is absent
+- `tags`
+  - render as hero pills
+  - render in the metadata hashtag row
+  - drive related-post matching and JSON-LD keywords
+- `h2` headings
+  - define the table of contents
+  - drive the numbered section layout
+
+## Heading Guidance
+
+- Use `##` for major article sections.
+- Those `h2` sections are what populate the TOC in the redesigned post layout.
+- Use `###` only inside a major section; it does not create a TOC entry.
+
+## Images and Figures
+
+Static image sync:
+
+- Source:
+  - `blog/<post-folder>/*.(png|jpg|jpeg|webp|gif|svg|avif)`
+- Copied to:
+  - `apps/blog/public/posts/<slug>/...`
+
+Markdown image usage:
+
+- Recommended:
+  - `![Alt text](1.jpg)`
+- Also valid:
+  - `![Alt text](/posts/<slug>/1.jpg)`
+
+Design-related notes:
+
+- `featuredImage` is for the article hero figure.
+- Other inline markdown images render inside the prose flow.
+- Alt text matters because it is the only author-controlled figure description available to the layout.
+- No separate caption field exists today; if you need descriptive figure context, put it in the surrounding prose or alt text.
 
 ## Routes
 
@@ -64,30 +121,19 @@ draft: true
 - RSS: `https://blog.02labs.me/rss.xml`
 - JSON archive feed: `https://blog.02labs.me/posts.json`
 
-## Images (Static)
-
-The blog syncs image files into `public/` automatically:
-
-- Source of truth:
-  - `blog/<post-folder>/*.(png|jpg|jpeg|webp|gif|svg|avif)`
-- Copied to:
-  - `apps/blog/public/posts/<slug>/...`
-- In markdown, you can use either:
-  - relative links like `![Alt](1.jpg)` (recommended for portability)
-  - absolute links like `/posts/<slug>/1.jpg`
-
-This keeps builds fully static and guarantees the images resolve in production.
-
-Implementation:
-
-- `apps/blog/scripts/sync-root-blog.mjs` syncs `./blog` into `apps/blog/src/content/blog`.
-- `apps/blog/scripts/sync-post-assets.mjs` copies images into `apps/blog/public/posts`.
-
 ## Draft Workflow
 
-- Set `draft: true` to hide a post from:
-  - blog home listing
-  - tag archive pages
+- `draft: true` hides a post from:
+  - blog home
+  - tag archives
   - related-post recommendations
-  - RSS feed
-  - static routes generation
+  - RSS
+  - `posts.json`
+  - static route generation
+
+## Build Sync Scripts
+
+- `apps/blog/scripts/sync-root-blog.mjs`
+  - syncs `./blog` into `apps/blog/src/content/blog`
+- `apps/blog/scripts/sync-post-assets.mjs`
+  - copies post assets into `apps/blog/public/posts`

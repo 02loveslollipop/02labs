@@ -1,14 +1,15 @@
 ---
+import SiteHeader from "../components/SiteHeader.astro";
 import BaseLayout from "./BaseLayout.astro";
 import {
 	BLOG_AUTHOR,
-	BLOG_NAME,
 	BLOG_TWITTER_HANDLE,
-	formatDateIso,
+	formatDisplayDate,
+	orderDisplayTags,
 	renderInlineMarkdown,
 	slugifyTag,
-	stripMarkdownInline,
 	type RelatedPostPreview,
+	type TocHeading,
 } from "../lib/posts";
 
 export interface Props {
@@ -21,20 +22,42 @@ export interface Props {
 	ogImageAlt?: string;
 	jsonLd?: string;
 	relatedPosts?: RelatedPostPreview[];
+	readTimeLabel: string;
+	heroImageSrc?: string;
+	heroImageAlt?: string;
+	tocItems?: TocHeading[];
 }
 
-const { title, description, pubDate, updatedDate, tags, ogImage, ogImageAlt, jsonLd, relatedPosts } = Astro.props;
-const published = formatDateIso(pubDate);
-const updated = updatedDate ? formatDateIso(updatedDate) : null;
-const titlePlain = stripMarkdownInline(title);
-const descriptionPlain = stripMarkdownInline(description);
+const {
+	title,
+	description,
+	pubDate,
+	updatedDate,
+	tags,
+	ogImage,
+	ogImageAlt,
+	jsonLd,
+	relatedPosts = [],
+	readTimeLabel,
+	heroImageSrc,
+	heroImageAlt,
+	tocItems = [],
+} = Astro.props;
+
+const published = formatDisplayDate(pubDate);
+const updated = updatedDate ? formatDisplayDate(updatedDate) : null;
 const titleHtml = renderInlineMarkdown(title);
 const descriptionHtml = renderInlineMarkdown(description);
+const tagLinks = Array.isArray(tags) ? orderDisplayTags(tags) : [];
+const articleNavLinks = relatedPosts.slice(0, 2).map((post, index) => ({
+	...post,
+	kicker: index === 0 ? "Related post" : "Keep reading",
+}));
 ---
 
 <BaseLayout
-	title={titlePlain}
-	description={descriptionPlain}
+	title={title}
+	description={description}
 	ogType="article"
 	ogImage={ogImage}
 	ogImageAlt={ogImageAlt}
@@ -46,64 +69,140 @@ const descriptionHtml = renderInlineMarkdown(description);
 	twitterSite={BLOG_TWITTER_HANDLE}
 	twitterCreator={BLOG_TWITTER_HANDLE}
 >
-	<header class="header">
-		<div class="header__inner">
-			<a class="brand" href="/">{BLOG_NAME}</a>
-			<nav class="header__links" aria-label="Site">
-				<a href="/rss.xml">RSS</a>
-				<a href="https://02labs.me/" rel="noopener noreferrer">Main site</a>
-			</nav>
-		</div>
-	</header>
+	<SiteHeader />
 
 	<main class="wrap">
-		<article class="paper article">
-			<h1 set:html={titleHtml}></h1>
-			<p class="lede" set:html={descriptionHtml}></p>
-
-			<div class="meta">
-				<span>
-					Published <time datetime={pubDate.toISOString()}>{published}</time>
-				</span>
-				{updatedDate ? (
-					<span>
-						{" "}· Updated <time datetime={updatedDate.toISOString()}>{updated}</time>
-					</span>
-				) : null}
-			</div>
-			{Array.isArray(tags) && tags.length > 0 ? (
+		<section class="hero">
+			{tagLinks.length > 0 ? (
 				<div class="article-tags" aria-label="Tags">
-					{tags.map((tag) => (
-						<a class="tag-pill" href={`/tags/${slugifyTag(tag)}/`}>
+					{tagLinks.map((tag, index) => (
+						<a class={index === 0 ? "tag tag--solid" : "tag tag--ghost"} href={`/tags/${slugifyTag(tag)}/`}>
 							{tag}
 						</a>
 					))}
 				</div>
 			) : null}
 
-			<div style="height: 18px" aria-hidden="true"></div>
-			<slot />
+			<h1 class="title" set:html={titleHtml}></h1>
+			<p class="lede" set:html={descriptionHtml}></p>
 
-			{Array.isArray(relatedPosts) && relatedPosts.length > 0 ? (
-				<section class="related-posts" aria-label="Related posts">
-					<h2>Related posts</h2>
-					<div class="related-posts__list">
-						{relatedPosts.map((post) => (
-							<a class="related-post" href={`/posts/${post.slug}/`}>
-								<h3>{post.title}</h3>
-								<p>{post.excerpt}</p>
-								<div class="meta">
-									<time datetime={post.pubDate.toISOString()}>{formatDateIso(post.pubDate)}</time>
-								</div>
-							</a>
+			<div class="meta-bar">
+					<span>
+						<span class="k">DATE</span>
+						<time datetime={pubDate.toISOString()}>{published}</time>
+					</span>
+				{updated ? (
+					<span>
+						<span class="k">UPDATED</span>
+						<time datetime={updatedDate?.toISOString()}>{updated}</time>
+					</span>
+				) : null}
+				<span><span class="k">READ</span>{readTimeLabel}</span>
+				{tagLinks.length > 0 ? (
+					<span class="tags">
+						{tagLinks.map((tag) => (
+							<a href={`/tags/${slugifyTag(tag)}/`}>#{tag.toUpperCase().replaceAll(" ", "-")}</a>
+						))}
+					</span>
+				) : null}
+			</div>
+
+			{heroImageSrc ? (
+				<figure class="figure">
+					<div class="figure__img">
+						<img
+							src={heroImageSrc}
+							alt={heroImageAlt ?? `${title} featured image`}
+							loading="eager"
+							decoding="async"
+						/>
+					</div>
+					<figcaption class="figure__cap">
+						{heroImageAlt ?? `${title} featured image`}
+					</figcaption>
+				</figure>
+			) : null}
+		</section>
+
+		<div class="article-grid">
+			<aside class="toc" aria-label="Table of contents" id="toc">
+				<div class="toc__label">Contents</div>
+				{tocItems.length > 0 ? (
+					<div class="toc__items">
+						{tocItems.map((item) => (
+							<a data-toc-link href={`#${item.id}`}>{item.text}</a>
 						))}
 					</div>
-				</section>
-			) : null}
+				) : (
+					<div class="toc__empty">No sections</div>
+				)}
+			</aside>
 
-			<p class="footer">
-				<a href="/">Back to all posts</a>
-			</p>
-		</article>
+			<article class="prose" id="articleContent">
+				<slot />
+
+				{articleNavLinks.length > 0 ? (
+					<section class="article-foot" aria-label="Further reading">
+						{articleNavLinks.map((post) => (
+							<a class="nav-link" href={`/posts/${post.slug}/`}>
+								<span class="k">{post.kicker}</span>
+								<span class="t">{post.title}</span>
+							</a>
+						))}
+					</section>
+				) : null}
+
+				<a class="back-link" href="/">BACK TO ARCHIVE →</a>
+			</article>
+		</div>
 	</main>
+
+	<script is:inline>
+		(() => {
+			const article = document.getElementById("articleContent");
+			const toc = document.getElementById("toc");
+			if (!(article instanceof HTMLElement) || !(toc instanceof HTMLElement)) return;
+
+			const links = Array.from(toc.querySelectorAll("[data-toc-link]"));
+			const headings = Array.from(article.querySelectorAll("h2"));
+
+			if (headings.length === 0) {
+				toc.hidden = true;
+				return;
+			}
+
+			headings.forEach((heading, index) => {
+				const link = links[index];
+				if (!(heading instanceof HTMLElement) || !(link instanceof HTMLAnchorElement)) return;
+				const targetId = link.getAttribute("href")?.replace(/^#/, "");
+				if (targetId && heading.id !== targetId) heading.id = targetId;
+				link.setAttribute("href", `#${heading.id}`);
+			});
+
+			if (links.length === 0) {
+				toc.hidden = true;
+				return;
+			}
+
+			const observer = new IntersectionObserver(
+				(entries) => {
+					const visible = entries
+						.filter((entry) => entry.isIntersecting)
+						.sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
+					if (!visible?.target.id) return;
+					for (const link of links) {
+						link.classList.toggle("on", link.getAttribute("href") === `#${visible.target.id}`);
+					}
+				},
+				{
+					rootMargin: "-20% 0px -55% 0px",
+					threshold: 0.1,
+				}
+			);
+
+			for (const heading of headings) {
+				if (heading instanceof HTMLElement) observer.observe(heading);
+			}
+		})();
+	</script>
 </BaseLayout>
