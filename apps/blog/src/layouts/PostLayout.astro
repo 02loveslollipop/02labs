@@ -124,19 +124,23 @@ const articleNavLinks = relatedPosts.slice(0, 2).map((post, index) => ({
 			) : null}
 		</section>
 
-		<div class="article-grid">
-			<aside class="toc" aria-label="Table of contents" id="toc">
-				<div class="toc__label">Contents</div>
-				{tocItems.length > 0 ? (
+		<div class:list={["article-grid", { "article-grid--no-toc": tocItems.length === 0 }]}>
+			{tocItems.length > 0 ? (
+				<aside class="toc" aria-label="Table of contents" id="toc">
+					<div class="toc__label">Contents</div>
 					<div class="toc__items">
 						{tocItems.map((item) => (
-							<a data-toc-link href={`#${item.id}`}>{item.text}</a>
+							<a
+								class={`toc__link toc__link--depth-${Math.min(item.depth, 3)}`}
+								data-toc-link
+								href={`#${item.id}`}
+							>
+								{item.text}
+							</a>
 						))}
 					</div>
-				) : (
-					<div class="toc__empty">No sections</div>
-				)}
-			</aside>
+				</aside>
+			) : null}
 
 			<article class="prose" id="articleContent">
 				<slot />
@@ -164,9 +168,9 @@ const articleNavLinks = relatedPosts.slice(0, 2).map((post, index) => ({
 			if (!(article instanceof HTMLElement) || !(toc instanceof HTMLElement)) return;
 
 			const links = Array.from(toc.querySelectorAll("[data-toc-link]"));
-			const headings = Array.from(article.querySelectorAll("h2"));
+			const headings = Array.from(article.querySelectorAll("h1, h2, h3"));
 
-			if (headings.length === 0) {
+			if (headings.length === 0 || links.length === 0) {
 				toc.hidden = true;
 				return;
 			}
@@ -178,11 +182,6 @@ const articleNavLinks = relatedPosts.slice(0, 2).map((post, index) => ({
 				if (targetId && heading.id !== targetId) heading.id = targetId;
 				link.setAttribute("href", `#${heading.id}`);
 			});
-
-			if (links.length === 0) {
-				toc.hidden = true;
-				return;
-			}
 
 			const observer = new IntersectionObserver(
 				(entries) => {

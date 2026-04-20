@@ -294,19 +294,40 @@ export function slugifyHeading(input: string): string {
 		.replace(/^-|-$/g, "");
 }
 
-export function extractTocHeadings(markdownBody: string, depth = 2): TocHeading[] {
-	const prefix = "#".repeat(depth);
-	return String(markdownBody || "")
-		.split(/\r?\n/)
-		.map((line) => line.trim())
-		.filter((line) => line.startsWith(`${prefix} `))
-		.map((line) => stripMarkdownInline(line.slice(prefix.length + 1)))
-		.filter(Boolean)
-		.map((text) => ({
+export function extractTocHeadings(markdownBody: string, depths = [1, 2, 3]): TocHeading[] {
+	const allowedDepths = new Set(depths);
+	const seenIds = new Map<string, number>();
+	const headings: TocHeading[] = [];
+	let inFence = false;
+
+	for (const rawLine of String(markdownBody || "").split(/\r?\n/)) {
+		const line = rawLine.trim();
+		if (line.startsWith("```") || line.startsWith("~~~")) {
+			inFence = !inFence;
+			continue;
+		}
+		if (inFence) continue;
+
+		const match = /^(#{1,6})\s+(.+?)\s*#*$/.exec(line);
+		if (!match) continue;
+
+		const depth = match[1].length;
+		if (!allowedDepths.has(depth)) continue;
+
+		const text = stripMarkdownInline(match[2]);
+		if (!text) continue;
+
+		const baseId = slugifyHeading(text) || "section";
+		const count = seenIds.get(baseId) ?? 0;
+		seenIds.set(baseId, count + 1);
+		headings.push({
 			depth,
-			id: slugifyHeading(text),
+			id: count === 0 ? baseId : `${baseId}-${count + 1}`,
 			text,
-		}));
+		});
+	}
+
+	return headings;
 }
 
 export function toBlogIndexPost(

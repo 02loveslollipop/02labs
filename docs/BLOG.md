@@ -27,7 +27,7 @@ Required:
 title: "..."
 description: "..."
 pubDate: 2026-02-22
-tags: ["ctf", "writeup"]
+tags: ["alpacahack", "crypto", "aes"]
 ---
 ```
 
@@ -58,6 +58,8 @@ draft: true
   - converted to read time in the archive and post hero
 - `tags`
   - first tag becomes the primary category treatment
+  - for CTF writeups, the first tag should be the event/source tag, such as `alpacahack`, `dicectf`, `bkctf`, `tamuctf`, or `ritsec`
+  - avoid generic tags such as `ctf`, `writeup`, `challenge`, or `chall` when a more specific event and topic tag exists
   - all tags contribute to the tag-chip archive bar and tag archive routing
 - image selection:
   - archive preview uses `featuredImage` first
@@ -89,6 +91,14 @@ draft: true
 - Use `##` for major article sections.
 - Those `h2` sections are what populate the TOC in the redesigned post layout.
 - Use `###` only inside a major section; it does not create a TOC entry.
+
+## Tag Guidance
+
+- Keep tags lowercase and hyphenated in frontmatter, matching their URL slug.
+- Prefer event/source tags first for CTF writeups: `alpacahack`, `dicectf`, `bkctf`, `tamuctf`, `ritsec`.
+- Follow with meaningful technical tags such as `crypto`, `aes`, `ecb`, `forensics`, `osint`, `web`, `http`, or `spn`.
+- Do not add generic placeholder tags like `ctf` or `writeup` to CTF posts unless there is no more specific event/source tag.
+- Add tag descriptions in `apps/blog/src/data/tag-lookup.json` when introducing a new public tag archive.
 
 ## Images and Figures
 

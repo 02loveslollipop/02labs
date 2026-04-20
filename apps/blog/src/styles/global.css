@@ -707,6 +707,10 @@ h1.title {
 	align-items: start;
 }
 
+.article-grid--no-toc {
+	grid-template-columns: 1fr;
+}
+
 .toc {
 	position: sticky;
 	top: 110px;
@@ -731,6 +735,15 @@ h1.title {
 	transition:
 		color 160ms var(--ease),
 		border-color 160ms var(--ease);
+}
+
+.toc__link--depth-2 {
+	padding-left: 26px;
+}
+
+.toc__link--depth-3 {
+	padding-left: 38px;
+	color: var(--fg-dim);
 }
 
 .toc__items a:hover,
@@ -777,6 +790,7 @@ h1.title {
 	border-bottom-color: var(--accent);
 }
 
+.prose h1,
 .prose h2 {
 	counter-increment: section;
 	margin: 56px 0 22px;
@@ -792,6 +806,7 @@ h1.title {
 	letter-spacing: -0.01em;
 }
 
+.prose h1::before,
 .prose h2::before {
 	content: counter(section, decimal-leading-zero);
 	color: var(--fg-dim);
@@ -892,21 +907,23 @@ h1.title {
 .prose img {
 	display: block;
 	width: auto;
-	max-width: min(100%, 75%);
-	max-height: 50vh;
-	object-fit: contain;
+	height: auto;
+	max-width: 100%;
 	margin: 28px auto;
 	background: var(--media-bg);
 }
 
 .prose figure {
-	margin: 34px 0;
+	display: table;
+	max-width: 100%;
+	margin: 34px auto;
 }
 
 .prose figure img {
 	margin: 0;
+	width: auto;
 	max-width: 100%;
-	max-height: none;
+	height: auto;
 	background: var(--media-bg);
 }
 
