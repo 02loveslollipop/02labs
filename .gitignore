@@ -11,3 +11,10 @@ apps/*/dist/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+
+# mockup files
+docs/mockups/*
+
+# non project related files
+.playwright-cli/
