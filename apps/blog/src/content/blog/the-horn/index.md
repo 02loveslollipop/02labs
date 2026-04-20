@@ -2,7 +2,7 @@
 title: "Daily AlpacaHack: The horn Writeup"
 description: "The failures in previous challenges become the solution for this one."
 pubDate: 2026-04-06
-tags: ["AlpacaHack", "Crypto", "Writeup", "SP Networks", "Block ciphers"]
+tags: ["alpacahack", "crypto", "spn", "block-ciphers"]
 featuredImage: "figures/pn-structure.svg"
 ---
 

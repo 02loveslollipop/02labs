@@ -2,7 +2,7 @@
 title: "Daily AlpacaHack: Wither Writeup"
 description: "Statistical recovery and law of large numbers, isn't that a bit overkill?"
 pubDate: 2026-04-14
-tags: ["AlpacaHack", "Crypto", "Writeup", "AND"]
+tags: ["alpacahack", "crypto", "bitwise-and"]
 ---
 
 This time in Daily AlpacaHack, we are given a "cipher" in which each bit of the plaintext is ANDed with a cryptographically secure pseudorandomly generated key `os.urandom()` by using the `secrets` module. We are also given an arbitrary number of oracle queries for the encrypted flag.

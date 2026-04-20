@@ -2,7 +2,7 @@
 title: "Daily AlpacaHack: Bloom Writeup"
 description: "How does a single number convert a perfect secrecy encryption scheme into a completely insecure one?"
 pubDate: 2026-03-24
-tags: ["AlpacaHack", "Crypto", "Writeup", "XOR", "One-Time Pad"]
+tags: ["alpacahack", "crypto", "xor", "one-time-pad"]
 ---
 
 Daily AlpacaHack - Bloom presents us with a One-Time Pad encryption scheme where every byte of the plaintext is XORed with a cryptographically secure random byte (generated from os.urandom using the secrets Python module). This makes any frequency or PRNG state recovery attacks unfeasible.

@@ -2,7 +2,7 @@
 title: "AlpacaHack Daily: No Content Writeup"
 description: "HTTP is just a social construct"
 pubDate: 2026-04-07
-tags: ["Web", "HTTP", "TCP", "Wireshark", "Writeup"]
+tags: ["alpacahack", "web", "http", "tcp", "wireshark"]
 featuredImage: "2.png"
 ---
 

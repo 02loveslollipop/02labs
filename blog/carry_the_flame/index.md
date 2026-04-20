@@ -2,7 +2,7 @@
 title: "DiceCTF 2026: Carry the Flame"
 description: "Goal: recover the 40-bit per-session key for the remote 1024-round SPN, submit it on the same connection, and obtain the flag."
 pubDate: 2026-03-08
-tags: ["ctf", "crypto", "gpu", "writeup"]
+tags: ["dicectf", "crypto", "gpu"]
 featuredImage: "figures/spn-structure.svg"
 ---
 

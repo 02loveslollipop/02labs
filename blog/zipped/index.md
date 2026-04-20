@@ -2,7 +2,7 @@
 title: "RITSEC CTF: Zipped Writeup"
 description: "Why the hell are ZIP challenges always so hard?"
 pubDate: 2026-04-04
-tags: ["RITSEC", "Crypto", "Forensic", "Known-Plaintext Attack"]
+tags: ["ritsec", "crypto", "forensics", "known-plaintext-attack"]
 ---
 
 For this challenge, we are given a ZIP file, `zipped.zip`, that contains two encrypted files: a PNG image (`BeautifulDetailedSunset.png`) that occupies most of the archive's size (~2.3 MB), and a small text file (`flag.txt`) that contains the flag but is only 16 bytes long once decrypted.

@@ -3,7 +3,7 @@ title: "Daily AlpacaHack: AES is dead Writeup"
 description: "AES probably not, ECB definitely."
 pubDate: 2026-04-10
 featuredImage: "figures/ecb-cbc-image-example.png"
-tags: ["AlpacaHack", "Crypto", "Writeup", "ECB", "AES", "cipher mode"]
+tags: ["alpacahack", "crypto", "aes", "ecb", "cipher-mode"]
 ---
 
 This challenge presents us with quite a different scenario than most cryptography challenges. We are given a Python script that encrypts data using the Python `Crypto` library's AES implementation. It generates a random key using `os.urandom` and encrypts a BMP file containing a rendered image of the flag. The vulnerability lies in the choice of the ECB cipher mode. Because ECB provides no diffusion across blocks, we can still observe meaningful structural patterns in the resulting ciphertext, even though the data itself is encrypted.
