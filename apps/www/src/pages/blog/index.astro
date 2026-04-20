@@ -5,24 +5,23 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import Navbar from "../../components/Navbar.astro";
 import {
 	BLOG_ROOT,
-	fetchLatestBlogPosts,
+	fetchBlogArchivePosts,
 	featuredBlogPosts,
 	majorBlogTags,
 } from "../../lib/blog";
 
-const latestPosts = await fetchLatestBlogPosts(6);
-const itemListEntries = [
-	...featuredBlogPosts.map((post) => ({
-		name: post.title,
-		url: post.href,
-	})),
-	...latestPosts
-		.filter((post) => !featuredBlogPosts.some((featured) => featured.href === post.link))
-		.map((post) => ({
-			name: post.title,
-			url: post.link,
-		})),
-];
+const archivePosts = await fetchBlogArchivePosts();
+const itemListEntries = archivePosts.length > 0
+	? archivePosts
+	: featuredBlogPosts.map((post) => ({
+			title: post.title,
+			link: post.href,
+			excerpt: post.description,
+			pubDate: "",
+			imageSrc: null,
+			tags: [],
+			description: post.description,
+		}));
 
 const pageUrl = Astro.site ? new URL("/blog/", Astro.site).toString() : "/blog/";
 const jsonLd = JSON.stringify(
@@ -30,25 +29,25 @@ const jsonLd = JSON.stringify(
 		{
 			"@context": "https://schema.org",
 			"@type": "CollectionPage",
-			name: "02loveslollipop Blog Hub",
+			name: "02Labs Blog Hub",
 			description:
-				"Main-site discovery hub for CTF writeups, OSINT notes, crypto solves, and technical deep dives published on the 02loveslollipop blog.",
+				"Main-site mirror of the 02Labs blog archive with crawlable links to CTF writeups, OSINT notes, crypto solves, and systems deep dives.",
 			url: pageUrl,
 			isPartOf: {
 				"@type": "WebSite",
-				name: "02loveslollipop / 02Labs",
+				name: "02Labs",
 				url: Astro.site ? new URL("/", Astro.site).toString() : "/",
 			},
 		},
 		{
 			"@context": "https://schema.org",
 			"@type": "ItemList",
-			name: "Featured and recent blog posts",
+			name: "02Labs blog posts",
 			itemListElement: itemListEntries.map((item, index) => ({
 				"@type": "ListItem",
 				position: index + 1,
-				name: item.name,
-				url: item.url,
+				name: item.title,
+				url: item.link,
 			})),
 		},
 	],
@@ -58,10 +57,10 @@ const jsonLd = JSON.stringify(
 ---
 
 <BaseLayout
-	title="Blog Hub: CTF Writeups, OSINT Notes, and Crypto Solves"
-	description="Discover the 02loveslollipop blog from the main site, with featured writeups, the latest posts, and tag-based topic browsing."
+	title="02Labs Blog Hub"
+	description="Browse a mirrored archive of the 02Labs blog from the main site, with server-rendered links to the canonical posts on blog.02labs.me."
 	ogType="website"
-	canonical="https://02loveslollipop.uk/blog/"
+	canonical="https://02labs.me/blog/"
 	jsonLd={jsonLd}
 >
 	<Navbar forceScrolled />
@@ -69,23 +68,74 @@ const jsonLd = JSON.stringify(
 	<main id="main" class="blog-hub-page">
 		<div class="blog-hub-shell panel">
 			<section class="blog-hub-hero">
-				<p class="blog-hub-eyebrow">02loveslollipop / 02Labs</p>
-				<h1>Blog hub</h1>
+				<p class="blog-hub-eyebrow">02Labs blog mirror</p>
+				<h1>CTF writeups, OSINT notes, crypto solves, and systems deep dives</h1>
 				<p class="blog-hub-copy">
-					The writeups live on <strong>blog.02loveslollipop.uk</strong>, but this page
-					acts as the main-site index for the posts, topic archives, and the latest
-					technical notes.
+					This page mirrors the blog archive on the main site for discovery and SEO,
+					while every post keeps its canonical home on <strong>blog.02labs.me</strong>.
 				</p>
 				<div class="btn-row">
-					<a class="btn" href={BLOG_ROOT}>Open the blog home</a>
+					<a class="btn" href={BLOG_ROOT}>Open canonical blog home</a>
 				</div>
+			</section>
+
+			<section class="blog-hub-section" aria-labelledby="blog-hub-latest">
+				<div class="section-head">
+					<div>
+						<h2 id="blog-hub-latest">Archive mirror</h2>
+						<p>Server-rendered from the canonical blog feed so crawlers can see the latest entries immediately.</p>
+					</div>
+				</div>
+				{archivePosts.length > 0 ? (
+					<div class="blog-hub-list" aria-label="Blog archive mirror">
+						{archivePosts.map((post) => (
+							<a class={`blog-hub-post ${post.imageSrc ? "" : "blog-hub-post--no-image"}`} href={post.link}>
+								{post.imageSrc ? (
+									<img
+										class="blog-hub-post__thumb"
+										src={post.imageSrc}
+										alt={`${post.title} preview`}
+										loading="lazy"
+										decoding="async"
+									/>
+								) : null}
+								<div class="blog-hub-post__body">
+									<h3>{post.title}</h3>
+									<p>{post.excerpt || post.description}</p>
+									<div class="blog-hub-post__meta">
+										{post.pubDate
+											? new Date(post.pubDate).toLocaleDateString("en-US", {
+													year: "numeric",
+													month: "short",
+													day: "numeric",
+													timeZone: "UTC",
+												})
+											: "Post"}
+									</div>
+									{post.tags.length > 0 ? (
+										<div class="blog-hub-post__tags" aria-label="Post tags">
+											{post.tags.slice(0, 4).map((tag) => (
+												<span class="blog-hub-tag">{tag}</span>
+											))}
+										</div>
+									) : null}
+								</div>
+							</a>
+						))}
+					</div>
+				) : (
+					<div class="cta">
+						<p>The live blog feed was unavailable during build, so this page falls back to curated entry points.</p>
+						<p><a class="btn" href={BLOG_ROOT}>Open canonical blog home</a></p>
+					</div>
+				)}
 			</section>
 
 			<section class="blog-hub-section" aria-labelledby="blog-hub-featured">
 				<div class="section-head">
 					<div>
 						<h2 id="blog-hub-featured">Featured writeups</h2>
-						<p>A few standout posts that give a strong picture of the blog.</p>
+						<p>A few strong entry points into the archive.</p>
 					</div>
 				</div>
 				<div class="blog-hub-grid" aria-label="Featured blog posts">
@@ -98,45 +148,11 @@ const jsonLd = JSON.stringify(
 				</div>
 			</section>
 
-			<section class="blog-hub-section" aria-labelledby="blog-hub-latest">
-				<div class="section-head">
-					<div>
-						<h2 id="blog-hub-latest">Latest posts</h2>
-						<p>Recent entries pulled from the live blog RSS feed when available.</p>
-					</div>
-				</div>
-				{latestPosts.length > 0 ? (
-					<div class="blog-hub-list" aria-label="Latest blog posts">
-						{latestPosts.map((post) => (
-							<article class="blog-hub-list-item">
-								<div class="blog-hub-list-item__meta">
-									{post.pubDate
-										? new Date(post.pubDate).toLocaleDateString("en-US", {
-												year: "numeric",
-												month: "short",
-												day: "numeric",
-												timeZone: "UTC",
-											})
-										: "Post"}
-								</div>
-								<h3><a href={post.link}>{post.title}</a></h3>
-								<p>{post.description}</p>
-							</article>
-						))}
-					</div>
-				) : (
-					<div class="cta">
-						<p>The blog feed was unavailable during build, but the curated index above remains fully crawlable.</p>
-						<p><a class="btn" href={BLOG_ROOT}>Open the blog home</a></p>
-					</div>
-				)}
-			</section>
-
 			<section class="blog-hub-section" aria-labelledby="blog-hub-tags">
 				<div class="section-head">
 					<div>
 						<h2 id="blog-hub-tags">Tags</h2>
-						<p>Browse the blog by the main topic archives.</p>
+						<p>Browse the canonical blog by topic archive.</p>
 					</div>
 				</div>
 				<div class="blog-hub-grid" aria-label="Blog tags">
@@ -197,7 +213,7 @@ const jsonLd = JSON.stringify(
 	}
 
 	.blog-hub-card,
-	.blog-hub-list-item {
+	.blog-hub-post {
 		border: 1px solid rgba(255, 255, 255, 0.1);
 		border-radius: 1rem;
 		padding: 1rem 1.1rem;
@@ -205,19 +221,20 @@ const jsonLd = JSON.stringify(
 	}
 
 	.blog-hub-card h3,
-	.blog-hub-list-item h3 {
+	.blog-hub-post h3 {
 		margin: 0 0 0.5rem;
 	}
 
 	.blog-hub-card p,
-	.blog-hub-list-item p {
+	.blog-hub-post p {
 		margin: 0;
 		color: var(--color-muted, #b9b9c7);
 	}
 
 	.blog-hub-card a,
-	.blog-hub-list-item a {
+	.blog-hub-post {
 		color: inherit;
+		text-decoration: none;
 	}
 
 	.blog-hub-list {
@@ -225,14 +242,51 @@ const jsonLd = JSON.stringify(
 		gap: 1rem;
 	}
 
-	.blog-hub-list-item__meta {
-		margin-bottom: 0.65rem;
+	.blog-hub-post {
+		display: grid;
+		grid-template-columns: 220px minmax(0, 1fr);
+		gap: 1rem;
+		align-items: start;
+	}
+
+	.blog-hub-post--no-image {
+		grid-template-columns: 1fr;
+	}
+
+	.blog-hub-post__thumb {
+		width: 100%;
+		aspect-ratio: 16 / 9;
+		object-fit: cover;
+		border-radius: 0.9rem;
+	}
+
+	.blog-hub-post__body {
+		display: grid;
+		gap: 0.7rem;
+	}
+
+	.blog-hub-post__meta {
 		font-size: 0.85rem;
 		color: var(--color-muted, #b9b9c7);
 	}
 
+	.blog-hub-post__tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+	}
+
+	.blog-hub-tag {
+		border: 1px solid rgba(255, 255, 255, 0.14);
+		border-radius: 999px;
+		padding: 0.2rem 0.55rem;
+		font-size: 0.8rem;
+		color: var(--color-muted, #b9b9c7);
+	}
+
 	@media (max-width: 720px) {
-		.blog-hub-grid {
+		.blog-hub-grid,
+		.blog-hub-post {
 			grid-template-columns: 1fr;
 		}
 	}

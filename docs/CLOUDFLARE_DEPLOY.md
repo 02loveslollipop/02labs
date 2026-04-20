@@ -3,12 +3,16 @@
 This repo contains two static Astro apps:
 
 - `apps/www` for `02labs.me`
-- `apps/blog` for `blog.02loveslollipop.uk`
+- `apps/blog` for `blog.02labs.me`
 
 Both apps now include a `wrangler.jsonc` configured for assets-only deploys:
 
 - `apps/www/wrangler.jsonc`
 - `apps/blog/wrangler.jsonc`
+
+For the blog deployment, attach both `blog.02labs.me` and `blog.02loveslollipop.uk`
+to the same Worker/custom-domain setup so the blog worker can issue a `301`
+from the legacy `.uk` host to `blog.02labs.me` while preserving path and query.
 
 ## Why the previous deploy failed
 

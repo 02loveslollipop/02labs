@@ -9,8 +9,8 @@ type Env = {
 	};
 };
 
-const PRIMARY_HOST = "02labs.me";
-const REDIRECT_HOSTS = new Set(["02loveslollipop.uk", "www.02labs.me", "www.02loveslollipop.uk"]);
+const PRIMARY_HOST = "blog.02labs.me";
+const REDIRECT_HOSTS = new Set(["blog.02loveslollipop.uk"]);
 
 function getRedirectResponse(request: Request): Response | null {
 	const url = new URL(request.url);

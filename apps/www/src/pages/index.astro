@@ -55,7 +55,7 @@ const jsonLd = JSON.stringify(
 			"@type": "Person",
 			name: "02loveslollipop",
 			jobTitle: "Computer and systems engineer & Data science engineer",
-			url: "https://02loveslollipop.uk/",
+			url: "https://02labs.me/",
 			sameAs: [
 				"https://github.com/02loveslollipop",
 				"https://ctftime.org/team/408704",
@@ -64,9 +64,9 @@ const jsonLd = JSON.stringify(
 		{
 			"@context": "https://schema.org",
 			"@type": "WebSite",
-			name: "02loveslollipop / 02Labs",
+			name: "02Labs",
 			alternateName: ["02loveslollipop", "02Labs"],
-			url: "https://02loveslollipop.uk/",
+			url: "https://02labs.me/",
 		},
 	],
 	null,
@@ -78,10 +78,10 @@ const blogPosts = await fetchLatestBlogPosts(4);
 ---
 
 <BaseLayout
-	title="02loveslollipop | Systems, Data, Projects, and CTF Writeups"
-	description="02loveslollipop's portfolio and lab, featuring systems engineering projects, data work, security experiments, and technical writeups from 02Labs."
+	title="Systems, Data, Projects, and CTF Writeups"
+	description="02Labs is the portfolio and lab of 02loveslollipop, featuring systems engineering projects, data work, security experiments, and technical writeups."
 	ogType="website"
-	canonical="https://02loveslollipop.uk/"
+	canonical="https://02labs.me/"
 	jsonLd={jsonLd}
 >
 	<Navbar />
@@ -96,7 +96,7 @@ const blogPosts = await fetchLatestBlogPosts(4);
 						<div>
 							<h2>Introduction</h2>
 							<p>
-								Hi, I'm 02loveslollipop. I love technology, engineering, and building things in general. Even tough I'm a Computer and systems engineer &amp; Data science engineer, I have a wide range of interests and like to explore different areas. 02Labs is my personal portfolio site, where I share projects, writeups, and other content related to my interests and work.
+								Hi, I'm 02loveslollipop. 02Labs is my personal portfolio and lab, where I share projects, writeups, and experiments across systems engineering, data, security, and the other technical areas I like to explore deeply.
 							</p>
 						</div>
 					<div class="intro-divider" aria-hidden="true"></div>
@@ -210,7 +210,7 @@ const blogPosts = await fetchLatestBlogPosts(4);
 						</div>
 					) : (
 						<div class="cta">
-							<p>The blog is deployed separately at <strong>blog.02loveslollipop.uk</strong>.</p>
+							<p>The canonical blog lives at <strong>blog.02labs.me</strong>.</p>
 							<p><a class="btn" href="/blog/">Open the blog</a></p>
 						</div>
 					)}
@@ -260,7 +260,7 @@ const blogPosts = await fetchLatestBlogPosts(4);
 	<footer class="site-footer" aria-label="Footer">
 		<div class="site-footer__inner">
 			<p class="site-footer__copy">
-				© {new Date().getFullYear()} 02loveslollipop / 02Labs. Built with Astro.
+				© {new Date().getFullYear()} 02Labs. Built with Astro.
 			</p>
 			<p class="site-footer__meta">
 				<a href="/#top">Back to top</a>

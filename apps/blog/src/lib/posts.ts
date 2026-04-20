@@ -16,6 +16,17 @@ export const BLOG_PUBLISHER = {
 	logoPath: "/02loveslollipop.png",
 } as const;
 
+export interface BlogIndexPost {
+	slug: string;
+	title: string;
+	description: string;
+	excerpt: string;
+	url: string;
+	pubDate: string;
+	imageSrc: string | null;
+	tags: string[];
+}
+
 export interface RelatedPostPreview {
 	slug: string;
 	title: string;
@@ -172,4 +183,24 @@ export function getRelatedPosts(
 		excerpt: getPostExcerpt(entry.body, stripMarkdownInline(entry.data.description)),
 		pubDate: entry.data.pubDate,
 	}));
+}
+
+export function toBlogIndexPost(
+	entry: CollectionEntry<"blog">,
+	site?: URL
+): BlogIndexPost {
+	const slug = getPostSlug(entry);
+	const imageSrc =
+		resolvePostImageSrc(entry.data.featuredImage, slug) ??
+		getPostFirstImageSrc(entry.body, slug);
+	return {
+		slug,
+		title: stripMarkdownInline(entry.data.title),
+		description: stripMarkdownInline(entry.data.description),
+		excerpt: getPostExcerpt(entry.body, stripMarkdownInline(entry.data.description)),
+		url: resolveSiteUrl(`/posts/${slug}/`, site),
+		pubDate: entry.data.pubDate.toISOString(),
+		imageSrc: imageSrc ? resolveSiteUrl(imageSrc, site) : null,
+		tags: [...entry.data.tags],
+	};
 }

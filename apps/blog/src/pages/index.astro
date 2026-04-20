@@ -8,29 +8,13 @@ import {
 	BLOG_NAME,
 	BLOG_PUBLISHER,
 	formatDateIso,
-	getPostExcerpt,
-	getPostFirstImageSrc,
-	getPostSlug,
-	resolvePostImageSrc,
 	resolveSiteUrl,
 	sortBlogEntries,
-	stripMarkdownInline,
+	toBlogIndexPost,
 } from "../lib/posts";
 
 const entries = sortBlogEntries((await getCollection("blog")).filter((p) => !p.data.draft));
-const posts = entries
-	.map((post) => {
-		const slug = getPostSlug(post);
-		return {
-			post,
-			slug,
-			title: stripMarkdownInline(post.data.title),
-			excerpt: getPostExcerpt(post.body, stripMarkdownInline(post.data.description)),
-			imageSrc:
-				resolvePostImageSrc(post.data.featuredImage, slug) ??
-				getPostFirstImageSrc(post.body, slug),
-		};
-	});
+const posts = entries.map((post) => ({ entry: post, preview: toBlogIndexPost(post, Astro.site) }));
 const blogUrl = resolveSiteUrl("/", Astro.site);
 const jsonLd = JSON.stringify(
 	[
@@ -69,11 +53,11 @@ const jsonLd = JSON.stringify(
 			"@context": "https://schema.org",
 			"@type": "ItemList",
 			name: `${BLOG_NAME} Posts`,
-			itemListElement: posts.map(({ slug, title }, index) => ({
+			itemListElement: posts.map(({ preview }, index) => ({
 				"@type": "ListItem",
 				position: index + 1,
-				name: title,
-				url: resolveSiteUrl(`/posts/${slug}/`, Astro.site),
+				name: preview.title,
+				url: preview.url,
 			})),
 		},
 	],
@@ -83,7 +67,7 @@ const jsonLd = JSON.stringify(
 ---
 
 <BaseLayout
-	title="CTF Writeups, OSINT Notes, Crypto Solves, and Systems Deep Dives"
+	title="02loveslollipop's Blog, mostly Crypto CTF writeups/deep dives and whatever I feel like writing about"
 	description={BLOG_DESCRIPTION}
 	ogType="website"
 	jsonLd={jsonLd}
@@ -102,29 +86,29 @@ const jsonLd = JSON.stringify(
 		<section class="paper" aria-label="Posts">
 			<header class="archive-hero">
 				<p class="archive-hero__eyebrow">{BLOG_NAME}</p>
-				<h1>CTF writeups, OSINT notes, crypto solves, and systems deep dives</h1>
+				<h1>02loveslollipop's Blog, mostly Crypto CTF writeups/deep dives and whatever I feel like writing about</h1>
 				<p>
-					Long-form breakdowns from 02loveslollipop covering security challenges,
-					investigations, and engineering work.
+					Long-form breakdowns from 02Labs, authored by 02loveslollipop, covering
+					security challenges, investigations, and engineering work.
 				</p>
 			</header>
 			<div class="post-list">
-				{posts.map(({ post, slug, title, excerpt, imageSrc }) => (
-					<a class={`post-item ${imageSrc ? "" : "post-item--no-image"}`} href={`/posts/${slug}/`}>
-						{imageSrc ? (
+				{posts.map(({ entry, preview }) => (
+					<a class={`post-item ${preview.imageSrc ? "" : "post-item--no-image"}`} href={`/posts/${preview.slug}/`}>
+						{preview.imageSrc ? (
 							<img
 								class="post-item__thumb"
-								src={imageSrc}
-								alt={`${title} preview`}
+								src={preview.imageSrc}
+								alt={`${preview.title} preview`}
 								loading="lazy"
 								decoding="async"
 							/>
 						) : null}
 							<div class="post-item__body">
-								<h2>{title}</h2>
-								<p class="post-item__excerpt">{excerpt}</p>
+								<h2>{preview.title}</h2>
+								<p class="post-item__excerpt">{preview.excerpt}</p>
 								<div class="meta">
-									<time datetime={post.data.pubDate.toISOString()}>{formatDateIso(post.data.pubDate)}</time>
+									<time datetime={entry.data.pubDate.toISOString()}>{formatDateIso(entry.data.pubDate)}</time>
 								</div>
 							</div>
 						</a>

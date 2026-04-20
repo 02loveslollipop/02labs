@@ -1,7 +1,16 @@
 {
 	"name": "02labs-blog",
 	"compatibility_date": "2026-02-23",
+	"compatibility_flags": ["nodejs_compat"],
+	"main": "./dist/_worker.js/index.js",
 	"assets": {
-		"directory": "./dist"
-	}
+		"directory": "./dist",
+		"binding": "ASSETS"
+	},
+	/*
+	 * Attach both blog.02labs.me and blog.02loveslollipop.uk to this deployment,
+	 * then the worker entrypoint will 301 legacy .uk traffic to blog.02labs.me
+	 * preserving path and query.
+	 */
+	"routes": []
 }
