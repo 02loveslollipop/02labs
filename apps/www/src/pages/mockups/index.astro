@@ -1,0 +1,258 @@
+---
+export const prerender = true;
+
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Navbar from "../../components/Navbar.astro";
+import ProjectCard from "../../components/ProjectCard.astro";
+import ProjectDetail from "../../components/ProjectDetail.astro";
+import { getCollection } from "astro:content";
+import { fetchLatestBlogPosts, featuredBlogPosts } from "../../lib/blog";
+
+const entries = await getCollection("projects");
+const projects = entries.map((e) => e.data).sort((a, b) => a.order - b.order);
+const featured = projects.filter((p) => p.featured).slice(0, 5);
+const featuredProject = featured[0] ?? projects[0];
+const blogPosts = await fetchLatestBlogPosts(4);
+const mockBlogPosts = blogPosts.length > 0
+	? blogPosts
+	: featuredBlogPosts.map((post) => ({
+			title: post.title,
+			link: post.href,
+			description: post.description,
+			pubDate: "",
+		}));
+
+const team = {
+	rating_place: 40,
+	country_place: 1,
+	rating_points: 121.352,
+};
+const events = [
+	{ title: "TAMUctf 2026", place: 19, rating_points: 80.232, ctf_points: "2018.0000" },
+	{ title: "DiceCTF 2026 Quals", place: 24, rating_points: 80.371, ctf_points: "554.0000" },
+	{ title: "DawgCTF 2026", place: 52, rating_points: 54.712, ctf_points: "3365.0000" },
+	{ title: "BlueHens CTF 2026", place: 5, rating_points: 49.158, ctf_points: "4050.0000" },
+];
+const stacks = Array.from(new Set(projects.flatMap((project) => project.stack))).sort((a, b) =>
+	a.localeCompare(b)
+);
+---
+
+<BaseLayout
+	title="WWW Redesign Mockups"
+	description="High-fidelity mockups for aligning the main 02Labs site with the blog design system."
+	ogType="website"
+>
+	<Navbar forceScrolled rightText="Mockups" />
+
+	<main id="main" class="mockups-page">
+		<div class="mockups-shell">
+			<section class="mockup-hero">
+				<div class="eyebrow">
+					<span>02Labs</span>
+					<span class="dot"></span>
+					<span>WWW redesign mockups</span>
+				</div>
+				<h1>Blog-aligned main site system</h1>
+				<p class="blog-hub-copy">
+					These mockups use the current portfolio, CTF, project, and blog data while previewing the new dark editorial visual language.
+				</p>
+			</section>
+
+			<div class="mockup-grid">
+				<section class="mockup-frame mockup-frame--home" aria-labelledby="mockup-home-hero">
+					<div class="mockup-frame__label" id="mockup-home-hero">Home / hero card</div>
+					<div class="hero__inner">
+						<div class="eyebrow hero__eyebrow">
+							<span>02loveslollipop</span>
+							<span class="dot"></span>
+							<span>Systems / Data / Security</span>
+						</div>
+						<h1>02Labs</h1>
+						<p>
+							02Labs is my portfolio for systems engineering, data work, security experiments, and technical writeups.
+						</p>
+					</div>
+				</section>
+
+				<section class="mockup-frame" aria-labelledby="mockup-intro">
+					<div class="mockup-frame__label" id="mockup-intro">Home / intro card</div>
+					<div class="intro-grid">
+						<div>
+							<h2>Introduction</h2>
+							<p>
+								Hi, I'm 02loveslollipop. 02Labs is my personal portfolio and lab, where I share projects, writeups, and experiments across systems engineering, data, security, and the technical areas I like to explore deeply.
+							</p>
+						</div>
+						<div class="intro-divider" aria-hidden="true"></div>
+						<div>
+							<h2>Focus</h2>
+							<p>
+								I like to build things that are interesting, solve problems, or are just fun to me, while going deep enough to respect the work and the topic.
+							</p>
+						</div>
+					</div>
+				</section>
+
+				<section class="mockup-frame" aria-labelledby="mockup-ctf">
+					<div class="mockup-frame__label" id="mockup-ctf">Home / Ch0wn3rs CTF card</div>
+					<div class="ch0wn3rs-header">
+						<img class="ch0wn3rs-logo" src="/ch0wn3rs-logo.jpeg" alt="Ch0wn3rs team logo" />
+						<div class="ch0wn3rs-meta">
+							<h2>Ch0wn3rs</h2>
+							<p class="ch0wn3rs-role">Co-founder & Infrastructure lead</p>
+							<p class="ch0wn3rs-desc">
+								Elite cybersecurity CTF team. I manage the core infrastructure: web apps, CTF platforms, workshops, and instances.
+							</p>
+							<div class="ch0wn3rs-badges">
+								<span class="badge">Colombia #{team.country_place}</span>
+								<span class="badge">World #{team.rating_place}</span>
+								<span class="badge">{team.rating_points.toFixed(3)} pts</span>
+							</div>
+						</div>
+					</div>
+					<div class="ch0wn3rs-table-wrap">
+						<table class="ch0wn3rs-table">
+							<thead>
+								<tr>
+									<th>Place</th>
+									<th>Event</th>
+									<th>Rank pts</th>
+									<th>CTF pts</th>
+								</tr>
+							</thead>
+							<tbody>
+								{events.map((event) => (
+									<tr>
+										<td>{event.place}</td>
+										<td>{event.title}</td>
+										<td>{event.rating_points.toFixed(3)}</td>
+										<td>{Number.parseFloat(event.ctf_points).toLocaleString("en-US", { maximumFractionDigits: 1 })}</td>
+									</tr>
+								))}
+							</tbody>
+						</table>
+					</div>
+				</section>
+
+				<section class="mockup-frame" aria-labelledby="mockup-blog-card">
+					<div class="mockup-frame__label" id="mockup-blog-card">Home / blog card</div>
+					<div class="section-head">
+						<div>
+							<h2>Blog</h2>
+							<p>Writeups, notes, and long-form breakdowns.</p>
+						</div>
+						<a class="btn" href="/blog/">All posts</a>
+					</div>
+					<div class="blog-row">
+						{mockBlogPosts.slice(0, 4).map((post) => (
+							<article class="blog-card">
+								<div class="blog-card__text">
+									<div class="blog-card__badge">{post.pubDate || "Post"}</div>
+									<h3 class="blog-card__title">{post.title}</h3>
+									<p class="blog-card__summary">{post.description}</p>
+								</div>
+								<div class="btn-row">
+									<a class="btn" href={post.link}>Read post</a>
+								</div>
+							</article>
+						))}
+					</div>
+				</section>
+
+				<section class="mockup-frame" aria-labelledby="mockup-featured">
+					<div class="mockup-frame__label" id="mockup-featured">Home / featured projects card</div>
+					<div class="section-head">
+						<div>
+							<h2>Featured projects</h2>
+							<p>Five highlights. Static pages, crawlable links, and details below.</p>
+						</div>
+						<a class="btn" href="/projects/">All projects</a>
+					</div>
+					<div class="featured-row">
+						{featured.map((project) => (
+							<ProjectCard project={project} detailsHref={`/projects/${project.slug}/`} />
+						))}
+					</div>
+				</section>
+
+				{featuredProject ? (
+					<section class="mockup-frame" aria-labelledby="mockup-featured-detail">
+						<div class="mockup-frame__label" id="mockup-featured-detail">Home / featured project detail card</div>
+						<ProjectDetail project={featuredProject} />
+					</section>
+				) : null}
+
+				<section class="mockup-frame" aria-labelledby="mockup-projects">
+					<div class="mockup-frame__label" id="mockup-projects">/projects directory</div>
+					<div class="section-head">
+						<div>
+							<h2>Projects</h2>
+							<p>Systems, data, security, embedded, and tooling projects from the 02Labs portfolio.</p>
+						</div>
+					</div>
+					<div class="projects-filters">
+						<label class="projects-filter">
+							<span>Search</span>
+							<input type="search" placeholder="Search title, summary, stack..." />
+						</label>
+						<label class="projects-filter">
+							<span>Stack</span>
+							<select>
+								<option>All stacks</option>
+								{stacks.slice(0, 6).map((stack) => <option>{stack}</option>)}
+							</select>
+						</label>
+						<label class="projects-toggle">
+							<input type="checkbox" />
+							<span>Featured only</span>
+						</label>
+					</div>
+					<div class="projects-grid">
+						{projects.slice(0, 6).map((project) => (
+							<div class="project-item">
+								<ProjectCard project={project} detailsHref={`/projects/${project.slug}/`} />
+							</div>
+						))}
+					</div>
+				</section>
+
+				{featuredProject ? (
+					<section class="mockup-frame" aria-labelledby="mockup-project-detail">
+						<div class="mockup-frame__label" id="mockup-project-detail">/projects/[slug] detail page</div>
+						<nav class="project-page__breadcrumb" aria-label="Breadcrumb">
+							<a href="/">Home</a>
+							<span aria-hidden="true">/</span>
+							<a href="/projects/">Projects</a>
+							<span aria-hidden="true">/</span>
+							<span>{featuredProject.title}</span>
+						</nav>
+						<ProjectDetail project={featuredProject} headingTag="h1" />
+					</section>
+				) : null}
+
+				<section class="mockup-frame" aria-labelledby="mockup-blog-mirror">
+					<div class="mockup-frame__label" id="mockup-blog-mirror">/blog mirror page</div>
+					<section class="blog-hub-hero">
+						<p class="blog-hub-eyebrow">02Labs blog mirror</p>
+						<h1>CTF writeups, OSINT notes, crypto solves, and systems deep dives</h1>
+						<p class="blog-hub-copy">
+							This page mirrors the blog archive on the main site for discovery and SEO.
+						</p>
+					</section>
+					<div class="blog-hub-list">
+						{mockBlogPosts.slice(0, 3).map((post) => (
+							<a class="blog-hub-post blog-hub-post--no-image" href={post.link}>
+								<div class="blog-hub-post__body">
+									<h3>{post.title}</h3>
+									<p>{post.description}</p>
+									<div class="blog-hub-post__meta">{post.pubDate || "Post"}</div>
+								</div>
+							</a>
+						))}
+					</div>
+				</section>
+			</div>
+		</div>
+	</main>
+</BaseLayout>

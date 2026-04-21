@@ -1,6 +1,6 @@
 ---
-// Prerender the home page so external data (blog RSS) is baked at build time.
-export const prerender = true;
+// Render on the server so CTFtime data is current in the HTML, not patched in by the client.
+export const prerender = false;
 
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Navbar from "../components/Navbar.astro";
@@ -8,41 +8,22 @@ import Hero from "../components/Hero.astro";
 import ProjectCard from "../components/ProjectCard.astro";
 import ProjectDetail from "../components/ProjectDetail.astro";
 import { getCollection } from "astro:content";
-import type { CTFTimeData } from "./api/ctftime.json";
 import { fetchLatestBlogPosts } from "../lib/blog";
+import { getServerCTFTimeData, getTopCTFPerformances } from "../lib/ctftime";
 
-// ---------- Server-side KV read ----------
 const kv = Astro.locals?.runtime?.env?.CTFTIME_KV;
-let ctf: CTFTimeData | null = null;
-if (kv) {
-	try {
-		const raw = await kv.get("ctftime_data");
-		if (raw) ctf = JSON.parse(raw) as CTFTimeData;
-	} catch {
-		// fall through to static fallback
-	}
-}
-
-// Static fallback used on first deploy / before first sync
-const fallbackTeam = {
-	rating_place: 40,
-	country_place: 1,
-	rating_points: 121.352,
+const ctf = await getServerCTFTimeData(kv);
+const team = ctf.team;
+const topEvents = getTopCTFPerformances(ctf.events, 5);
+const ctfYear = ctf.year;
+const formatRatingPoints = (points: number | null) =>
+	points != null ? points.toFixed(3) : "—";
+const formatCTFPoints = (points: string) => {
+	const parsed = Number.parseFloat(points);
+	return Number.isNaN(parsed)
+		? points
+		: parsed.toLocaleString("en-US", { maximumFractionDigits: 1 });
 };
-const fallbackEvents = [
-	{ event_id: "3043", title: "Srdnlen CTF 2026 Quals",       place: 131, ctf_points: "250.0000",   time: 0 },
-	{ event_id: "3127", title: "EHAX CTF 2026",                 place: 24,  ctf_points: "5312.0000",  time: 0 },
-	{ event_id: "3098", title: "Batman's Kitchen CTF 2026",     place: 10,  ctf_points: "10689.0000", time: 0 },
-	{ event_id: "3122", title: "BITSCTF 2026",                  place: 31,  ctf_points: "2672.0000",  time: 0 },
-	{ event_id: "3086", title: "TaipanByte\u2019s Chart CTF",   place: 34,  ctf_points: "5730.0000",  time: 0 },
-	{ event_id: "3081", title: "0xFUN CTF 2026",                place: 291, ctf_points: "1903.0000",  time: 0 },
-	{ event_id: "3066", title: "Nullcon Goa HackIM 2026 CTF",   place: 12,  ctf_points: "5262.0000",  time: 0 },
-	{ event_id: "2767", title: "PascalCTF 2026",                place: 63,  ctf_points: "6413.0000",  time: 0 },
-];
-
-const team    = ctf?.team    ?? fallbackTeam;
-const events  = ctf?.events  ?? fallbackEvents;
-const ctfYear = ctf?.year    ?? new Date().getUTCFullYear();
 
 const entries = await getCollection("projects");
 const projects = entries.map((e) => e.data).sort((a, b) => a.order - b.order);
@@ -75,6 +56,10 @@ const jsonLd = JSON.stringify(
 
 // ---------- Blog RSS fetch ----------
 const blogPosts = await fetchLatestBlogPosts(4);
+
+// AI Agent Headers
+Astro.response.headers.set('Link', '<' + '/.well-known/api-catalog>; rel="api-catalog", <' + '/docs/api>; rel="service-doc"');
+
 ---
 
 <BaseLayout
@@ -142,7 +127,7 @@ const blogPosts = await fetchLatestBlogPosts(4);
 					<div class="ch0wn3rs-events">
 						<div class="section-head ch0wn3rs-events-head">
 							<div>
-								<h3 id="ctf-year-heading">{ctfYear} CTF Participations</h3>
+								<h3>{ctfYear} Top 5 CTF Performances</h3>
 								<p id="ctf-rating-summary">
 									Overall rating place: {team.rating_place ?? "—"} &mdash; {team.rating_points != null ? team.rating_points.toFixed(3) : "—"} pts
 								</p>
@@ -153,17 +138,19 @@ const blogPosts = await fetchLatestBlogPosts(4);
 							<table class="ch0wn3rs-table">
 								<thead>
 									<tr>
+										<th>Rank pts</th>
 										<th>Place</th>
 										<th>Event</th>
 										<th>CTF pts</th>
 									</tr>
 								</thead>
-								<tbody id="ctf-events-tbody">
-									{events.map((ev) => (
+								<tbody>
+									{topEvents.map((ev) => (
 										<tr>
+											<td>{formatRatingPoints(ev.rating_points)}</td>
 											<td>{ev.place}</td>
 											<td>{ev.title}</td>
-											<td>{ev.ctf_points}</td>
+											<td>{formatCTFPoints(ev.ctf_points)}</td>
 										</tr>
 									))}
 								</tbody>
@@ -231,10 +218,18 @@ const blogPosts = await fetchLatestBlogPosts(4);
 						</p>
 					</div>
 
-					<div class="featured-row" aria-label="Featured projects">
-						{featured.map((project) => (
-							<ProjectCard project={project} detailsHref={`/projects/${project.slug}/`} />
-						))}
+					<div class="carousel-wrapper">
+						<button class="carousel-btn prev-btn" aria-label="Previous project">
+							<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+						</button>
+						<div class="featured-row" aria-label="Featured projects">
+							{featured.map((project) => (
+								<ProjectCard project={project} detailsHref={`/projects/${project.slug}/`} />
+							))}
+						</div>
+						<button class="carousel-btn next-btn" aria-label="Next project">
+							<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+						</button>
 					</div>
 				</div>
 			</div>
@@ -270,77 +265,23 @@ const blogPosts = await fetchLatestBlogPosts(4);
 
 	<script>
 		import "../scripts/home";
-	</script>
 
-	<script>
-		// Refresh Ch0wn3rs CTFtime data every 10 minutes without a full page reload.
-		const POLL_MS = 10 * 60 * 1000;
+		// Carousel logic for featured projects
+		const rows = document.querySelectorAll('.featured-row');
+		const prevBtns = document.querySelectorAll('.prev-btn');
+		const nextBtns = document.querySelectorAll('.next-btn');
 
-		interface CTFEvent {
-			event_id: string;
-			title: string;
-			place: number;
-			ctf_points: string;
-			time: number;
-		}
-
-		interface CTFTimeData {
-			team: {
-				rating_place: number | null;
-				rating_points: number | null;
-				country_place: number | null;
-			};
-			events: CTFEvent[];
-			year: number;
-		}
-
-		function applyData(data: CTFTimeData) {
-			const { team, events, year } = data;
-
-			const countryBadge = document.getElementById("ctf-badge-country");
-			const worldBadge   = document.getElementById("ctf-badge-world");
-			const ptsBadge     = document.getElementById("ctf-badge-pts");
-			const yearHeading  = document.getElementById("ctf-year-heading");
-			const ratingSummary = document.getElementById("ctf-rating-summary");
-			const tbody        = document.getElementById("ctf-events-tbody");
-
-			if (countryBadge) countryBadge.textContent = `Colombia #${team.country_place ?? "—"}`;
-			if (worldBadge)   worldBadge.textContent   = `World #${team.rating_place ?? "—"}`;
-			if (ptsBadge)     ptsBadge.textContent     = team.rating_points != null
-				? `${team.rating_points.toFixed(3)} pts`
-				: "— pts";
-			if (yearHeading)  yearHeading.textContent  = `${year} CTF Participations`;
-			if (ratingSummary) ratingSummary.textContent =
-				`Overall rating place: ${team.rating_place ?? "—"} — ${
-					team.rating_points != null ? team.rating_points.toFixed(3) : "—"
-				} pts`;
-
-			if (tbody && events.length > 0) {
-				tbody.innerHTML = events
-					.map(
-						(ev) =>
-							`<tr><td>${ev.place}</td><td>${ev.title}</td><td>${ev.ctf_points}</td></tr>`
-					)
-					.join("");
+		rows.forEach((row, index) => {
+			const prev = prevBtns[index];
+			const next = nextBtns[index];
+			if (row && prev && next) {
+				prev.addEventListener('click', () => {
+					row.scrollBy({ left: -row.clientWidth * 0.8, behavior: 'smooth' });
+				});
+				next.addEventListener('click', () => {
+					row.scrollBy({ left: row.clientWidth * 0.8, behavior: 'smooth' });
+				});
 			}
-		}
-
-		async function poll() {
-			try {
-				const res = await fetch("/api/ctftime.json");
-				if (!res.ok) return;
-				const data: CTFTimeData = await res.json();
-				applyData(data);
-			} catch {
-				// silently ignore — stale server-rendered content stays visible
-			}
-		}
-
-		// Refresh once on load so visitors do not stay on the baked fallback,
-		// then keep the data warm with periodic polling.
-		void poll();
-		const id = setInterval(poll, POLL_MS);
-		// Clean up if the page is torn down (e.g. SPA navigation).
-		document.addEventListener("astro:before-swap", () => clearInterval(id), { once: true });
+		});
 	</script>
 </BaseLayout>

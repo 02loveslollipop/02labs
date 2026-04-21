@@ -272,6 +272,7 @@ function runHeroAnimation() {
 	if (prefersReducedMotion) return;
 
 	const title    = document.querySelector<HTMLElement>("[data-animate='hero-title']");
+	const kicker   = document.querySelector<HTMLElement>("[data-animate='hero-kicker']");
 	const sub      = document.querySelector<HTMLElement>("[data-animate='hero-sub']");
 	const navBrand = document.querySelector<HTMLElement>("[data-animate='nav-brand']");
 	const navGH    = document.querySelector<HTMLElement>("[data-animate='nav-github']");
@@ -279,7 +280,7 @@ function runHeroAnimation() {
 
 	if (!title || !sub) return;
 
-	const els = [title, sub, navBrand, navGH, ...navLinks].filter(
+	const els = [kicker, title, sub, navBrand, navGH, ...navLinks].filter(
 		(v): v is HTMLElement => Boolean(v)
 	);
 
@@ -304,8 +305,9 @@ function runHeroAnimation() {
 		});
 	};
 
-	fadeIn(title, 720, 0);
-	fadeIn(sub, 640, 200);
+	if (kicker) fadeIn(kicker, 520, 0);
+	fadeIn(title, 720, kicker ? 120 : 0);
+	fadeIn(sub, 640, kicker ? 320 : 200);
 
 	let t = 80;
 	if (navBrand) { fadeIn(navBrand, 520, t); t += 60; }
@@ -320,4 +322,3 @@ function runHeroAnimation() {
 setupNav();
 setupCardStack();
 runHeroAnimation();
-
