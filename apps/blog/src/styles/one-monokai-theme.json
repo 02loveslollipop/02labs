@@ -76,7 +76,7 @@
     "titleBar.inactiveBackground": "#282C34",
     "titleBar.inactiveForeground": "#6B717D"
   },
-  "tokenColors": [
+  "settings": [
     {
       "name": "Comment",
       "scope": [

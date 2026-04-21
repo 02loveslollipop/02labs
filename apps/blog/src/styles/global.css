@@ -58,6 +58,30 @@ pre {
 	font-family: var(--f-mono);
 }
 
+.skip-link {
+	position: fixed;
+	left: var(--pad);
+	top: 12px;
+	z-index: 100;
+	display: inline-flex;
+	align-items: center;
+	min-height: 44px;
+	padding: 0 14px;
+	border: 1px solid var(--line-strong);
+	background: var(--fg);
+	color: var(--bg);
+	font-family: var(--f-mono);
+	font-size: 12px;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	transform: translateY(calc(-100% - 18px));
+	transition: transform 160ms var(--ease);
+}
+
+.skip-link:focus {
+	transform: translateY(0);
+}
+
 .bg {
 	position: fixed;
 	inset: -40px;
@@ -119,6 +143,9 @@ pre {
 }
 
 .brand {
+	display: inline-flex;
+	align-items: center;
+	min-height: 44px;
 	font-family: var(--f-display);
 	font-size: 16px;
 	letter-spacing: 0.04em;
@@ -137,7 +164,12 @@ pre {
 
 .nav a {
 	position: relative;
-	padding: 8px 2px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 44px;
+	min-width: 44px;
+	padding: 0 2px;
 	color: var(--fg-mute);
 	transition: color 160ms var(--ease);
 }
@@ -160,8 +192,10 @@ pre {
 .gh-btn {
 	display: inline-flex;
 	align-items: center;
+	justify-content: center;
 	gap: 8px;
-	padding: 9px 14px;
+	min-height: 44px;
+	padding: 0 14px;
 	border: 1px solid var(--line-strong);
 	font-family: var(--f-mono);
 	font-size: 12px;
@@ -195,6 +229,8 @@ pre {
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
+	min-width: 0;
+	max-width: 100%;
 	gap: 18px;
 	font-family: var(--f-mono);
 	font-size: 11px;
@@ -212,6 +248,7 @@ pre {
 
 .arc-hero {
 	display: grid;
+	min-width: 0;
 	gap: 26px;
 	padding-bottom: 48px;
 	border-bottom: 1px solid var(--line);
@@ -220,18 +257,22 @@ pre {
 .arc-hero h1 {
 	margin: 0;
 	max-width: 18ch;
+	min-width: 0;
 	font-family: var(--f-display);
 	font-size: clamp(44px, 6vw, 88px);
 	line-height: 0.96;
 	letter-spacing: -0.01em;
+	overflow-wrap: anywhere;
 }
 
 .arc-hero p {
 	margin: 0;
 	max-width: 68ch;
+	min-width: 0;
 	font-size: 19px;
 	line-height: 1.7;
 	color: var(--fg-mute);
+	overflow-wrap: anywhere;
 }
 
 .filter-bar {
@@ -263,7 +304,9 @@ pre {
 .chip {
 	display: inline-flex;
 	align-items: center;
-	padding: 7px 13px;
+	justify-content: center;
+	min-height: 44px;
+	padding: 0 13px;
 	border: 1px solid var(--line);
 	color: var(--fg-mute);
 	background: transparent;
@@ -447,11 +490,16 @@ pre {
 .tag-pill {
 	display: inline-flex;
 	align-items: center;
+	justify-content: center;
 	padding: 5px 11px;
 	font-family: var(--f-mono);
 	font-size: 11px;
 	letter-spacing: 0.12em;
 	text-transform: uppercase;
+}
+
+.article-tags .tag {
+	min-height: 44px;
 }
 
 .tag-a,
@@ -610,6 +658,9 @@ pre {
 }
 
 .arc-foot a {
+	display: inline-flex;
+	align-items: center;
+	min-height: 44px;
 	color: var(--fg);
 	border-bottom: 1px solid var(--line-strong);
 }
@@ -628,18 +679,22 @@ pre {
 h1.title {
 	margin: 0;
 	max-width: 18ch;
+	min-width: 0;
 	font-family: var(--f-display);
 	font-size: clamp(40px, 6vw, 84px);
 	line-height: 0.96;
 	letter-spacing: -0.01em;
+	overflow-wrap: anywhere;
 }
 
 .lede {
 	margin: 0;
 	max-width: 68ch;
+	min-width: 0;
 	font-size: 19px;
 	line-height: 1.7;
 	color: var(--fg-mute);
+	overflow-wrap: anywhere;
 }
 
 .meta-bar {
@@ -665,6 +720,11 @@ h1.title {
 }
 
 .meta-bar .tags a {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 44px;
+	min-width: 44px;
 	color: var(--fg-mute);
 }
 
@@ -728,7 +788,9 @@ h1.title {
 }
 
 .toc__items a {
-	display: block;
+	display: flex;
+	align-items: center;
+	min-height: 44px;
 	padding: 8px 0 8px 14px;
 	border-left: 1px solid var(--line);
 	color: var(--fg-mute);
@@ -759,11 +821,14 @@ h1.title {
 
 .prose {
 	min-width: 0;
+	max-width: 100%;
+	overflow-wrap: anywhere;
 	counter-reset: section;
 }
 
 .prose p,
 .prose li {
+	min-width: 0;
 	font-size: 17px;
 	line-height: 1.85;
 	color: var(--fg);
@@ -840,13 +905,17 @@ h1.title {
 	background: var(--accent-soft);
 	padding: 2px 6px;
 	border: 1px solid var(--line);
+	overflow-wrap: anywhere;
+	word-break: break-word;
 }
 
 .prose pre {
+	max-width: 100%;
 	margin: 24px 0;
 	border: 1px solid var(--line);
 	background: rgba(255, 255, 255, 0.02);
 	overflow-x: hidden;
+	contain: inline-size;
 }
 
 .prose pre::before {
@@ -949,9 +1018,12 @@ h1.title {
 }
 
 .prose .katex-display {
+	max-width: 100%;
 	margin: 28px 0;
 	padding: 22px 20px;
 	overflow-x: auto;
+	overflow-y: hidden;
+	contain: inline-size;
 }
 
 .article-foot {
@@ -1001,6 +1073,8 @@ h1.title {
 
 .back-link {
 	display: inline-flex;
+	align-items: center;
+	min-height: 44px;
 	margin-top: 28px;
 	color: var(--fg-dim);
 }
@@ -1022,11 +1096,31 @@ h1.title {
 
 @media (max-width: 960px) {
 	.site__inner {
-		grid-template-columns: auto auto;
+		grid-template-columns: minmax(0, 1fr) auto;
+		gap: 0 16px;
+		padding-block: 12px;
 	}
 
 	.nav {
+		grid-column: 1 / -1;
+		order: 3;
+		justify-content: flex-start;
+		gap: 20px;
+		overflow-x: auto;
+		padding-top: 4px;
+		scrollbar-width: none;
+	}
+
+	.nav::-webkit-scrollbar {
 		display: none;
+	}
+
+	.nav a {
+		flex: 0 0 auto;
+	}
+
+	.gh-btn {
+		padding-inline: 14px;
 	}
 
 	.featured {
@@ -1066,5 +1160,12 @@ h1.title {
 
 	.article-foot {
 		grid-template-columns: 1fr;
+	}
+}
+
+@media (max-width: 480px) {
+	.arc-hero h1 {
+		font-size: 37px;
+		overflow-wrap: break-word;
 	}
 }

@@ -6,6 +6,12 @@ import remarkGfm from 'remark-gfm';
 import rehypeKatex from 'rehype-katex';
 import oneMonokaiTheme from './src/styles/one-monokai-theme.json' with { type: 'json' };
 
+/** @type {import('shiki').ThemeRegistrationRaw} */
+const oneMonokaiShikiTheme = {
+	...oneMonokaiTheme,
+	type: 'dark',
+};
+
 // https://astro.build/config
 export default defineConfig({
 	site: 'https://blog.02labs.me',
@@ -19,7 +25,7 @@ export default defineConfig({
 		remarkPlugins: [remarkGfm, remarkMath],
 		rehypePlugins: [rehypeKatex],
 		shikiConfig: {
-			theme: oneMonokaiTheme,
+			theme: oneMonokaiShikiTheme,
 		},
 	},
 });
