@@ -20,4 +20,5 @@ docs/mockups/*
 .playwright-cli/
 
 # Wrangler related files
-apps/blog/.wrangler
+apps/blog/.wrangler/*
+apps/www/.wrangler/*
