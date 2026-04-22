@@ -1,0 +1,23 @@
+\documentclass[tikz,border=6pt]{standalone}
+\input{common.tex}
+
+\begin{document}
+\begin{tikzpicture}
+  \node[byteheader, anchor=west, minimum width=20mm, minimum height=18mm] (sign) at (0,0) {Sign\\1 bit};
+  \node[byteknown, anchor=west, minimum width=48mm, minimum height=18mm] (exp) at (sign.east) {Exponent\\11 bits\\\texttt{0x7ff}};
+  \node[byteother, anchor=west, minimum width=78mm, minimum height=18mm] (mantissa) at (exp.east) {Fraction\\52 bits\\\texttt{deadbeef00000}};
+
+  \draw[conn] (sign.north west) rectangle (mantissa.south east);
+
+  \draw[conn] (sign.south west) -- ++(0,-6mm);
+  \draw[conn] (exp.south west) -- ++(0,-6mm);
+  \draw[conn] (mantissa.south west) -- ++(0,-6mm);
+  \draw[conn] (mantissa.south east) -- ++(0,-6mm);
+
+  \node[mathlabel, anchor=north] at ($(sign.south west)+(0,-6mm)$) {$63$};
+  \node[mathlabel, anchor=north] at ($(exp.south west)+(0,-6mm)$) {$62$};
+  \node[mathlabel, anchor=north] at ($(mantissa.south west)+(0,-6mm)$) {$51$};
+  \node[mathlabel, anchor=north] at ($(mantissa.south east)+(0,-6mm)$) {$0$};
+
+\end{tikzpicture}
+\end{document}

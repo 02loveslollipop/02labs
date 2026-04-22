@@ -1,0 +1,22 @@
+\documentclass[tikz,border=6pt]{standalone}
+\input{common.tex}
+
+\begin{document}
+\begin{tikzpicture}
+  \node[byteheader, anchor=west, minimum width=22mm, minimum height=20mm] (sign) at (0,0) {Sign\\\texttt{0}};
+  \node[byteknown, anchor=west, minimum width=54mm, minimum height=20mm] (exponent) at (sign.east) {Exponent\\\texttt{11111111111}};
+  \node[byteother, anchor=west, minimum width=76mm, minimum height=20mm] (mantissa) at (exponent.east) {Fraction\\non-zero payload\\\texttt{deadbeef00000}};
+
+  \draw[conn] (sign.north west) rectangle (mantissa.south east);
+
+  \draw[conn] (sign.south west) -- ++(0,-6mm);
+  \draw[conn] (exponent.south west) -- ++(0,-6mm);
+  \draw[conn] (mantissa.south west) -- ++(0,-6mm);
+  \draw[conn] (mantissa.south east) -- ++(0,-6mm);
+
+  \node[mathlabel, anchor=north] at ($(sign.south west)+(0,-6mm)$) {$63$};
+  \node[mathlabel, anchor=north] at ($(exponent.south west)+(0,-6mm)$) {$62$};
+  \node[mathlabel, anchor=north] at ($(mantissa.south west)+(0,-6mm)$) {$51$};
+  \node[mathlabel, anchor=north] at ($(mantissa.south east)+(0,-6mm)$) {$0$};
+\end{tikzpicture}
+\end{document}
