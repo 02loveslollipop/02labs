@@ -316,9 +316,276 @@ function runHeroAnimation() {
 }
 
 // --------------------------------------------------------------------------
+// Hero wave field
+// --------------------------------------------------------------------------
+
+type HeroParticle = {
+	x: number;
+	y: number;
+	jitter: number;
+	level: number;
+};
+
+type HeroRipple = {
+	x: number;
+	y: number;
+	start: number;
+	strength: number;
+};
+
+function clamp(value: number, min: number, max: number): number {
+	return Math.min(max, Math.max(min, value));
+}
+
+function mix(a: number, b: number, amount: number): number {
+	return a + (b - a) * amount;
+}
+
+function smoothstep(edge0: number, edge1: number, value: number): number {
+	const x = clamp((value - edge0) / (edge1 - edge0), 0, 1);
+	return x * x * (3 - 2 * x);
+}
+
+function setupHeroWaveParticles() {
+	if (prefersReducedMotion) return;
+
+	const hero = document.querySelector<HTMLElement>(".hero");
+	const canvas = document.querySelector<HTMLCanvasElement>("[data-hero-wave]");
+	if (!hero || !canvas) return;
+
+	const ctx = canvas.getContext("2d", { alpha: true });
+	if (!ctx) return;
+
+	const heroEl = hero;
+	const canvasEl = canvas;
+	const context = ctx;
+
+	let width = 0;
+	let height = 0;
+	let dpr = 1;
+	let particles: HeroParticle[] = [];
+	let ripples: HeroRipple[] = [];
+	let raf = 0;
+	let lastFrame = performance.now();
+	let lastPointer: { x: number; y: number; time: number } | null = null;
+	const accent = { r: 45, g: 108, b: 255 };
+	const inactiveBlue = { r: 8, g: 22, b: 58 };
+
+	const hashNoise = (x: number, y: number, seed: number): number => {
+		const n = Math.sin(x * 127.1 + y * 311.7 + seed * 74.7) * 43758.5453123;
+		return n - Math.floor(n);
+	};
+
+	const valueNoise = (x: number, y: number, seed: number): number => {
+		const x0 = Math.floor(x);
+		const y0 = Math.floor(y);
+		const xf = x - x0;
+		const yf = y - y0;
+		const u = xf * xf * (3 - 2 * xf);
+		const v = yf * yf * (3 - 2 * yf);
+		const a = hashNoise(x0, y0, seed);
+		const b = hashNoise(x0 + 1, y0, seed);
+		const c = hashNoise(x0, y0 + 1, seed);
+		const d = hashNoise(x0 + 1, y0 + 1, seed);
+
+		return mix(mix(a, b, u), mix(c, d, u), v);
+	};
+
+	const waveFunction = (x: number, y: number, t: number): number => {
+		const scale = Math.max(1, Math.min(width, height));
+		const nx = (x - width * 0.5) / scale;
+		const ny = (y - height * 0.5) / scale;
+		const driftX = t * 0.075;
+		const driftY = t * -0.052;
+		const warpX = (valueNoise(nx * 2.2 + driftX, ny * 2.2 - t * 0.03, 8.4) - 0.5) * 1.28;
+		const warpY = (valueNoise(nx * 2.2 + t * 0.04, ny * 2.2 + driftY, 19.7) - 0.5) * 1.28;
+		const px = nx * 2.8 + warpX + driftX;
+		const py = ny * 2.8 + warpY + driftY;
+		let field = 0;
+		let amplitude = 0.58;
+		let total = 0;
+
+		for (let octave = 0; octave < 5; octave++) {
+			const frequency = 1.15 * 2 ** octave;
+			const motion = t * (0.042 + octave * 0.013);
+			field += valueNoise(
+				px * frequency + motion,
+				py * frequency - motion * 1.35,
+				31.2 + octave * 11.9
+			) * amplitude;
+			total += amplitude;
+			amplitude *= 0.52;
+		}
+
+		const plasma = field / total;
+		const threshold = 0.42 + 0.08 * Math.sin(t * 1.18 + warpX * 2.4 - warpY * 1.7);
+		const ember = smoothstep(threshold, threshold + 0.3, plasma);
+		const hotCore = smoothstep(threshold + 0.16, threshold + 0.42, plasma);
+		const breathe = 0.78 + 0.22 * Math.sin(t * 1.85 + plasma * Math.PI * 4);
+
+		return clamp((ember * 0.7 + hotCore * 0.3) * breathe, 0, 0.98);
+	};
+
+	const rippleField = (particle: HeroParticle, now: number): number => {
+		let intensity = 0;
+
+		for (const ripple of ripples) {
+			const age = (now - ripple.start) / 1000;
+			const distance = Math.hypot(particle.x - ripple.x, particle.y - ripple.y);
+			const radius = age * 430;
+			const ringWidth = 58 + age * 24;
+			const ring = Math.exp(-Math.pow((distance - radius) / ringWidth, 2));
+			const oscillation = 0.5 + 0.5 * Math.cos((distance - radius) * 0.075);
+			const damping = Math.exp(-age * 1.28);
+
+			intensity = Math.max(
+				intensity,
+				ripple.strength * ring * oscillation * damping
+			);
+		}
+
+		return clamp(intensity, 0, 1);
+	};
+
+	function resize() {
+		const rect = heroEl.getBoundingClientRect();
+		width = Math.max(1, rect.width);
+		height = Math.max(1, rect.height);
+		dpr = Math.min(2, window.devicePixelRatio || 1);
+
+		canvasEl.width = Math.round(width * dpr);
+		canvasEl.height = Math.round(height * dpr);
+		canvasEl.style.width = `${width}px`;
+		canvasEl.style.height = `${height}px`;
+		context.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+		const spacing = clamp(Math.min(width, height) / 20, 22, 34);
+		const cols = Math.ceil(width / spacing) + 2;
+		const rows = Math.ceil(height / spacing) + 2;
+		particles = [];
+
+		for (let row = 0; row < rows; row++) {
+			for (let col = 0; col < cols; col++) {
+				const seed = Math.sin((row + 1) * 37.12 + (col + 1) * 19.42) * 43758.5453;
+				const jitter = seed - Math.floor(seed);
+				particles.push({
+					x: (col - 0.5) * spacing + (jitter - 0.5) * spacing * 0.26,
+					y: (row - 0.5) * spacing + (0.5 - jitter) * spacing * 0.18,
+					jitter,
+					level: 0,
+				});
+			}
+		}
+	}
+
+	function addRipple(x: number, y: number, strength: number) {
+		ripples.push({
+			x,
+			y,
+			start: performance.now(),
+			strength: clamp(strength, 0.24, 1.18),
+		});
+
+		if (ripples.length > 44) {
+			ripples = ripples.slice(-44);
+		}
+	}
+
+	function onPointerMove(event: PointerEvent) {
+		const rect = heroEl.getBoundingClientRect();
+		const x = event.clientX - rect.left;
+		const y = event.clientY - rect.top;
+		const time = performance.now();
+
+		if (x < 0 || y < 0 || x > rect.width || y > rect.height) return;
+
+		if (lastPointer) {
+			const dt = Math.max(16, time - lastPointer.time);
+			const distance = Math.hypot(x - lastPointer.x, y - lastPointer.y);
+			const velocity = distance / dt;
+
+			if (distance > 8) {
+				const steps = Math.min(12, Math.max(1, Math.ceil(distance / 34)));
+				const strength = velocity * 1.12;
+
+				for (let step = 1; step <= steps; step++) {
+					const amount = step / steps;
+					addRipple(
+						mix(lastPointer.x, x, amount),
+						mix(lastPointer.y, y, amount),
+						strength
+					);
+				}
+			}
+		} else {
+			addRipple(x, y, 0.36);
+		}
+
+		lastPointer = { x, y, time };
+	}
+
+	function draw(now: number) {
+		const time = now / 1000;
+		const dt = Math.min(0.05, Math.max(0.001, (now - lastFrame) / 1000));
+		const sizeSmoothing = 1 - Math.exp(-dt * 7.2);
+		lastFrame = now;
+		ripples = ripples.filter((ripple) => (now - ripple.start) / 1000 < 2.2);
+		context.clearRect(0, 0, width, height);
+
+		context.lineCap = "square";
+		context.globalCompositeOperation = "lighter";
+
+		for (const particle of particles) {
+			const base = waveFunction(particle.x, particle.y, time + particle.jitter * 0.18);
+			const ripple = rippleField(particle, now);
+			const target = Math.max(base, ripple);
+			particle.level = mix(particle.level, target, sizeSmoothing);
+
+			const glow = Math.pow(particle.level, 1.28);
+			const arm = 1.4 + glow * 6.6 + particle.jitter * 0.55;
+			const lineWidth = 0.42 + glow * 2.2;
+			const alpha = 0.035 + glow * 0.72;
+			const colorLevel = smoothstep(0.08, 0.86, glow);
+			const red = Math.round(mix(inactiveBlue.r, accent.r, colorLevel));
+			const green = Math.round(mix(inactiveBlue.g, accent.g, colorLevel));
+			const blue = Math.round(mix(inactiveBlue.b, accent.b, colorLevel));
+
+			context.strokeStyle = `rgba(${red}, ${green}, ${blue}, ${alpha})`;
+			context.lineWidth = lineWidth;
+			context.beginPath();
+			context.moveTo(particle.x - arm, particle.y);
+			context.lineTo(particle.x + arm, particle.y);
+			context.moveTo(particle.x, particle.y - arm);
+			context.lineTo(particle.x, particle.y + arm);
+			context.stroke();
+		}
+
+		context.globalCompositeOperation = "source-over";
+		raf = window.requestAnimationFrame(draw);
+	}
+
+	const observer = new ResizeObserver(resize);
+	observer.observe(heroEl);
+	resize();
+
+	heroEl.addEventListener("pointermove", onPointerMove, { passive: true });
+	heroEl.addEventListener("pointerleave", () => {
+		lastPointer = null;
+	});
+	addRipple(width * 0.72, height * 0.48, 0.38);
+	raf = window.requestAnimationFrame(draw);
+
+	window.addEventListener("pagehide", () => {
+		window.cancelAnimationFrame(raf);
+		observer.disconnect();
+	});
+}
+
+// --------------------------------------------------------------------------
 // Boot
 // --------------------------------------------------------------------------
 
 setupNav();
 setupCardStack();
 runHeroAnimation();
+setupHeroWaveParticles();
