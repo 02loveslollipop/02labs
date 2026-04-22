@@ -89,6 +89,7 @@ const resolvedTwitterCard = twitterCard ?? (ogImage ? "summary_large_image" : "s
 		{twitterCreator ? <meta name="twitter:creator" content={twitterCreator} /> : null}
 		{ogImage ? <meta name="twitter:image" content={ogImage} /> : null}
 		<link rel="alternate" type="application/rss+xml" title={`${BLOG_NAME} RSS`} href="https://blog.02labs.me/rss.xml" />
+		<link rel="alternate" href="https://blog.02labs.me/" hreflang="en" />
 
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

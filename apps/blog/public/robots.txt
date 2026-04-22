@@ -2,3 +2,4 @@ User-agent: *
 Allow: /
 
 Sitemap: https://blog.02labs.me/sitemap-index.xml
+Content-Signal: ai-train=yes, search=yes, ai-input=yes

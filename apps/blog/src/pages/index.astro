@@ -38,6 +38,11 @@ const jsonLd = JSON.stringify(
 			description: BLOG_DESCRIPTION,
 			url: blogUrl,
 			inLanguage: BLOG_LOCALE,
+			isPartOf: {
+				"@type": "WebSite",
+				name: "02Labs",
+				url: "https://02labs.me/",
+			},
 		},
 		{
 			"@context": "https://schema.org",

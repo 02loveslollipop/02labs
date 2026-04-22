@@ -23,7 +23,9 @@ export default defineConfig({
 		workerEntryPoint: { path: "./src/worker.ts" },
 	}),
 	trailingSlash: 'always',
-	integrations: [sitemap()],
+	integrations: [sitemap({
+		customPages: ['https://02labs.me/'],
+	})],
 	markdown: {
 		remarkPlugins: [remarkGfm, remarkMath],
 		rehypePlugins: [rehypeKatex],

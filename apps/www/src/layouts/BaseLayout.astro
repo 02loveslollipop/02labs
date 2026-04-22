@@ -6,6 +6,9 @@ export interface Props {
 	title?: string;
 	description?: string;
 	ogType?: "website" | "article";
+	ogImage?: string;
+	ogImageAlt?: string;
+	twitterCard?: "summary" | "summary_large_image";
 	jsonLd?: string;
 	canonical?: string;
 }
@@ -15,6 +18,9 @@ const {
 	title = siteBrand,
 	description = "02Labs is a portfolio and lab for projects, writing, and experiments in systems, data, and security.",
 	ogType = "website",
+	ogImage,
+	ogImageAlt,
+	twitterCard,
 	jsonLd,
 	canonical,
 } = Astro.props;
@@ -22,6 +28,9 @@ const {
 const site = Astro.site;
 const canonicalUrl = canonical ?? (site ? new URL(Astro.url.pathname, site).toString() : Astro.url.toString());
 const fullTitle = title === siteBrand ? title : `${title} | ${siteBrand}`;
+const resolvedOgImage = ogImage ?? (site ? new URL("/og-default.png", site).toString() : "/og-default.png");
+const resolvedOgImageAlt = ogImageAlt ?? "02Labs — Systems, Data, Security, and CTF Writeups";
+const resolvedTwitterCard = twitterCard ?? (ogImage ? "summary_large_image" : "summary_large_image");
 ---
 
 <html lang="en">
@@ -42,10 +51,16 @@ const fullTitle = title === siteBrand ? title : `${title} | ${siteBrand}`;
 		<meta property="og:description" content={description} />
 		<meta property="og:type" content={ogType} />
 		<meta property="og:url" content={canonicalUrl} />
+		<meta property="og:locale" content="en_US" />
+		<meta property="og:image" content={resolvedOgImage} />
+		<meta property="og:image:alt" content={resolvedOgImageAlt} />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
 
-		<meta name="twitter:card" content="summary" />
+		<meta name="twitter:card" content={resolvedTwitterCard} />
 		<meta name="twitter:title" content={fullTitle} />
 		<meta name="twitter:description" content={description} />
+		<meta name="twitter:image" content={resolvedOgImage} />
 
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -67,3 +82,4 @@ const fullTitle = title === siteBrand ? title : `${title} | ${siteBrand}`;
 		<slot />
 	</body>
 </html>
+
