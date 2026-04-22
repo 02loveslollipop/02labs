@@ -1,0 +1,73 @@
+---
+import type { BlogTagSummary } from "../../lib/blog-posts";
+
+export interface Props {
+	allCount: number;
+	activeTagSlug?: string | null;
+	tagSummaries: BlogTagSummary[];
+}
+
+const { allCount, activeTagSlug = null, tagSummaries } = Astro.props;
+const eligibleTags = tagSummaries.filter((tag) => tag.count >= 2);
+const visibleTags = eligibleTags.slice(0, 12);
+const hiddenTags = eligibleTags.slice(12);
+const toggleId = `tag-toggle-${Math.random().toString(36).slice(2, 10)}`;
+const listId = `${toggleId}-list`;
+---
+
+<div class="filter-bar">
+	<div class="chips" role="group" aria-label="Filter by tag">
+		<a class={activeTagSlug ? "chip" : "chip on"} href="https://blog.02labs.me/">
+			ALL · {String(allCount).padStart(2, "0")}
+		</a>
+		{visibleTags.map((tag) => (
+			<a class={tag.slug === activeTagSlug ? "chip on" : "chip"} href={`https://blog.02labs.me/tags/${tag.slug}/`}>
+				{tag.label.toUpperCase()} · {String(tag.count).padStart(2, "0")}
+			</a>
+		))}
+		{hiddenTags.length > 0 ? (
+			<>
+				<div class="chips chips--expanded" id={listId} hidden>
+					{hiddenTags.map((tag) => (
+						<a class={tag.slug === activeTagSlug ? "chip on" : "chip"} href={`https://blog.02labs.me/tags/${tag.slug}/`}>
+							{tag.label.toUpperCase()} · {String(tag.count).padStart(2, "0")}
+						</a>
+					))}
+				</div>
+				<button
+					class="chip chip-toggle"
+					id={toggleId}
+					data-chip-toggle
+					type="button"
+					aria-controls={listId}
+					aria-expanded="false"
+				>
+					VIEW ALL
+				</button>
+			</>
+		) : null}
+	</div>
+	<div class="count">SORT → LATEST FIRST</div>
+</div>
+
+{hiddenTags.length > 0 ? (
+	<script is:inline>
+		(() => {
+			const buttons = Array.from(document.querySelectorAll("[data-chip-toggle]"));
+			for (const button of buttons) {
+				if (!(button instanceof HTMLButtonElement)) continue;
+				const listId = button.getAttribute("aria-controls");
+				if (!listId) continue;
+				const list = document.getElementById(listId);
+				if (!(list instanceof HTMLElement)) continue;
+				button.addEventListener("click", () => {
+					const expanded = button.getAttribute("aria-expanded") === "true";
+					button.setAttribute("aria-expanded", expanded ? "false" : "true");
+					button.textContent = expanded ? "VIEW ALL" : "SHOW LESS";
+					list.hidden = expanded;
+				});
+				list.hidden = true;
+			}
+		})();
+	</script>
+) : null}

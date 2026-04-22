@@ -1,0 +1,111 @@
+---
+import Navbar from "../components/Navbar.astro";
+import "../styles/blog.css";
+import "katex/dist/katex.min.css";
+
+import {
+	BLOG_DESCRIPTION,
+	BLOG_LOCALE,
+	BLOG_NAME,
+} from "../lib/blog-posts";
+
+export interface Props {
+	title?: string;
+	description?: string;
+	ogType?: "website" | "article";
+	ogImage?: string;
+	ogImageAlt?: string;
+	twitterCard?: "summary" | "summary_large_image";
+	jsonLd?: string;
+	authorName?: string;
+	publishedTime?: string;
+	modifiedTime?: string;
+	articleTags?: string[];
+	ogLocale?: string;
+	twitterSite?: string;
+	twitterCreator?: string;
+	canonical?: string;
+}
+
+const {
+	title = BLOG_NAME,
+	description = BLOG_DESCRIPTION,
+	ogType = "website",
+	ogImage,
+	ogImageAlt,
+	twitterCard,
+	jsonLd,
+	authorName,
+	publishedTime,
+	modifiedTime,
+	articleTags = [],
+	ogLocale = BLOG_LOCALE,
+	twitterSite,
+	twitterCreator,
+	canonical,
+} = Astro.props;
+
+const site = Astro.site;
+const canonicalUrl = canonical
+	? canonical
+	: site
+		? new URL(Astro.url.pathname, site).toString()
+		: Astro.url.toString();
+const fullTitle = title === BLOG_NAME ? title : `${title} | ${BLOG_NAME}`;
+const resolvedTwitterCard = twitterCard ?? (ogImage ? "summary_large_image" : "summary");
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="generator" content={Astro.generator} />
+
+		<title>{fullTitle}</title>
+		<meta name="description" content={description} />
+		{authorName ? <meta name="author" content={authorName} /> : null}
+		{canonical ? <link rel="canonical" href={canonicalUrl} /> : null}
+
+		<meta name="robots" content="index,follow" />
+		<meta name="theme-color" content="#0b0b10" />
+
+		<meta property="og:site_name" content={BLOG_NAME} />
+		<meta property="og:title" content={fullTitle} />
+		<meta property="og:description" content={description} />
+		<meta property="og:type" content={ogType} />
+		<meta property="og:url" content={canonicalUrl} />
+		<meta property="og:locale" content={ogLocale} />
+		{ogImage ? <meta property="og:image" content={ogImage} /> : null}
+		{ogImageAlt ? <meta property="og:image:alt" content={ogImageAlt} /> : null}
+		{publishedTime ? <meta property="article:published_time" content={publishedTime} /> : null}
+		{modifiedTime ? <meta property="article:modified_time" content={modifiedTime} /> : null}
+		{authorName ? <meta property="article:author" content={authorName} /> : null}
+		{articleTags.map((tag) => <meta property="article:tag" content={tag} />)}
+
+		<meta name="twitter:card" content={resolvedTwitterCard} />
+		<meta name="twitter:title" content={fullTitle} />
+		<meta name="twitter:description" content={description} />
+		{twitterSite ? <meta name="twitter:site" content={twitterSite} /> : null}
+		{twitterCreator ? <meta name="twitter:creator" content={twitterCreator} /> : null}
+		{ogImage ? <meta name="twitter:image" content={ogImage} /> : null}
+		<link rel="alternate" type="application/rss+xml" title={`${BLOG_NAME} RSS`} href="https://blog.02labs.me/rss.xml" />
+
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600;700;800&display=swap"
+			rel="stylesheet"
+		/>
+
+		<link rel="icon" type="image/png" href="/02loveslollipop.png" />
+		<link rel="apple-touch-icon" href="/02loveslollipop.png" />
+
+		{jsonLd ? <script type="application/ld+json" is:inline set:html={jsonLd} /> : null}
+	</head>
+	<body>
+		<a class="skip-link" href="#main">Skip to content</a>
+		<div class="bg"><div class="bg-wash"></div></div>
+		<Navbar forceScrolled />
+		<slot />
+	</body>
+</html>

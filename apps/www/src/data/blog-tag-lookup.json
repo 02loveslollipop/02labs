@@ -1,0 +1,80 @@
+{
+	"alpacahack": {
+		"description": "Writeups and deep dives from AlpacaHack Daily challenges."
+	},
+	"ctf": {
+		"description": "Capture-the-flag writeups, challenge retrospectives, and technical breakdowns from competitions and practice sets."
+	},
+	"crypto": {
+		"description": "Cryptography writeups mostly covering cryptoanalysis, cipher design, and weakness in implementations."
+	},
+	"osint": {
+		"description": "Open-source intelligence writeups, specially aviation and geospatial OSINT."
+	},
+	"web": {
+		"description": "Web security writeups, mostly focused on protocol analysis."
+	},
+	"forensics": {
+		"description": "Digital forensics writeups focused on artifact recovery and metadata analysis."
+	},
+	"aes": {
+		"description": "AES-specific analyses and examples."
+	},
+	"ecb": {
+		"description": "ECB cipher mode discussions and visualizations."
+	},
+	"cipher-mode": {
+		"description": "Block cipher modes of operation (ECB, CBC, etc.)."
+	},
+	"xor": {
+		"description": "XOR-based problems and analyses."
+	},
+	"one-time-pad": {
+		"description": "One-Time Pad / OTP discussions."
+	},
+	"dicectf": {
+		"description": "DiceCTF event writeups and challenges."
+	},
+	"bkctf": {
+		"description": "Batman's Kitchen CTF (bkctf) writeups."
+	},
+	"aviation": {
+		"description": "Aviation and flight-related OSINT writeups."
+	},
+	"http": {
+		"description": "HTTP protocol analysis and examples."
+	},
+	"tcp": {
+		"description": "TCP-level packet analysis and networking."
+	},
+	"wireshark": {
+		"description": "Packet capture and Wireshark-based analysis."
+	},
+	"tamuctf": {
+		"description": "TAMUctf event writeups and challenges."
+	},
+	"spn": {
+		"description": "Substitution–Permutation Network (SPN) cipher analyses."
+	},
+	"block-ciphers": {
+		"description": "Block cipher topics and attacks."
+	},
+	"bitwise-and": {
+		"description": "Bitwise AND operator and statistical attacks."
+	},
+	"ritsec": {
+		"description": "RITSEC CTF event writeups."
+	},
+	"known-plaintext-attack": {
+		"description": "Known-plaintext and related cryptanalytic attacks."
+	},
+	"gpu": {
+		"description": "GPU-accelerated implementations and optimizations."
+	},
+	"git": {
+		"description": "Git usage, forensics, and repository analysis."
+	},
+	"github": {
+		"description": "GitHub-specific analysis and platform behavior."
+	}
+}

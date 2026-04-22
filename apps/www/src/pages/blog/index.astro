@@ -1,53 +1,79 @@
 ---
 export const prerender = true;
 
-import BaseLayout from "../../layouts/BaseLayout.astro";
-import Navbar from "../../components/Navbar.astro";
+import { getCollection } from "astro:content";
+import blogArchiveSettings from "../../data/blog-archive-settings.json";
+import ArchiveTagBar from "../../components/blog/ArchiveTagBar.astro";
+import EmptyFeaturedMedia from "../../components/blog/EmptyFeaturedMedia.astro";
+import BlogLayout from "../../layouts/BlogLayout.astro";
 import {
-	BLOG_ROOT,
-	fetchBlogArchivePosts,
-	featuredBlogPosts,
-	majorBlogTags,
-} from "../../lib/blog";
+	BLOG_AUTHOR,
+	BLOG_DESCRIPTION,
+	BLOG_LOCALE,
+	BLOG_NAME,
+	BLOG_PUBLISHER,
+	getTagSummaries,
+	resolveSiteUrl,
+	sortBlogEntries,
+	toBlogIndexPost,
+	resolvePostImageSrc,
+	getPostSlug,
+} from "../../lib/blog-posts";
 
-const archivePosts = await fetchBlogArchivePosts();
-const itemListEntries = archivePosts.length > 0
-	? archivePosts
-	: featuredBlogPosts.map((post) => ({
-			title: post.title,
-			link: post.href,
-			excerpt: post.description,
-			pubDate: "",
-			imageSrc: null,
-			tags: [],
-			description: post.description,
-		}));
-
-const pageUrl = Astro.site ? new URL("/blog/", Astro.site).toString() : "/blog/";
+const entries = sortBlogEntries((await getCollection("blog")).filter((entry) => !entry.data.draft));
+const posts = entries.map((entry) => ({ entry, preview: toBlogIndexPost(entry, Astro.site) }));
+const configuredFeaturedSlug = String(blogArchiveSettings.featuredSlug || "").trim();
+const featured =
+	posts.find(({ preview }) => preview.slug === configuredFeaturedSlug) ??
+	posts[0] ??
+	null;
+const archivePosts = featured
+	? posts.filter(({ preview }) => preview.slug !== featured.preview.slug)
+	: posts;
+const tagSummaries = getTagSummaries(entries);
+const blogUrl = Astro.site ? new URL("/blog/", Astro.site).toString() : "/blog/";
 const jsonLd = JSON.stringify(
 	[
 		{
 			"@context": "https://schema.org",
-			"@type": "CollectionPage",
-			name: "02Labs Blog Hub",
-			description:
-				"Main-site mirror of the 02Labs blog archive with crawlable links to CTF writeups, OSINT notes, crypto solves, and systems deep dives.",
-			url: pageUrl,
-			isPartOf: {
-				"@type": "WebSite",
-				name: "02Labs",
-				url: Astro.site ? new URL("/", Astro.site).toString() : "/",
+			"@type": "WebSite",
+			name: BLOG_NAME,
+			description: BLOG_DESCRIPTION,
+			url: blogUrl,
+			inLanguage: BLOG_LOCALE,
+		},
+		{
+			"@context": "https://schema.org",
+			"@type": "Blog",
+			name: BLOG_NAME,
+			description: BLOG_DESCRIPTION,
+			url: blogUrl,
+			inLanguage: BLOG_LOCALE,
+			author: {
+				"@type": "Person",
+				name: BLOG_AUTHOR.name,
+				url: BLOG_AUTHOR.url,
+				sameAs: [...BLOG_AUTHOR.sameAs],
+			},
+			publisher: {
+				"@type": "Organization",
+				name: BLOG_PUBLISHER.name,
+				url: BLOG_PUBLISHER.url,
+				logo: {
+					"@type": "ImageObject",
+					url: resolveSiteUrl(BLOG_PUBLISHER.logoPath, Astro.site),
+				},
 			},
 		},
 		{
 			"@context": "https://schema.org",
 			"@type": "ItemList",
-			name: "02Labs blog posts",
-			itemListElement: itemListEntries.map((item, index) => ({
+			name: `${BLOG_NAME} Posts`,
+			itemListElement: posts.map(({ preview }, index) => ({
 				"@type": "ListItem",
 				position: index + 1,
-				name: item.title,
-				url: item.link,
+				name: preview.title,
+				url: preview.url,
 			})),
 		},
 	],
@@ -56,114 +82,78 @@ const jsonLd = JSON.stringify(
 );
 ---
 
-<BaseLayout
-	title="02Labs Blog Hub"
-	description="Browse a mirrored archive of the 02Labs blog from the main site, with server-rendered links to the canonical posts on blog.02labs.me."
-	ogType="website"
-	canonical="https://02labs.me/blog/"
-	jsonLd={jsonLd}
->
-	<Navbar forceScrolled />
+<BlogLayout title="Blog" description={BLOG_DESCRIPTION} ogType="website" jsonLd={jsonLd}>
+	<main class="wrap" id="main">
+		<section class="arc-hero">
+			<div class="eyebrow">
+				<span>02Labs</span>
+				<span class="dot"></span>
+				<span>THE BLOG</span>
+			</div>
+			<h1>02loveslollipop's Blog</h1>
+			<p>
+				Mostly Crypto CTF writeups/deep dives and whatever I feel like writing about
+			</p>
+		</section>
 
-	<main id="main" class="blog-hub-page">
-		<div class="blog-hub-shell panel">
-			<section class="blog-hub-hero">
-				<p class="blog-hub-eyebrow">02Labs blog mirror</p>
-				<h1>CTF writeups, OSINT notes, crypto solves, and systems deep dives</h1>
-				<p class="blog-hub-copy">
-					This page mirrors the blog archive on the main site for discovery and SEO,
-					while every post keeps its canonical home on <strong>blog.02labs.me</strong>.
-				</p>
-				<div class="btn-row">
-					<a class="btn" href={BLOG_ROOT}>Open canonical blog home</a>
+		<ArchiveTagBar allCount={posts.length} tagSummaries={tagSummaries} />
+
+		{featured ? (
+			<a class="featured" href={`https://blog.02labs.me/posts/${featured.preview.slug}/`}>
+				<div class="featured__img">
+					{featured.preview.imageSrc ? (
+						<img
+							src={featured.preview.imageSrc}
+							alt={`${featured.preview.title} preview`}
+							loading="eager"
+							decoding="async"
+						/>
+					) : (
+						<EmptyFeaturedMedia />
+					)}
 				</div>
-			</section>
-
-			<section class="blog-hub-section" aria-labelledby="blog-hub-latest">
-				<div class="section-head">
+				<div class="featured__body">
 					<div>
-						<h2 id="blog-hub-latest">Archive mirror</h2>
-						<p>Server-rendered from the canonical blog feed so crawlers can see the latest entries immediately.</p>
+						<div class="featured__tags">
+							{featured.preview.tags.slice(0, 3).map((tag, index) => (
+								<span class={index === 0 ? "tag-a" : "tag-g"}>{tag}</span>
+							))}
+						</div>
+						<div style="height: 18px" aria-hidden="true"></div>
+						<h2>{featured.preview.title}</h2>
+						<div style="height: 14px" aria-hidden="true"></div>
+						<p>{featured.preview.excerpt}</p>
+					</div>
+					<div class="featured__foot">
+						<span>{featured.preview.pubDateDisplay} · {featured.preview.readTimeLabel}</span>
+						<span class="cta">READ POST →</span>
 					</div>
 				</div>
-				{archivePosts.length > 0 ? (
-					<div class="blog-hub-list" aria-label="Blog archive mirror">
-						{archivePosts.map((post) => (
-							<a class={`blog-hub-post ${post.imageSrc ? "" : "blog-hub-post--no-image"}`} href={post.link}>
-								{post.imageSrc ? (
-									<img
-										class="blog-hub-post__thumb"
-										src={post.imageSrc}
-										alt={`${post.title} preview`}
-										loading="lazy"
-										decoding="async"
-									/>
-								) : null}
-								<div class="blog-hub-post__body">
-									<h3>{post.title}</h3>
-									<p>{post.excerpt || post.description}</p>
-									<div class="blog-hub-post__meta">
-										{post.pubDate
-											? new Date(post.pubDate).toLocaleDateString("en-US", {
-													year: "numeric",
-													month: "short",
-													day: "numeric",
-													timeZone: "UTC",
-												})
-											: "Post"}
-									</div>
-									{post.tags.length > 0 ? (
-										<div class="blog-hub-post__tags" aria-label="Post tags">
-											{post.tags.slice(0, 4).map((tag) => (
-												<span class="blog-hub-tag">{tag}</span>
-											))}
-										</div>
-									) : null}
-								</div>
-							</a>
-						))}
-					</div>
-				) : (
-					<div class="cta">
-						<p>The live blog feed was unavailable during build, so this page falls back to curated entry points.</p>
-						<p><a class="btn" href={BLOG_ROOT}>Open canonical blog home</a></p>
-					</div>
-				)}
-			</section>
+			</a>
+		) : null}
 
-			<section class="blog-hub-section" aria-labelledby="blog-hub-featured">
-				<div class="section-head">
-					<div>
-						<h2 id="blog-hub-featured">Featured writeups</h2>
-						<p>A few strong entry points into the archive.</p>
-					</div>
-				</div>
-				<div class="blog-hub-grid" aria-label="Featured blog posts">
-					{featuredBlogPosts.map((post) => (
-						<article class="blog-hub-card">
-							<h3><a href={post.href}>{post.title}</a></h3>
-							<p>{post.description}</p>
-						</article>
-					))}
-				</div>
-			</section>
-
-			<section class="blog-hub-section" aria-labelledby="blog-hub-tags">
-				<div class="section-head">
-					<div>
-						<h2 id="blog-hub-tags">Tags</h2>
-						<p>Browse the canonical blog by topic archive.</p>
-					</div>
-				</div>
-				<div class="blog-hub-grid" aria-label="Blog tags">
-					{majorBlogTags.map((tag) => (
-						<article class="blog-hub-card">
-							<h3><a href={tag.href}>{tag.label}</a></h3>
-							<p>{tag.description}</p>
-						</article>
-					))}
-				</div>
-			</section>
+		<div class="list" role="list">
+			{archivePosts.map(({ preview }, index) => (
+				<a class="post-row" href={`https://blog.02labs.me/posts/${preview.slug}/`} role="listitem">
+					<span class="pr-num">
+						{String(index + 1).padStart(2, "0")} · {preview.pubDateCode}
+					</span>
+					<span class="pr-cat">
+						{preview.tags.slice(0, 2).map((tag) => tag.toUpperCase()).join(" · ")}
+					</span>
+					<span class="pr-title">{preview.title}</span>
+					<span class="pr-meta">
+						<span>{preview.readTimeLabel}</span>
+						<span>{preview.pubDateDisplay.replace(",", "")}</span>
+					</span>
+					<span class="pr-arrow">→</span>
+				</a>
+			))}
 		</div>
+
+		<footer class="arc-foot">
+			<span>END OF ARCHIVE · {String(posts.length).padStart(2, "0")} POSTS</span>
+			<a href="https://blog.02labs.me/rss.xml">RSS FEED →</a>
+		</footer>
 	</main>
-</BaseLayout>
+</BlogLayout>
