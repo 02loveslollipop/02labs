@@ -322,7 +322,7 @@ function runHeroAnimation() {
 type HeroParticle = {
 	x: number;
 	y: number;
-	jitter: number;
+	phase: number;
 	level: number;
 };
 
@@ -447,10 +447,10 @@ function setupHeroWaveParticles() {
 		return clamp(intensity, 0, 1);
 	};
 
-	function resize() {
-		const rect = heroEl.getBoundingClientRect();
-		width = Math.max(1, rect.width);
-		height = Math.max(1, rect.height);
+		function resize() {
+			const rect = heroEl.getBoundingClientRect();
+			width = Math.max(1, rect.width);
+			height = Math.max(1, rect.height);
 		dpr = Math.min(2, window.devicePixelRatio || 1);
 
 		canvasEl.width = Math.round(width * dpr);
@@ -459,23 +459,23 @@ function setupHeroWaveParticles() {
 		canvasEl.style.height = `${height}px`;
 		context.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-		const spacing = clamp(Math.min(width, height) / 20, 22, 34);
-		const cols = Math.ceil(width / spacing) + 2;
-		const rows = Math.ceil(height / spacing) + 2;
-		particles = [];
+			const spacing = clamp(Math.min(width, height) / 20, 22, 34);
+			const cols = Math.ceil(width / spacing) + 2;
+			const rows = Math.ceil(height / spacing) + 2;
+			const startX = (width - (cols - 1) * spacing) / 2;
+			const startY = (height - (rows - 1) * spacing) / 2;
+			particles = [];
 
-		for (let row = 0; row < rows; row++) {
-			for (let col = 0; col < cols; col++) {
-				const seed = Math.sin((row + 1) * 37.12 + (col + 1) * 19.42) * 43758.5453;
-				const jitter = seed - Math.floor(seed);
-				particles.push({
-					x: (col - 0.5) * spacing + (jitter - 0.5) * spacing * 0.26,
-					y: (row - 0.5) * spacing + (0.5 - jitter) * spacing * 0.18,
-					jitter,
-					level: 0,
-				});
+			for (let row = 0; row < rows; row++) {
+				for (let col = 0; col < cols; col++) {
+					particles.push({
+						x: startX + col * spacing,
+						y: startY + row * spacing,
+						phase: row * 0.73 + col * 0.49,
+						level: 0,
+					});
+				}
 			}
-		}
 	}
 
 	function addRipple(x: number, y: number, strength: number) {
@@ -535,14 +535,19 @@ function setupHeroWaveParticles() {
 		context.lineCap = "square";
 		context.globalCompositeOperation = "lighter";
 
-		for (const particle of particles) {
-			const base = waveFunction(particle.x, particle.y, time + particle.jitter * 0.18);
-			const ripple = rippleField(particle, now);
-			const target = Math.max(base, ripple);
-			particle.level = mix(particle.level, target, sizeSmoothing);
+			for (const particle of particles) {
+				const phaseOffset = 0.5 + 0.5 * Math.sin(particle.phase);
+				const base = waveFunction(
+					particle.x,
+					particle.y,
+					time + phaseOffset * 0.18
+				);
+				const ripple = rippleField(particle, now);
+				const target = Math.max(base, ripple);
+				particle.level = mix(particle.level, target, sizeSmoothing);
 
-			const glow = Math.pow(particle.level, 1.28);
-			const arm = 1.4 + glow * 6.6 + particle.jitter * 0.55;
+				const glow = Math.pow(particle.level, 1.28);
+				const arm = 1.4 + glow * 6.6 + phaseOffset * 0.55;
 			const lineWidth = 0.42 + glow * 2.2;
 			const alpha = 0.035 + glow * 0.72;
 			const colorLevel = smoothstep(0.08, 0.86, glow);

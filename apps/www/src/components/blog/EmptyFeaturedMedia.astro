@@ -40,10 +40,6 @@
 		return Math.max(min, Math.min(max, value));
 	}
 
-	function randomBetween(min: number, max: number) {
-		return min + Math.random() * (max - min);
-	}
-
 	for (const root of roots) {
 		if (!(root instanceof HTMLElement) || root.dataset.animated === "true") continue;
 		root.dataset.animated = "true";
@@ -72,7 +68,6 @@
 		let rows = 0;
 		let spacingX = 0;
 		let spacingY = 0;
-		let maxOffset = 0;
 		let rafId = 0;
 		let lastTimestamp = 0;
 		let nodes: EmptyNode[] = [];
@@ -92,18 +87,14 @@
 			rows = clamp(Math.round(height / 58), 5, 9);
 			spacingX = width / (columns + 1);
 			spacingY = height / (rows + 1);
-			maxOffset = Math.min(spacingX, spacingY) * 0.28;
 			nodes = [];
 
 			for (let row = 0; row < rows; row += 1) {
 				for (let column = 0; column < columns; column += 1) {
-					const x =
-						spacingX * (column + 1) + randomBetween(-spacingX * 0.28, spacingX * 0.28);
-					const y =
-						spacingY * (row + 1) + randomBetween(-spacingY * 0.28, spacingY * 0.28);
-					const driftAngle = randomBetween(0, Math.PI * 2);
-					const driftAngleB = randomBetween(0, Math.PI * 2);
-					const connectionBoost = Math.random() < 0.26 ? randomBetween(1.25, 1.65) : 1;
+					const x = spacingX * (column + 1);
+					const y = spacingY * (row + 1);
+					const phase = row * 0.73 + column * 0.49;
+					const phaseB = row * 0.37 - column * 0.29;
 					nodes.push({
 						baseX: x,
 						baseY: y,
@@ -115,21 +106,20 @@
 						offsetY: 0,
 						impulseX: 0,
 						impulseY: 0,
-						phase: randomBetween(0, Math.PI * 2),
-						phaseB: randomBetween(0, Math.PI * 2),
-						speed: randomBetween(0.48, 1.18),
-						speedB: randomBetween(0.26, 0.94),
-						strength: randomBetween(0.55, 1.18),
-						strengthB: randomBetween(0.18, 0.7),
-						driftAngle,
-						driftAngleB,
-						driftRadius: randomBetween(maxOffset * 0.32, maxOffset * 1.1),
-						driftRadiusB: randomBetween(maxOffset * 0.14, maxOffset * 0.7),
-						connectionRadius:
-							Math.min(spacingX, spacingY) * randomBetween(1.18, 1.42) * connectionBoost,
-						glowRadius: randomBetween(1.6, 3.9),
-						dotRadius: randomBetween(0.4, 1.3),
-						alpha: randomBetween(0.68, 0.98),
+						phase,
+						phaseB,
+						speed: 0.82,
+						speedB: 0.58,
+						strength: 1,
+						strengthB: 1,
+						driftAngle: 0,
+						driftAngleB: 0,
+						driftRadius: 0,
+						driftRadiusB: 0,
+						connectionRadius: Math.min(spacingX, spacingY) * 1.34,
+						glowRadius: 2.6,
+						dotRadius: 0.9,
+						alpha: 0.86,
 					});
 				}
 			}
@@ -189,51 +179,20 @@
 			draw.clearRect(0, 0, width, height);
 
 			const t = timestamp * 0.001;
-			const influenceRadius = Math.min(spacingX, spacingY) * 2.3;
-
 			scrollImpulse.x *= Math.pow(0.92, dt);
 			scrollImpulse.y *= Math.pow(0.9, dt);
 			pointer.vx *= Math.pow(0.74, dt);
 			pointer.vy *= Math.pow(0.74, dt);
 
 			for (const node of nodes) {
-				const waveX =
-					Math.cos(t * node.speed + node.phase + node.driftAngle) *
-						node.driftRadius *
-						node.strength +
-					Math.sin(t * node.speedB + node.phaseB + node.driftAngleB) * node.driftRadiusB +
-					Math.cos(t * 0.46 + (node.baseY / Math.max(height, 1)) * 4.1) * maxOffset * 0.2;
-				const waveY =
-					Math.sin(t * node.speed * 0.9 + node.phase + node.driftAngle) *
-						node.driftRadius *
-						node.strengthB +
-					Math.cos(t * node.speedB * 1.08 + node.phaseB + node.driftAngleB) *
-						node.driftRadiusB +
-					Math.sin(t * 0.42 + (node.baseX / Math.max(width, 1)) * 3.7) * maxOffset * 0.22;
-
-				node.offsetX += (waveX - node.offsetX) * 0.12 * dt;
-				node.offsetY += (waveY - node.offsetY) * 0.12 * dt;
-
-				node.impulseX += scrollImpulse.x * 0.05;
-				node.impulseY += scrollImpulse.y * 0.05;
-
-				if (pointer.active) {
-					const dx = node.baseX - pointer.x;
-					const dy = node.baseY - pointer.y;
-					const distance = Math.hypot(dx, dy) || 1;
-					if (distance < influenceRadius) {
-						const falloff = 1 - distance / influenceRadius;
-						node.impulseX += pointer.vx * 0.12 * falloff;
-						node.impulseY += pointer.vy * 0.12 * falloff;
-					}
-				}
-
-				node.impulseX *= Math.pow(0.84, dt);
-				node.impulseY *= Math.pow(0.84, dt);
-				node.x = node.baseX + node.offsetX + node.impulseX;
-				node.y = node.baseY + node.offsetY + node.impulseY;
-				node.drawX += (node.x - node.drawX) * 0.24 * dt;
-				node.drawY += (node.y - node.drawY) * 0.24 * dt;
+				node.offsetX = 0;
+				node.offsetY = 0;
+				node.impulseX = 0;
+				node.impulseY = 0;
+				node.x = node.baseX;
+				node.y = node.baseY;
+				node.drawX += (node.baseX - node.drawX) * 0.24 * dt;
+				node.drawY += (node.baseY - node.drawY) * 0.24 * dt;
 			}
 
 			for (let index = 0; index < nodes.length; index += 1) {
@@ -264,14 +223,23 @@
 			}
 
 			for (const node of nodes) {
+				const pulse = getWaveStrength(
+					node.baseX,
+					node.baseY,
+					t + (0.5 + 0.5 * Math.sin(node.phase)) * 0.18
+				);
+				const dotAlpha = 0.24 + pulse * 0.62;
+				const glowAlpha = 0.04 + pulse * 0.12;
+				const glowRadius = node.glowRadius + pulse * 1.2;
+
 				draw.beginPath();
 				draw.arc(node.drawX, node.drawY, node.dotRadius, 0, Math.PI * 2);
-				draw.fillStyle = `rgba(45, 108, 255, ${node.alpha})`;
+				draw.fillStyle = `rgba(45, 108, 255, ${dotAlpha * node.alpha})`;
 				draw.fill();
 
 				draw.beginPath();
-				draw.arc(node.drawX, node.drawY, node.glowRadius, 0, Math.PI * 2);
-				draw.fillStyle = `rgba(45, 108, 255, ${0.045 + node.alpha * 0.05})`;
+				draw.arc(node.drawX, node.drawY, glowRadius, 0, Math.PI * 2);
+				draw.fillStyle = `rgba(45, 108, 255, ${glowAlpha})`;
 				draw.fill();
 			}
 
