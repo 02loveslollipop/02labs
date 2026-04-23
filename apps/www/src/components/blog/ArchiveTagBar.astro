@@ -17,7 +17,7 @@ const listId = `${toggleId}-list`;
 
 <div class="filter-bar">
 	<div class="chips" role="group" aria-label="Filter by tag">
-		<a class={activeTagSlug ? "chip" : "chip on"} href="https://blog.02labs.me/">
+		<a class={activeTagSlug ? "chip" : "chip on"} href="/blog/">
 			ALL · {String(allCount).padStart(2, "0")}
 		</a>
 		{visibleTags.map((tag) => (

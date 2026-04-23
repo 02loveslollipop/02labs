@@ -1,36 +1,61 @@
 ---
-export const prerender = true;
+export const prerender = false;
 
-import { getCollection } from "astro:content";
 import blogArchiveSettings from "../../data/blog-archive-settings.json";
 import ArchiveTagBar from "../../components/blog/ArchiveTagBar.astro";
 import EmptyFeaturedMedia from "../../components/blog/EmptyFeaturedMedia.astro";
 import BlogLayout from "../../layouts/BlogLayout.astro";
+import { fetchBlogMirrorPosts } from "../../lib/blog";
+import type { BlogArchivePost } from "../../lib/blog";
 import {
 	BLOG_AUTHOR,
 	BLOG_DESCRIPTION,
 	BLOG_LOCALE,
 	BLOG_NAME,
 	BLOG_PUBLISHER,
-	getTagSummaries,
+	type BlogTagSummary,
 	resolveSiteUrl,
-	sortBlogEntries,
-	toBlogIndexPost,
-	resolvePostImageSrc,
-	getPostSlug,
+	slugifyTag,
 } from "../../lib/blog-posts";
 
-const entries = sortBlogEntries((await getCollection("blog")).filter((entry) => !entry.data.draft));
-const posts = entries.map((entry) => ({ entry, preview: toBlogIndexPost(entry, Astro.site) }));
+function getTagSummaries(posts: BlogArchivePost[]): BlogTagSummary[] {
+	const tagMap = new Map<string, BlogTagSummary>();
+
+	for (const post of posts) {
+		for (const tag of post.tags) {
+			const slug = slugifyTag(tag);
+			if (!slug) continue;
+			const existing = tagMap.get(slug);
+			if (existing) {
+				existing.count += 1;
+				continue;
+			}
+			tagMap.set(slug, {
+				slug,
+				label: tag,
+				count: 1,
+			});
+		}
+	}
+
+	return Array.from(tagMap.values()).sort((a, b) => {
+		if (b.count !== a.count) return b.count - a.count;
+		return a.label.localeCompare(b.label);
+	});
+}
+
+Astro.response.headers.set("Cache-Control", "public, s-maxage=900, stale-while-revalidate=86400");
+
+const posts = await fetchBlogMirrorPosts();
 const configuredFeaturedSlug = String(blogArchiveSettings.featuredSlug || "").trim();
 const featured =
-	posts.find(({ preview }) => preview.slug === configuredFeaturedSlug) ??
+	posts.find((post) => post.slug === configuredFeaturedSlug) ??
 	posts[0] ??
 	null;
 const archivePosts = featured
-	? posts.filter(({ preview }) => preview.slug !== featured.preview.slug)
+	? posts.filter((post) => post.slug !== featured.slug)
 	: posts;
-const tagSummaries = getTagSummaries(entries);
+const tagSummaries = getTagSummaries(posts);
 const blogUrl = Astro.site ? new URL("/blog/", Astro.site).toString() : "/blog/";
 const jsonLd = JSON.stringify(
 	[
@@ -69,11 +94,11 @@ const jsonLd = JSON.stringify(
 			"@context": "https://schema.org",
 			"@type": "ItemList",
 			name: `${BLOG_NAME} Posts`,
-			itemListElement: posts.map(({ preview }, index) => ({
+			itemListElement: posts.map((post, index) => ({
 				"@type": "ListItem",
 				position: index + 1,
-				name: preview.title,
-				url: preview.url,
+				name: post.title,
+				url: post.url,
 			})),
 		},
 	],
@@ -82,7 +107,7 @@ const jsonLd = JSON.stringify(
 );
 ---
 
-<BlogLayout title="Blog" description={BLOG_DESCRIPTION} ogType="website" jsonLd={jsonLd}>
+<BlogLayout title="Blog" description={BLOG_DESCRIPTION} ogType="website" jsonLd={jsonLd} canonical={blogUrl}>
 	<main class="wrap" id="main">
 		<section class="arc-hero">
 			<div class="eyebrow">
@@ -99,12 +124,12 @@ const jsonLd = JSON.stringify(
 		<ArchiveTagBar allCount={posts.length} tagSummaries={tagSummaries} />
 
 		{featured ? (
-			<a class="featured" href={`https://blog.02labs.me/posts/${featured.preview.slug}/`}>
+			<a class="featured" href={featured.url}>
 				<div class="featured__img">
-					{featured.preview.imageSrc ? (
+					{featured.imageSrc ? (
 						<img
-							src={featured.preview.imageSrc}
-							alt={`${featured.preview.title} preview`}
+							src={featured.imageSrc}
+							alt={`${featured.title} preview`}
 							loading="eager"
 							decoding="async"
 						/>
@@ -115,17 +140,17 @@ const jsonLd = JSON.stringify(
 				<div class="featured__body">
 					<div>
 						<div class="featured__tags">
-							{featured.preview.tags.slice(0, 3).map((tag, index) => (
+							{featured.tags.slice(0, 3).map((tag, index) => (
 								<span class={index === 0 ? "tag-a" : "tag-g"}>{tag}</span>
 							))}
 						</div>
 						<div style="height: 18px" aria-hidden="true"></div>
-						<h2>{featured.preview.title}</h2>
+						<h2>{featured.title}</h2>
 						<div style="height: 14px" aria-hidden="true"></div>
-						<p>{featured.preview.excerpt}</p>
+						<p>{featured.excerpt}</p>
 					</div>
 					<div class="featured__foot">
-						<span>{featured.preview.pubDateDisplay} · {featured.preview.readTimeLabel}</span>
+						<span>{featured.pubDateDisplay} · {featured.readTimeLabel}</span>
 						<span class="cta">READ POST →</span>
 					</div>
 				</div>
@@ -133,18 +158,18 @@ const jsonLd = JSON.stringify(
 		) : null}
 
 		<div class="list" role="list">
-			{archivePosts.map(({ preview }, index) => (
-				<a class="post-row" href={`https://blog.02labs.me/posts/${preview.slug}/`} role="listitem">
+			{archivePosts.map((post, index) => (
+				<a class="post-row" href={post.url} role="listitem">
 					<span class="pr-num">
-						{String(index + 1).padStart(2, "0")} · {preview.pubDateCode}
+						{String(index + 1).padStart(2, "0")} · {post.pubDateCode}
 					</span>
 					<span class="pr-cat">
-						{preview.tags.slice(0, 2).map((tag) => tag.toUpperCase()).join(" · ")}
+						{post.tags.slice(0, 2).map((tag) => tag.toUpperCase()).join(" · ")}
 					</span>
-					<span class="pr-title">{preview.title}</span>
+					<span class="pr-title">{post.title}</span>
 					<span class="pr-meta">
-						<span>{preview.readTimeLabel}</span>
-						<span>{preview.pubDateDisplay.replace(",", "")}</span>
+						<span>{post.readTimeLabel}</span>
+						<span>{post.pubDateDisplay.replace(",", "")}</span>
 					</span>
 					<span class="pr-arrow">→</span>
 				</a>

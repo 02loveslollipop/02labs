@@ -1,5 +1,5 @@
 ---
-import Navbar from "../components/Navbar.astro";
+import BlogSiteHeader from "../components/blog/BlogSiteHeader.astro";
 import "../styles/blog.css";
 import "katex/dist/katex.min.css";
 
@@ -106,7 +106,7 @@ const resolvedTwitterCard = twitterCard ?? (ogImage ? "summary_large_image" : "s
 	<body>
 		<a class="skip-link" href="#main">Skip to content</a>
 		<div class="bg"><div class="bg-wash"></div></div>
-		<Navbar forceScrolled />
+		<BlogSiteHeader />
 		<slot />
 	</body>
 </html>

@@ -6,14 +6,41 @@
 </div>
 
 <script>
+	type EmptyNode = {
+		baseX: number;
+		baseY: number;
+		x: number;
+		y: number;
+		drawX: number;
+		drawY: number;
+		offsetX: number;
+		offsetY: number;
+		impulseX: number;
+		impulseY: number;
+		phase: number;
+		phaseB: number;
+		speed: number;
+		speedB: number;
+		strength: number;
+		strengthB: number;
+		driftAngle: number;
+		driftAngleB: number;
+		driftRadius: number;
+		driftRadiusB: number;
+		connectionRadius: number;
+		glowRadius: number;
+		dotRadius: number;
+		alpha: number;
+	};
+
 	const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 	const roots = Array.from(document.querySelectorAll("[data-featured-empty]"));
 
-	function clamp(value, min, max) {
+	function clamp(value: number, min: number, max: number) {
 		return Math.max(min, Math.min(max, value));
 	}
 
-	function randomBetween(min, max) {
+	function randomBetween(min: number, max: number) {
 		return min + Math.random() * (max - min);
 	}
 
@@ -26,6 +53,8 @@
 
 		const context = canvas.getContext("2d");
 		if (!context) continue;
+		const emptyCanvas: HTMLCanvasElement = canvas;
+		const draw: CanvasRenderingContext2D = context;
 
 		const pointer = {
 			active: false,
@@ -46,18 +75,18 @@
 		let maxOffset = 0;
 		let rafId = 0;
 		let lastTimestamp = 0;
-		let nodes = [];
+		let nodes: EmptyNode[] = [];
 
 		function rebuild() {
 			const rect = root.getBoundingClientRect();
 			const dpr = Math.min(window.devicePixelRatio || 1, 2);
 			width = Math.max(1, Math.round(rect.width));
 			height = Math.max(1, Math.round(rect.height));
-			canvas.width = Math.round(width * dpr);
-			canvas.height = Math.round(height * dpr);
-			canvas.style.width = `${width}px`;
-			canvas.style.height = `${height}px`;
-			context.setTransform(dpr, 0, 0, dpr, 0, 0);
+			emptyCanvas.width = Math.round(width * dpr);
+			emptyCanvas.height = Math.round(height * dpr);
+			emptyCanvas.style.width = `${width}px`;
+			emptyCanvas.style.height = `${height}px`;
+			draw.setTransform(dpr, 0, 0, dpr, 0, 0);
 
 			columns = clamp(Math.round(width / 68), 7, 12);
 			rows = clamp(Math.round(height / 58), 5, 9);
@@ -96,7 +125,8 @@
 						driftAngleB,
 						driftRadius: randomBetween(maxOffset * 0.32, maxOffset * 1.1),
 						driftRadiusB: randomBetween(maxOffset * 0.14, maxOffset * 0.7),
-						connectionRadius: Math.min(spacingX, spacingY) * randomBetween(1.18, 1.42) * connectionBoost,
+						connectionRadius:
+							Math.min(spacingX, spacingY) * randomBetween(1.18, 1.42) * connectionBoost,
 						glowRadius: randomBetween(1.6, 3.9),
 						dotRadius: randomBetween(0.4, 1.3),
 						alpha: randomBetween(0.68, 0.98),
@@ -105,7 +135,7 @@
 			}
 		}
 
-		function updatePointer(event) {
+		function updatePointer(event: PointerEvent) {
 			const rect = root.getBoundingClientRect();
 			const nextX = event.clientX - rect.left;
 			const nextY = event.clientY - rect.top;
@@ -118,7 +148,7 @@
 			pointer.active = true;
 		}
 
-		function onPointerEnter(event) {
+		function onPointerEnter(event: PointerEvent) {
 			const rect = root.getBoundingClientRect();
 			pointer.lastX = event.clientX - rect.left;
 			pointer.lastY = event.clientY - rect.top;
@@ -133,7 +163,7 @@
 			pointer.active = false;
 		}
 
-		function onWheel(event) {
+		function onWheel(event: WheelEvent) {
 			const rect = root.getBoundingClientRect();
 			const insideX = event.clientX >= rect.left && event.clientX <= rect.right;
 			const insideY = event.clientY >= rect.top && event.clientY <= rect.bottom;
@@ -142,21 +172,21 @@
 			scrollImpulse.y += event.deltaY * 0.012;
 		}
 
-		function getWaveStrength(x, y, time) {
+		function getWaveStrength(x: number, y: number, time: number) {
 			const nx = x / Math.max(width, 1);
 			const ny = y / Math.max(height, 1);
-			const diagonalBand = Math.sin((nx * 8.2) - (ny * 6.4) - time * 1.8);
-			const crossBand = Math.sin((nx * 5.1) + (ny * 7.4) - time * 1.15 + 1.3);
+			const diagonalBand = Math.sin(nx * 8.2 - ny * 6.4 - time * 1.8);
+			const crossBand = Math.sin(nx * 5.1 + ny * 7.4 - time * 1.15 + 1.3);
 			const radialBand = Math.sin(Math.hypot(nx - 0.52, ny - 0.48) * 14.5 - time * 2.25);
 			const combined = diagonalBand * 0.5 + crossBand * 0.28 + radialBand * 0.22;
 			return clamp((combined + 1) * 0.5, 0, 1);
 		}
 
-		function render(timestamp) {
+		function render(timestamp: number) {
 			if (!lastTimestamp) lastTimestamp = timestamp;
 			const dt = clamp((timestamp - lastTimestamp) / 16.6667, 0.6, 1.8);
 			lastTimestamp = timestamp;
-			context.clearRect(0, 0, width, height);
+			draw.clearRect(0, 0, width, height);
 
 			const t = timestamp * 0.001;
 			const influenceRadius = Math.min(spacingX, spacingY) * 2.3;
@@ -168,13 +198,18 @@
 
 			for (const node of nodes) {
 				const waveX =
-					Math.cos(t * node.speed + node.phase + node.driftAngle) * node.driftRadius * node.strength +
+					Math.cos(t * node.speed + node.phase + node.driftAngle) *
+						node.driftRadius *
+						node.strength +
 					Math.sin(t * node.speedB + node.phaseB + node.driftAngleB) * node.driftRadiusB +
-					Math.cos((t * 0.46) + (node.baseY / Math.max(height, 1)) * 4.1) * maxOffset * 0.2;
+					Math.cos(t * 0.46 + (node.baseY / Math.max(height, 1)) * 4.1) * maxOffset * 0.2;
 				const waveY =
-					Math.sin((t * node.speed * 0.9) + node.phase + node.driftAngle) * node.driftRadius * node.strengthB +
-					Math.cos((t * node.speedB * 1.08) + node.phaseB + node.driftAngleB) * node.driftRadiusB +
-					Math.sin((t * 0.42) + (node.baseX / Math.max(width, 1)) * 3.7) * maxOffset * 0.22;
+					Math.sin(t * node.speed * 0.9 + node.phase + node.driftAngle) *
+						node.driftRadius *
+						node.strengthB +
+					Math.cos(t * node.speedB * 1.08 + node.phaseB + node.driftAngleB) *
+						node.driftRadiusB +
+					Math.sin(t * 0.42 + (node.baseX / Math.max(width, 1)) * 3.7) * maxOffset * 0.22;
 
 				node.offsetX += (waveX - node.offsetX) * 0.12 * dt;
 				node.offsetY += (waveY - node.offsetY) * 0.12 * dt;
@@ -219,25 +254,25 @@
 
 					const alpha = 1 - distance / neighborhood;
 					const waveAlpha = (waveStrength - waveThreshold) / (1 - waveThreshold);
-					context.beginPath();
-					context.moveTo(node.drawX, node.drawY);
-					context.lineTo(other.drawX, other.drawY);
-					context.strokeStyle = `rgba(45, 108, 255, ${0.05 + alpha * 0.12 + waveAlpha * 0.22})`;
-					context.lineWidth = 0.75 + alpha * 0.35 + waveAlpha * 0.7;
-					context.stroke();
+					draw.beginPath();
+					draw.moveTo(node.drawX, node.drawY);
+					draw.lineTo(other.drawX, other.drawY);
+					draw.strokeStyle = `rgba(45, 108, 255, ${0.05 + alpha * 0.12 + waveAlpha * 0.22})`;
+					draw.lineWidth = 0.75 + alpha * 0.35 + waveAlpha * 0.7;
+					draw.stroke();
 				}
 			}
 
 			for (const node of nodes) {
-				context.beginPath();
-				context.arc(node.drawX, node.drawY, node.dotRadius, 0, Math.PI * 2);
-				context.fillStyle = `rgba(45, 108, 255, ${node.alpha})`;
-				context.fill();
+				draw.beginPath();
+				draw.arc(node.drawX, node.drawY, node.dotRadius, 0, Math.PI * 2);
+				draw.fillStyle = `rgba(45, 108, 255, ${node.alpha})`;
+				draw.fill();
 
-				context.beginPath();
-				context.arc(node.drawX, node.drawY, node.glowRadius, 0, Math.PI * 2);
-				context.fillStyle = `rgba(45, 108, 255, ${0.045 + node.alpha * 0.05})`;
-				context.fill();
+				draw.beginPath();
+				draw.arc(node.drawX, node.drawY, node.glowRadius, 0, Math.PI * 2);
+				draw.fillStyle = `rgba(45, 108, 255, ${0.045 + node.alpha * 0.05})`;
+				draw.fill();
 			}
 
 			rafId = window.requestAnimationFrame(render);

@@ -16,6 +16,22 @@ export interface BlogPost {
 	tags: string[];
 }
 
+export interface BlogArchivePost {
+	slug: string;
+	title: string;
+	description: string;
+	excerpt: string;
+	url: string;
+	pubDate: string;
+	pubDateDisplay: string;
+	pubDateCode: string;
+	imageSrc: string | null;
+	tags: string[];
+	primaryTag: string | null;
+	readMinutes: number;
+	readTimeLabel: string;
+}
+
 export interface FeaturedBlogPost {
 	title: string;
 	href: string;
@@ -63,12 +79,14 @@ export const majorBlogTags: BlogTagLink[] = [
 	{
 		label: "OSINT",
 		href: `${BLOG_ROOT}tags/osint/`,
-		description: "Investigations, geolocation work, and source-correlation workflows.",
+		description:
+			"Investigations, geolocation work, and source-correlation workflows.",
 	},
 	{
 		label: "Writeup",
 		href: `${BLOG_ROOT}tags/writeup/`,
-		description: "Long-form technical breakdowns with results, reasoning, and tooling.",
+		description:
+			"Long-form technical breakdowns with results, reasoning, and tooling.",
 	},
 ];
 
@@ -106,6 +124,71 @@ function normalizeImageUrl(url: string | null | undefined): string | null {
 	return new URL(trimmed, BLOG_ROOT).toString();
 }
 
+function getString(record: Record<string, unknown>, key: string): string {
+	const value = record[key];
+	return typeof value === "string" ? value.trim() : "";
+}
+
+function getNumber(
+	record: Record<string, unknown>,
+	key: string,
+): number | null {
+	const value = record[key];
+	const parsed =
+		typeof value === "number" ? value : Number.parseFloat(String(value ?? ""));
+	return Number.isFinite(parsed) ? parsed : null;
+}
+
+function normalizeTags(tags: unknown): string[] {
+	return Array.isArray(tags)
+		? tags.map((tag) => String(tag || "").trim()).filter(Boolean)
+		: [];
+}
+
+function parseDate(value: string): Date | null {
+	const date = new Date(value);
+	return Number.isNaN(date.valueOf()) ? null : date;
+}
+
+function formatDisplayDate(date: Date): string {
+	return date
+		.toLocaleDateString("en-US", {
+			year: "numeric",
+			month: "short",
+			day: "2-digit",
+			timeZone: "UTC",
+		})
+		.toUpperCase();
+}
+
+function formatDateCode(date: Date): string {
+	return date.toISOString().slice(2, 10).replaceAll("-", ".");
+}
+
+function formatReadTime(minutes: number): string {
+	return `${String(Math.max(1, Math.ceil(minutes))).padStart(2, "0")} MIN`;
+}
+
+function getReadingMinutesFromText(text: string): number {
+	const words = String(text || "")
+		.trim()
+		.split(/\s+/)
+		.filter(Boolean).length;
+	return Math.max(1, Math.ceil(words / 200));
+}
+
+function extractSlugFromUrl(url: string): string {
+	try {
+		const segments = new URL(url).pathname.split("/").filter(Boolean);
+		const postsIndex = segments.indexOf("posts");
+		if (postsIndex >= 0 && segments[postsIndex + 1])
+			return segments[postsIndex + 1];
+		return segments.at(-1) ?? "";
+	} catch {
+		return "";
+	}
+}
+
 function normalizeBlogPost(input: Partial<BlogPost>): BlogPost | null {
 	const title = String(input.title || "").trim();
 	const link = normalizeBlogUrl(String(input.link || ""));
@@ -121,10 +204,60 @@ function normalizeBlogPost(input: Partial<BlogPost>): BlogPost | null {
 		link,
 		pubDate,
 		imageSrc: normalizeImageUrl(input.imageSrc),
-		tags: Array.isArray(input.tags)
-			? input.tags.map((tag) => String(tag || "").trim()).filter(Boolean)
-			: [],
+		tags: normalizeTags(input.tags),
 	};
+}
+
+function normalizeBlogArchivePost(
+	input: Record<string, unknown>,
+): BlogArchivePost | null {
+	const title = getString(input, "title");
+	const rawUrl = getString(input, "url") || getString(input, "link");
+	const url = normalizeBlogUrl(rawUrl);
+	const slug = getString(input, "slug") || extractSlugFromUrl(url);
+	if (!title || !url || !slug) return null;
+
+	const description = getString(input, "description");
+	const excerpt = getString(input, "excerpt") || description;
+	const pubDateRaw = getString(input, "pubDate");
+	const pubDate = parseDate(pubDateRaw);
+	const tags = normalizeTags(input.tags);
+	const readMinutes =
+		getNumber(input, "readMinutes") ??
+		getReadingMinutesFromText(`${description} ${excerpt}`);
+
+	return {
+		slug,
+		title,
+		description,
+		excerpt,
+		url,
+		pubDate: pubDate ? pubDate.toISOString() : pubDateRaw,
+		pubDateDisplay:
+			getString(input, "pubDateDisplay") ||
+			(pubDate ? formatDisplayDate(pubDate) : ""),
+		pubDateCode:
+			getString(input, "pubDateCode") ||
+			(pubDate ? formatDateCode(pubDate) : ""),
+		imageSrc: normalizeImageUrl(getString(input, "imageSrc")),
+		tags,
+		primaryTag: getString(input, "primaryTag") || tags[0] || null,
+		readMinutes,
+		readTimeLabel:
+			getString(input, "readTimeLabel") || formatReadTime(readMinutes),
+	};
+}
+
+function sortArchivePosts<T extends { pubDate: string }>(posts: T[]): T[] {
+	return [...posts].sort((a, b) => {
+		const aDate = parseDate(a.pubDate)?.valueOf() ?? 0;
+		const bDate = parseDate(b.pubDate)?.valueOf() ?? 0;
+		return bDate - aDate;
+	});
+}
+
+function limitPosts<T>(posts: T[], limit?: number): T[] {
+	return typeof limit === "number" ? posts.slice(0, limit) : posts;
 }
 
 export function parseRssItems(xml: string): BlogPost[] {
@@ -134,17 +267,27 @@ export function parseRssItems(xml: string): BlogPost[] {
 	while ((match = itemRe.exec(xml)) !== null) {
 		const block = match[1];
 		const title = decodeHtmlEntities(
-			(block.match(/<title>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/title>/)?.[1] ?? "").trim()
+			(
+				block.match(
+					/<title>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/title>/,
+				)?.[1] ?? ""
+			).trim(),
 		);
 		const description = decodeHtmlEntities(
-			(block.match(/<description>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/description>/)?.[1] ?? "").trim()
+			(
+				block.match(
+					/<description>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/description>/,
+				)?.[1] ?? ""
+			).trim(),
 		);
 		const parsed = normalizeBlogPost({
 			title,
 			description,
 			excerpt: description,
 			link: (block.match(/<link>([\s\S]*?)<\/link>/)?.[1] ?? "").trim(),
-			pubDate: (block.match(/<pubDate>([\s\S]*?)<\/pubDate>/)?.[1] ?? "").trim(),
+			pubDate: (
+				block.match(/<pubDate>([\s\S]*?)<\/pubDate>/)?.[1] ?? ""
+			).trim(),
 			imageSrc: null,
 			tags: [],
 		});
@@ -160,36 +303,68 @@ function parsePostsJson(raw: unknown): BlogPost[] {
 
 	return posts
 		.map((post) => {
-			const record = typeof post === "object" && post ? (post as Record<string, unknown>) : {};
+			const record =
+				typeof post === "object" && post
+					? (post as Record<string, unknown>)
+					: {};
 			return normalizeBlogPost({
 				title: typeof record.title === "string" ? record.title : "",
-				description: typeof record.description === "string" ? record.description : "",
+				description:
+					typeof record.description === "string" ? record.description : "",
 				excerpt: typeof record.excerpt === "string" ? record.excerpt : "",
 				link: typeof record.url === "string" ? record.url : "",
 				pubDate: typeof record.pubDate === "string" ? record.pubDate : "",
 				imageSrc: typeof record.imageSrc === "string" ? record.imageSrc : null,
-				tags: Array.isArray(record.tags)
-					? record.tags.filter((tag): tag is string => typeof tag === "string")
-					: [],
+				tags: normalizeTags(record.tags),
 			});
 		})
 		.filter((post): post is BlogPost => post !== null);
 }
 
-export async function fetchBlogArchivePosts(limit?: number): Promise<BlogPost[]> {
+function parseBlogArchiveJson(raw: unknown): BlogArchivePost[] {
+	if (!raw || typeof raw !== "object") return [];
+	const posts = (raw as { posts?: unknown }).posts;
+	if (!Array.isArray(posts)) return [];
+
+	return sortArchivePosts(
+		posts
+			.map((post) => {
+				const record =
+					typeof post === "object" && post
+						? (post as Record<string, unknown>)
+						: {};
+				return normalizeBlogArchivePost(record);
+			})
+			.filter((post): post is BlogArchivePost => post !== null),
+	);
+}
+
+function toArchivePost(post: BlogPost): BlogArchivePost | null {
+	return normalizeBlogArchivePost({
+		slug: extractSlugFromUrl(post.link),
+		title: post.title,
+		description: post.description,
+		excerpt: post.excerpt,
+		url: post.link,
+		pubDate: post.pubDate,
+		imageSrc: post.imageSrc,
+		tags: post.tags,
+	});
+}
+
+async function fetchPostsJson(): Promise<unknown | null> {
 	try {
 		const jsonRes = await fetch(BLOG_POSTS_JSON, {
 			signal: AbortSignal.timeout(3000),
 			headers: { Accept: "application/json" },
 		});
-		if (jsonRes.ok) {
-			const parsed = parsePostsJson(await jsonRes.json());
-			return typeof limit === "number" ? parsed.slice(0, limit) : parsed;
-		}
+		return jsonRes.ok ? jsonRes.json() : null;
 	} catch {
-		// Fall through to RSS parsing below.
+		return null;
 	}
+}
 
+async function fetchRssArchivePosts(): Promise<BlogPost[]> {
 	try {
 		const rssRes = await fetch(BLOG_RSS, {
 			signal: AbortSignal.timeout(3000),
@@ -197,11 +372,41 @@ export async function fetchBlogArchivePosts(limit?: number): Promise<BlogPost[]>
 		});
 		if (!rssRes.ok) return [];
 		const xml = await rssRes.text();
-		const parsed = parseRssItems(xml);
-		return typeof limit === "number" ? parsed.slice(0, limit) : parsed;
+		return parseRssItems(xml);
 	} catch {
 		return [];
 	}
+}
+
+export async function fetchBlogArchivePosts(
+	limit?: number,
+): Promise<BlogPost[]> {
+	const postsJson = await fetchPostsJson();
+	if (postsJson) {
+		const parsed = parsePostsJson(postsJson);
+		if (parsed.length > 0) return limitPosts(parsed, limit);
+	}
+
+	return limitPosts(await fetchRssArchivePosts(), limit);
+}
+
+export async function fetchBlogMirrorPosts(
+	limit?: number,
+): Promise<BlogArchivePost[]> {
+	const postsJson = await fetchPostsJson();
+	if (postsJson) {
+		const parsed = parseBlogArchiveJson(postsJson);
+		if (parsed.length > 0) return limitPosts(parsed, limit);
+	}
+
+	return limitPosts(
+		sortArchivePosts(
+			(await fetchRssArchivePosts())
+				.map(toArchivePost)
+				.filter((post): post is BlogArchivePost => post !== null),
+		),
+		limit,
+	);
 }
 
 export async function fetchLatestBlogPosts(limit = 4): Promise<BlogPost[]> {
