@@ -2,6 +2,12 @@
 	"name": "02labs-blog",
 	"compatibility_date": "2026-02-23",
 	"compatibility_flags": ["nodejs_compat"],
+	"observability": {
+		"logs": {
+			"enabled": false,
+			"invocation_logs": true
+		}
+	},
 	"main": "./dist/_worker.js/index.js",
 	"assets": {
 		"directory": "./dist",

@@ -1,6 +1,12 @@
 {
 	"name": "ctftime-sync",
 	"compatibility_date": "2025-04-01",
+	"observability": {
+		"logs": {
+			"enabled": false,
+			"invocation_logs": true
+		}
+	},
 	"main": "src/index.ts",
 
 	/*
