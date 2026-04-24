@@ -73,7 +73,7 @@ The solver was implemented using Numba (CuPy was also tried but was much slower)
 
 #### Parameter tuning
 
-The thread count was tuned on the target machine (Nvidia A100-SXM4-40GB) and the best performance was achieved with 64 threads per block. We also tried different table layouts and using constant memory, but the plain per-byte round-table kernel was the best practical option.
+The thread count was tuned on the target machine (Nvidia A100-SXM4-40GB) and the best performance was achieved with 64 threads per block. We also tried different table layouts and using constant memory, but the plain per-byte round-table kernel was the best practical option. With these optimizations, the solver ran at an approximate rate of $162,842,597.46it/s$.
 
 
 
