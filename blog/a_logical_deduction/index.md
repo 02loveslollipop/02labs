@@ -3,7 +3,7 @@ title: "Blue Hens CTF 2026: A Logical Deduction Writeup"
 description: "Propositional logic reversing???"
 pubDate: 2026-04-22
 tags: ["bluehens", "reversing", "propositional-logic", "boolean-satisfiability"]
-featuredImage: "figures/logical-deduction-layout.svg"
+featuredImage: "image-1.png"
 ---
 
 In this Blue Hens CTF 2026 challenge, we are given an image that seems heavily modified/obfuscated for artificial vision. The image contains a propositional logic formula represented as a circuit diagram, and we need to solve it for `TRUE` to recover the values of the 11 input variables in the form `UDCTF{xxxxxxxxxxx}`.
