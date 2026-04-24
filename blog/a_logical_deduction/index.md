@@ -16,8 +16,11 @@ In this Blue Hens CTF 2026 challenge, we are given an image that seems heavily m
 There are many ways to solve this problem. For example, you could model the whole proposition as a boolean satisfiability problem and use a SAT solver to find the solution; for a circuit of this size, that should not be too hard. However, there is a really "efficient" shortcut we can use here: if you look closely, most of the gates in the circuit are `XOR` and `OR`, and many of them are of the form:
 
 $$ A \oplus \bar{A} = 1 $$
+
 $$ A \lor \bar{A} = 1 $$
+
 $$ A \land \bar{A} = 0 $$
+
 $$ A \oplus A = 0 $$
 
 The key insight is that most of the gates in the circuit end up being a tautology (always true) or a contradiction (always false) regardless of the input value, which makes the circuit much easier to reduce and solve. The second big insight is that all the segments before the final `AND` gate are independent of each other, since each one uses only a single input variable without reusing variables, so we can solve each segment for `TRUE` independently and then combine the results to get the final solution.
@@ -35,25 +38,37 @@ We could get the solution by hand by checking each segment and applying the rule
 
 Here we have the following circuit:
 
-$$ (X_2 \oplus \bar{X_2}) \oplus [X_{10} \oplus (X_{11} \land \bar{X_{11}})]  = 1 \tag {1} $$
+$$
+(X_2 \oplus \bar{X}_2) \oplus [X_{10} \oplus (X_{11} \land \bar{X}_{11})] = 1 \tag{1}
+$$
 
 If we decompose we can see that:
 
-$$ X_2 \oplus \bar{X_2} = 1 \tag {2} $$
+$$
+X_2 \oplus \bar{X}_2 = 1 \tag{2}
+$$
 
 and:
 
-$$ X_{11} \land \bar{X_{11}} = 0 \tag {3} $$
+$$
+X_{11} \land \bar{X}_{11} = 0 \tag{3}
+$$
 
 So if we replace $(3)$ and $(2)$ in $(1)$ we get:
-$$ 1 \oplus [X_{10} \oplus 0] = 1 \tag {4} $$
+$$
+1 \oplus [X_{10} \oplus 0] = 1 \tag{4}
+$$
 
 At this point we can use the fact that $A \oplus 1 = \bar{A}$ to get:
 
-$$ \bar{X_{10}} = 1 \tag {5} $$
+$$
+\bar{X}_{10} = 1 \tag{5}
+$$
 
 And now we use the property that $\bar{A} = 1$ is equivalent to $A = 0$ to get:
-$$ X_{10} = 0 \tag {6} $$
+$$
+X_{10} = 0 \tag{6}
+$$
 
 We can simply repeat this process for all the segments to get the following solution:
 
@@ -70,6 +85,8 @@ We can simply repeat this process for all the segments to get the following solu
 | $X_9$ | 1 |
 | $X_{10}$ | 0 |
 | $X_{11}$ | 1 |
+
+<br />
 
 So the flag is `UDCTF{10100101101}`.
 
