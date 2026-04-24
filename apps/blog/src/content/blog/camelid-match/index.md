@@ -9,29 +9,37 @@ This Daily AlpacaHack challenge gives us a 5-card binary string and asks whether
 
 The reason this is not straightforward is that the first two bits are swapped, and then the 5-bit string is rotated by a random amount from 0 to 4. Since the patterns are `01` and `10`, we can't align the bits reliably to know which bits belong to Alice and which bits belong to Bob. For example, if Alice likes the animal and Bob does not, the string before the final rotation can be:
 
-$$\begin{aligned}
+$$
+\begin{aligned}
 0\ 1\ 1\ 0\ 1 \\ \tag{1}
-\end{aligned}$$
+\end{aligned}
+$$
 
 But if Alice does not like the animal and Bob does, the string before the final rotation can be:
 
-$$\begin{aligned}
+$$
+\begin{aligned}
 1\ 0\ 1\ 1\ 0 \\ \tag{2}
-\end{aligned}$$
+\end{aligned}
+$$
 
 Rotating the second string by one position gives the first string. So once we observe `01101`, we cannot tell which of those two assignments produced it.
 
 The key insight comes from two facts: the middle bit is always `1`, and the first two bits are swapped. Before that swap, the case `Alice likes, Bob likes` looks like this:
 
-$$\begin{aligned}
+$$
+\begin{aligned}
 1\ 0\ 1\ 1\ 0 \\ \tag{3}
-\end{aligned}$$
+\end{aligned}
+$$
 
 After swapping the first two bits, it becomes:
 
-$$\begin{aligned}
+$$
+\begin{aligned}
 0\ 1\ 1\ 1\ 0 \\ \tag{4}
-\end{aligned}$$
+\end{aligned}
+$$
 
 At this point, the case where Alice and Bob both like the animal has all three `1` bits next to each other, if we read the string circularly. Since the last step only rotates the string, that property survives the shuffle. We do not need to recover the rotation amount, and we do not need to know which two bits came from Alice or Bob.
 
@@ -41,10 +49,12 @@ Because there are always exactly two `0` bits and three `1` bits in the final st
 
 The clean combinatorial punchline is that, on a 5-cycle, binary strings with weight 3 have only two rotation classes: the class where the three `1` bits are contiguous, and the class where they are not. After the first two cards are swapped, the protocol maps exactly the predicate we care about onto those classes:
 
-$$\begin{aligned}
+$$
+\begin{aligned}
 a \land b = 1 &\Rightarrow rot(11100, k) \\
 a \land b = 0 &\Rightarrow rot(11010, k)
-\end{aligned}$$
+\end{aligned}
+$$
 
 The first family always contains three contiguous `1` bits when checked circularly. The second family never does: it has two adjacent `1` bits, then the third `1` is separated by a `0`.
 
