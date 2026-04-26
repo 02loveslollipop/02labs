@@ -1,6 +1,6 @@
 ---
 title: "Blue Hens CTF 2026: 2Blue2Hen Writeup"
-description: "Locating a player in a Minecraft world using bedrock patterns."
+description: "Locating a player in a Minecraft world using bottom bedrock patterns."
 pubDate: 2026-04-25
 tags: ["blue-hens-ctf", "misc", "minecraft", "bruteforce"]
 ---
@@ -176,7 +176,7 @@ At this point, we have a single candidate that localized us to a small area of t
 
 The matched 10x10 floor patch is at X `1370..1379`, Z `490..499`, and the screenshot-facing direction is back toward that patch from larger Z values. That gives us a much smaller manual search: in Minecraft coordinate terms, the player should be centered near the middle of the patch in X, but standing south of it and looking north toward the bedrock floor and wall. The center of the matched patch is around X `1375`, so I kept X fixed near `1375` and moved along positive Z until the screenshot perspective lined up.
 
-The crosshair is an useful anchor here. In the original screenshot it lands on the same part of the wall/floor geometry as in the recreated view, so matching the crosshair position tells us both the viewing direction and the camera distance from the patch. The matching view placed the player at Z `522`, which is `522 - 499 = 23` blocks south of the far edge of the matched 10x10 floor patch:
+The crosshair is the useful anchor here. In the original screenshot it lands on the same part of the wall/floor geometry as in the recreated view, so matching the crosshair position tells us both the viewing direction and the camera distance from the patch. The matching view placed the player at Z `522`, which is `522 - 499 = 23` blocks south of the far edge of the matched 10x10 floor patch:
 
 ```text
 matched floor: X 1370..1379, Z 490..499

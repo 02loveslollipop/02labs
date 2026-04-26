@@ -1,5 +1,5 @@
 ---
-title: "Daily AlpacaHack: No Content Writeup"
+title: "AlpacaHack Daily: No Content Writeup"
 description: "HTTP is just a social construct"
 pubDate: 2026-04-07
 tags: ["alpacahack", "web", "http", "tcp", "wireshark"]
