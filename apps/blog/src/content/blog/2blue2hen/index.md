@@ -184,16 +184,16 @@ We can also use the crosshair to approximately pinpoint whether the player is st
 ![Result](result.png)
 
 $$
-X: 1375
-Y: 5
+X: 1375 \
+Y: 5 \
 Z: 522
 $$
 
 That $Y: 5$ is the player's feet position from F3. The block the player is standing on is one block below that, so the coordinate wanted by the challenge has Y $5 - 1 = 4$:
 
 $$
-X: 1375
-Y: 4
+X: 1375 \
+Y: 4 \
 Z: 522
 $$
 
