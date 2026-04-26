@@ -189,7 +189,7 @@ Y: 5 \
 Z: 522
 $$
 
-That $Y: 5$ is the player's feet position from F3. The block the player is standing on is one block below that, so the coordinate wanted by the challenge has Y $5 - 1 = 4$:
+That $Y: 5$ is the player's feet position from F3. The block the player is standing on is one block below that, so the coordinate wanted by the challenge was $ Y: 5 - 1 = 4$:
 
 $$
 X: 1375 \
@@ -204,3 +204,7 @@ UDCTF{1375_4_522}
 ## Greetings
 
 Thanks to the Blue Hens CTF organizers for this amazing challenge and CTF in general, it had a lot of really interesting challenges and I had a lot of fun solving many of the hard challenges, it has been a while since I saw a Minecraft challenge that I actually enjoyed solving.
+
+## References
+
+- 2b2t Bedrock Finder by ChromeCrusher: https://gist.github.com/LuxXx/32b132a73e4073b9d2fe2544fb09a15d
