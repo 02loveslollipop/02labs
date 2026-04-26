@@ -1,0 +1,52 @@
+\documentclass[tikz,border=6pt]{standalone}
+\input{common.tex}
+
+\definecolor{bedrockfill}{HTML}{2F3A45}
+\definecolor{emptyfill}{HTML}{F1F3F5}
+
+\begin{document}
+\begin{tikzpicture}[x=6mm, y=6mm, font=\small]
+  \def\gridsize{10}
+
+  \foreach \row/\cols in {
+    0/{2,3,5,6,7,8,9},
+    1/{1,4,5,8},
+    2/{3,4,5,7},
+    3/{3,4,5,7},
+    4/{0,6},
+    5/{2,5},
+    6/{2,4,7,9},
+    7/{2,4,5,8},
+    8/{},
+    9/{5}
+  } {
+    \foreach \col in \cols {
+      \fill[bedrockfill] (\col, \gridsize-1-\row) rectangle ++(1,1);
+    }
+  }
+
+  \draw[conn] (0,0) rectangle (\gridsize,\gridsize);
+  \foreach \i in {1,...,9} {
+    \draw[conn] (\i,0) -- (\i,\gridsize);
+    \draw[conn] (0,\i) -- (\gridsize,\i);
+  }
+
+  \foreach \x in {0,...,9} {
+    \node[mathlabel, anchor=north] at (\x+0.5,0) {\x};
+  }
+  \foreach \z in {0,...,9} {
+    \node[mathlabel, anchor=east] at (0,\gridsize-\z-0.5) {\z};
+  }
+
+  \node[grouplabel, anchor=south] at (\gridsize/2,\gridsize+0.5) {$x$};
+  \node[grouplabel, anchor=south, rotate=90] at (-0.9,\gridsize/2) {$z$};
+
+  \fill[bedrockfill] (11.0,7.8) rectangle ++(0.8,0.8);
+  \draw[conn] (11.0,7.8) rectangle ++(0.8,0.8);
+  \node[anchor=west] at (12.1,8.2) {bedrock};
+
+  \fill[emptyfill] (11.0,6.4) rectangle ++(0.8,0.8);
+  \draw[conn] (11.0,6.4) rectangle ++(0.8,0.8);
+  \node[anchor=west] at (12.1,6.8) {not bedrock};
+\end{tikzpicture}
+\end{document}
