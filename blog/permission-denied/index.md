@@ -1,15 +1,15 @@
 ---
 title: "Daily AlpacaHack: Permission Denied Writeup"
-description: "At this point I don't know what to put here"
+description: "Exploiting a tiny permission race in a Dockerized Debian Trixie shell."
 pubDate: 2026-04-30
 tags: ["alpacahack", "misc", "unix permissions"]
 ---
 
-This time in Daily AlpacaHack, we are "simple" challenge, read `flag.txt` from a Debian Trixie shell. The flag file was created by root and has the $400(8)$ permission, which means that only the owner (root) can read it. An important detail is that we are given a shell as the `nobody` user, which is a non-root user, but the file `flag.txt` is stored in our user home directory.
+In this Daily AlpacaHack challenge, we are given a simple goal: read `flag.txt` from a Debian Trixie shell. The flag file is created by root in `/app`, the container's `WORKDIR`, and then changed to the `0400` permission mode, which means that only the owner (root) can read it. An important detail is that `chal.sh` drops us into a shell as the `nobody` user with `runuser -u nobody -- sh`, so we cannot read the file directly once the permissions are locked down.
 
 # The challenge
 
-We are given both the connection to the shell (via netcat) and the source code to instance the challenge: `Dockerfile`, `docker-compose.yml` (not important), and `chal.sh` (which is the entrypoint of the container). Let's take a look at `chal.sh` and `Dockerfile`:
+We are given both the connection to the shell (via netcat) and the source code to instantiate the challenge: `Dockerfile`, `docker-compose.yml` (not relevant here), and `chal.sh` (which is the entrypoint of the container). Let's take a look at `chal.sh` and `Dockerfile`:
 
 ```dockerfile
 FROM python:3.14.4-slim-trixie
@@ -26,17 +26,17 @@ runuser -u nobody -- sh
 rm flag.txt
 ```
 
-As we can see the `Dockerfile` sets up a Debian Trixie container with Python and socat installed, and it runs `chal.sh` when a connection is made to port 1337. And then `chal.sh` creates the `flag.txt` file with the flag, sets its permissions to `400`, and then runs a shell as the `nobody` user. After that, it deletes the `flag.txt` file.
+As we can see, the `Dockerfile` sets up a Debian Trixie container with Python and socat installed, and it runs `chal.sh` when a connection is made to port 1337. The `WORKDIR /app` line is important here: `flag.txt` is created in `/app`, not in a user home directory. Then `chal.sh` writes the flag to `flag.txt`, sets its permissions to `0400`, and runs a shell as the `nobody` user. After that shell exits, it deletes the `flag.txt` file.
 
-There are some important details to note here, first of all the `flag.txt` deletion happens after the shell command is executed, but as runuser is a blocking call, the deletion will only happen after we exit the shell. Another important point is that the chal.sh script is called as is from the `exec` option of socat, so if we span multiple shells, the echo and chmod commands will be executed on each one, meaning on each new connection the flag is overwritten and THEN the permissions are set to `400`. This opens a race condition, which is the key to solving this challenge.
+There are some important details to note here. First of all, the `flag.txt` deletion happens after the shell command is executed, but as `runuser` is a blocking call, the deletion will only happen after we exit the shell. Another important point is that the `chal.sh` script is called as is from the `exec` option of socat, so if we spawn multiple shells, the `echo`, `chmod`, and `rm` commands will be executed by each one. This means short-lived trigger connections can delete the file and let later connections create it again, opening a race condition between creation and permission tightening.
 
 # The exploit
 
-As we previously said, every time we connect to the shell, the `chal.sh` script is executed, which means that the `flag.txt` file is created (with the default permissions of `644`), and then in a next command, the permissions are set to `400`. This means that if we read the contents of the `flag.txt` file before the `chmod` command is executed, we can read the flag while the permissions are still `644`. So to exploit this we can:
+As we previously said, every time we connect to the shell, the `chal.sh` script is executed. When `flag.txt` has just been removed by another instance, `echo Alpaca{REDACTED} > flag.txt` creates it with the default permissions of `0644`, and then the next command changes the permissions to `0400`. This means that if we read the contents of `flag.txt` before the `chmod` command is executed, we can read the flag while the permissions are still `0644`. The window between `echo > flag.txt` and `chmod 400 flag.txt` is very small, but it is not zero; a busy-looping `cat` plus many parallel trigger connections makes hitting that gap probable enough. So to exploit this we can:
 
-1. In one terminal, connect to the shell, and execute a loop that continuously reads the contents of `flag.txt` and prints it to the terminal (it will most of the time simply print "permission denied").
+1. In one terminal, connect to the shell, and execute a loop that continuously reads the contents of `flag.txt`. Most attempts will fail with "permission denied", so in the solver we redirect those errors away and only keep successful reads.
 
-2. Then we can start spanning new shells in another process, which will trigger the `chal.sh` script and create the `flag.txt` file with the flag, and then set its permissions to `400`. If the timing and scheduling of the processes are right, we will align the read of the flag with the step in `chal.sh` where the flag is created but the `chmod` command has not yet been executed, allowing us to read the flag before the permissions are changed.
+2. Then we can start spawning new shells in another process, which will trigger the `chal.sh` script and create the `flag.txt` file with the flag, and then set its permissions to `0400`. If the timing and scheduling of the processes are right, we will align the read of the flag with the step in `chal.sh` where the flag is created but the `chmod` command has not yet been executed, allowing us to read the flag before the permissions are changed.
 
 # Solver
 
@@ -52,7 +52,7 @@ HOST = '34.170.146.252'
 PORT = 31900
 ```
 
-Now we define a helper function that will run on an independent thread, which will continuously spawn new shells to trigger the `chal.sh` script and create the `flag.txt` file, this will allow us to exploit the race condition and read the flag before the permissions are changed.
+Now we define a helper function that will run on an independent thread and continuously spawn new shells to trigger the `chal.sh` script and create the `flag.txt` file. This will allow us to exploit the race condition and read the flag before the permissions are changed.
 
 ```python
 def trigger():
@@ -66,7 +66,9 @@ def trigger():
             pass
 ```
 
-Now we init the main connection to the shell and make it continuously read the contents of `flag.txt` in a loop by running `while true; do cat flag.txt 2>/dev/null; done`, this will print the flag to the terminal whenever the `flag.txt` file is created and before its permissions are changed.
+The `level='error'` argument on the trigger connections keeps pwntools from printing connection logs for every trigger attempt, while leaving the main connection's useful status logs visible.
+
+Now we initialize the main connection to the shell and make it continuously read the contents of `flag.txt` in a loop by running `while true; do cat flag.txt 2>/dev/null; done`. This will print the flag to the terminal whenever `flag.txt` is created and before its permissions are changed.
 
 ```python
 log.info("Starting main connection to read the flag")
@@ -74,14 +76,14 @@ r = remote(HOST, PORT)
 r.sendline(b'while true; do cat flag.txt 2>/dev/null; done')
 ```
 
-Now we init in a new thread the `trigger` helper function.
+Now we initialize the `trigger` helper function in a new thread.
 
 ```python
 log.info("Started reading flag connection, now starting race condition trigger")
 threading.Thread(target=trigger).start()
 ```
 
-Finally, we receive any output from the main connection until the flag prefix `Alpaca{` is present, at this point we print simply print the flag and close the connection.
+Finally, we receive any output from the main connection until the flag prefix `Alpaca{` is present. At this point we print the flag and close the connection.
 
 ```python
 r.recvuntil(b'Alpaca{')
@@ -126,8 +128,8 @@ python solver.py
 
 # Conclusion
 
-As we can see, the solver successfully recovers the flag `Alpaca{h4s_fu11_p3rm1ss10ns_0v3r_3v3ry7h1ng}` in the 5th triggering attempt, as this is a non-deterministic vector it could vary between runs (so more than 20 triggers might be needed in some cases), but still it shows the main problem of the challenge, we are running 2 independet commands, one for creating the flag file and another for changing its permissions, as this isn't an atomic operation, the OS scheduler could schedule an operation between these 2 commands, allowing us to read the flag before the permissions are changed.
+As we can see, the solver successfully recovers the flag `Alpaca{h4s_fu11_p3rm1ss10ns_0v3r_3v3ry7h1ng}` on the 5th triggering attempt. Since this is a non-deterministic race, it can vary between runs (so more than 20 triggers might be needed in some cases), but it still shows the main problem of the challenge: we are running two independent commands, one for creating the flag file and another for changing its permissions. Since this is not an atomic operation, the OS scheduler can schedule another operation between these two commands, allowing us to read the flag before the permissions are changed.
 
 # Greetings
 
-As always thanks to the Daily AlpacaHack team for hosting these daily challenges and specialy this time to minaminao as the admin of Daily AlpacaHack and author of this challenge, it was a fun challenge to solve, quite different to what I usually do, but either way it was nice to solve it~!
+As always, thanks to the Daily AlpacaHack team for hosting these daily challenges, and especially this time to minaminao as the admin of Daily AlpacaHack and author of this challenge. It was a fun challenge to solve, quite different from what I usually do, but either way it was nice to solve it~!
