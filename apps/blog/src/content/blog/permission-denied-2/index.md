@@ -49,6 +49,8 @@ echo "cat flag.txt" > chal.sh
 
 3. Finally, we can trigger the execution of our custom `chal.sh` script by connecting to the shell from another terminal. This will execute our script as root and allow us to read the flag.
 
+   Note: keep the first connection open while triggering the second — the original `chal.sh` is the one that created `flag.txt`, and exiting it will run `rm flag.txt` before our replacement gets a chance to read it.
+
 ```bash
 $ nc 34.170.146.252 63303
 Alpaca{h4s_c0mpl3t3_p3rm1ss10ns_0v3r_3v3ry7h1ng}
