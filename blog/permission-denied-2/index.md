@@ -1,11 +1,11 @@
 ---
 title: "Daily AlpacaHack: Permission Denied 2 Writeup"
 description: "At this point I don't know what to put here part 2"
-pubDate: 2026-04-30
+pubDate: 2026-05-01
 tags: ["alpacahack", "misc", "unix permissions"]
 ---
 
-In today's Daily AlpacaHack challenge, we have the same goal as yesterday: read `flag.txt` from a Debian Trixie shell. The flag file is created by root in the `alpaca` user directory, but this time instead of using `echo Alpaca{REDACTED} > flag.txt` and `chmod 400 flag.txt`, the flag is created using `install -m 400 /dev/stdin flag.txt`. Because the file is created with mode `0400` from the start, we cannot exploit the same race as before.
+In today's Daily AlpacaHack challenge, we have the same goal as yesterday: read `flag.txt` from a Debian Trixie shell. The flag file is created by root in the `alpaca` user's home directory (`/home/alpaca`), but this time instead of using `echo Alpaca{REDACTED} > flag.txt` and `chmod 400 flag.txt`, the flag is created using `install -m 400 /dev/stdin flag.txt`. Because the file is created with mode `0400` from the start, we cannot exploit the same race as before.
 
 # The challenge
 
@@ -27,7 +27,7 @@ runuser -u alpaca -- sh
 rm flag.txt
 ```
 
-The key difference with the previous challenge, and what allows us to recover the flag at all, is that `chal.sh` is saved in the home directory of the `alpaca` user (the one we own), so even if we can't read the flag or `chal.sh` we can still remove it because we have write permissions in the home directory. This means that we can overwrite `chal.sh` with a custom script that will allow us to read the flag, since it is executed as root via the Dockerfile's `CMD`.
+The key difference with the previous challenge, and what allows us to recover the flag at all, is that `chal.sh` is saved in the home directory of the `alpaca` user (the one we own). We can't read `chal.sh` (mode `0400`, owned by root), but we can delete it: deletion requires write permission on the *parent directory*, not on the file itself, and `alpaca` has write permission on `/home/alpaca`. This means that we can overwrite `chal.sh` with a custom script that will allow us to read the flag, since it is executed as root via the Dockerfile's `CMD`.
 
 # The exploit
 
@@ -35,10 +35,10 @@ As said before, the main idea of the exploit is to overwrite `chal.sh` with a cu
 
 This is the exploit path:
 
-1. First we open a shell connection to the challenge and remove the `chal.sh` file using `rm -rf chal.sh`. This will allow us to create a new `chal.sh` file with our custom script.
+1. First we open a shell connection to the challenge and remove the `chal.sh` file using `rm chal.sh`. This will allow us to create a new `chal.sh` file with our custom script.
 
 ```bash
-rm -rf chal.sh
+rm chal.sh
 ```
 
 2. Now we can create a new `chal.sh` file with our custom script.
@@ -48,6 +48,8 @@ echo "cat flag.txt" > chal.sh
 ```
 
 3. Finally, we can trigger the execution of our custom `chal.sh` script by connecting to the shell from another terminal. This will execute our script as root and allow us to read the flag.
+
+   Note: keep the first connection open while triggering the second — the original `chal.sh` is the one that created `flag.txt`, and exiting it will run `rm flag.txt` before our replacement gets a chance to read it.
 
 ```bash
 $ nc 34.170.146.252 63303
