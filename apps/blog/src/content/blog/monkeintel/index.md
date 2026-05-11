@@ -36,7 +36,7 @@ monkeybusiness    (hidden.zip/monke2n.png)
 
 After extracting the ZIP file using the password, we find another image, `monke2n.png`. At this point we could try both OSINT and steganography on the new image. Initial steganography attempts showed no promising results, so we went back to OSINT and found the source of the image in a DeviantArt post, but this branch also led to a dead end.
 
-# 2. The insight: Why is the file named `monke2n.png`?
+# 2. The insight: Why is the file named monke2n.png?
 
 Something that could be obvious but is easy to overlook is the name of the file. The extracted image is named `monke2n.png`, which suggests that this step might involve $2n$, meaning even indices. After trying this hint in several places (keeping or discarding even/odd indexed bits in the raw pixel bytes, image rows/columns, and LSB planes), the biggest breakthrough came from applying the $2n$ hint to the LSB plane. That revealed a Base64 string that decoded to the flag.
 
@@ -58,7 +58,7 @@ The incorrect pipelines sit at $\sim 0.25$, especially after the 44-byte offset.
 |----------------------------------------------|-------------------------------------------------|
 | every LSB, MSB-first                         | `` v·)·gXbdvS_Rw]dj,'····.+)·i·j·/·=7b8··i·q··K`` |
 | odd-index LSBs, MSB-first                    | `` ········#P6!···9w·4··Io·U····>_*XA··kJ···]FV `` |
-| every 3rd LSB, MSB-first                     | `` b·3|·+iJ··?r"···O·····N=^·tD·k·)·$··J9··U··O `` |
+| every 3rd LSB, MSB-first                     | <code> b·3&#124;·+iJ··?r"···O·····N=^·tD·k·)·$··J9··U··O </code> |
 | even-index LSBs, LSB-first                   | `` ·vJ*··J··L··F··^·j·······^r··^Jf····Fv···J3· `` |
 | **even-index LSBs, MSB-first (ours)**        | `` QnRTQ1RGe20wbmszeV9kM3YxczNkXzRfcGw0bn0=·R·Q `` |
 
