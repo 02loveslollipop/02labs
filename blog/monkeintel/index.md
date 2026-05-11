@@ -3,6 +3,7 @@ title: "BTSctf 2026: Monkeintel Misc challenge"
 description: "If LSB, why not LSB shaped?"
 pubDate: 2026-05-09
 tags: ["btsctf", "stego", "lsb", "writeup"]
+featuredImage: "./diag1_b64_ratio_window.png"
 ---
 
 We are given an image `monke_thinkin.png`, which contains the famous [Thinking Monkey](https://knowyourmeme.com/memes/thinking-monkey) meme.
@@ -42,7 +43,7 @@ Something that could be obvious but is easy to overlook is the name of the file.
 
 # 3. Why this specific pipeline?
 
-Showing that *something* is hidden in the LSB plane is easy; showing that "flatten the image as $H \cdot W \cdot C$ row-major bytes, take their LSBs, keep every $2n$-th bit, and pack MSB-first" is the *one* pipeline that produces a meaningful payload is harder. The point we want to make is that small perturbations to any step in this pipeline do not yield results that look "almost right" - they yield results that look completely random.
+Showing that *something* is hidden in the LSB plane is easy; showing that "flatten the image as $H \cdot W \cdot C$ row-major bytes, take their LSBs, keep every $2n$-th bit, and pack MSB-first" is the *one* pipeline that produces a meaningful payload is harder. The point we want to make is that small perturbations to any step in this pipeline do not yield results that look "almost right",  they yield results that look completely random.
 
 To check this we need a metric that tells useful bytes apart from random ones. The payload turns out to be a Base64 string, and the Base64 alphabet (`A-Za-z0-9+/`) covers only $64$ out of $256$ possible byte values. So a window of random bytes lands inside that alphabet with probability $\tfrac{64}{256} = 0.25$, while a window of real Base64 lands there with probability close to $1.0$ (apart from padding). Sliding a 44-byte window (the length of the token) across the decoded stream and plotting that fraction at every offset gives us a diagnostic that makes the right pipeline jump out.
 
