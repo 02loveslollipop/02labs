@@ -21,8 +21,5 @@
     "deploy:www": "npm -w apps/www run build && cd apps/www && npx wrangler deploy",
     "deploy:blog": "npm -w apps/blog run build && cd apps/blog && npx wrangler deploy",
     "deploy:ctftime-sync": "npm -w ctftime-sync run deploy"
-  },
-  "devDependencies": {
-    "vitest": "^4.1.7"
   }
 }
