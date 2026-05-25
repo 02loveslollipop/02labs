@@ -184,8 +184,20 @@ export function renderInlineMarkdown(input: string): string {
 }
 
 export function getPostExcerpt(markdownBody: string, fallback: string): string {
-	const lines = String(markdownBody || "").split(/\r?\n/);
-	for (const rawLine of lines) {
+	const str = String(markdownBody || "");
+	const len = str.length;
+	let start = 0;
+
+	while (start < len) {
+		let end = str.indexOf('\n', start);
+		if (end === -1) end = len;
+
+		let rawLine = str.slice(start, end);
+		if (rawLine.charCodeAt(rawLine.length - 1) === 13) {
+			rawLine = rawLine.slice(0, -1);
+		}
+		start = end + 1;
+
 		const line = rawLine.trim();
 		if (!line) continue;
 		if (
@@ -300,7 +312,20 @@ export function extractTocHeadings(markdownBody: string, depths = [1, 2, 3]): To
 	const headings: TocHeading[] = [];
 	let inFence = false;
 
-	for (const rawLine of String(markdownBody || "").split(/\r?\n/)) {
+	const str = String(markdownBody || "");
+	const len = str.length;
+	let start = 0;
+
+	while (start < len) {
+		let end = str.indexOf('\n', start);
+		if (end === -1) end = len;
+
+		let rawLine = str.slice(start, end);
+		if (rawLine.charCodeAt(rawLine.length - 1) === 13) {
+			rawLine = rawLine.slice(0, -1);
+		}
+		start = end + 1;
+
 		const line = rawLine.trim();
 		if (line.startsWith("```") || line.startsWith("~~~")) {
 			inFence = !inFence;
