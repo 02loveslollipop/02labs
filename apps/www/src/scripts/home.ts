@@ -529,7 +529,16 @@ function setupHeroWaveParticles() {
 		const dt = Math.min(0.05, Math.max(0.001, (now - lastFrame) / 1000));
 		const sizeSmoothing = 1 - Math.exp(-dt * 7.2);
 		lastFrame = now;
-		ripples = ripples.filter((ripple) => (now - ripple.start) / 1000 < 2.2);
+
+		let j = 0;
+		const len = ripples.length;
+		for (let i = 0; i < len; i++) {
+			if ((now - ripples[i].start) / 1000 < 2.2) {
+				ripples[j++] = ripples[i];
+			}
+		}
+		ripples.length = j;
+
 		context.clearRect(0, 0, width, height);
 
 		context.lineCap = "square";
