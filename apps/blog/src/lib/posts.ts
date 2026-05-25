@@ -81,8 +81,14 @@ export function sortBlogEntries(entries: CollectionEntry<"blog">[]): CollectionE
 	return [...entries].sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 }
 
+const slugifyTagCache = new Map<string, string>();
+
 export function slugifyTag(input: string): string {
-	return String(input || "")
+	const raw = input || "";
+	const cached = slugifyTagCache.get(raw);
+	if (cached !== undefined) return cached;
+
+	const result = String(raw)
 		.normalize("NFKD")
 		.replace(/[\u0300-\u036f]/g, "")
 		.toLowerCase()
@@ -91,6 +97,9 @@ export function slugifyTag(input: string): string {
 		.replace(/[\s_]+/g, "-")
 		.replace(/-+/g, "-")
 		.replace(/^-|-$/g, "");
+
+	slugifyTagCache.set(raw, result);
+	return result;
 }
 
 function getDisplayTagPriority(input: string): number {
