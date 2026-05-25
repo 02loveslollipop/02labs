@@ -134,17 +134,40 @@ export function stripMarkdownInline(line: string): string {
 		.trim();
 }
 
+const MARKDOWN_BLOCK_INLINE_IMAGE_RE = /```[\s\S]*?```|`[^`]+`|!\[[^\]]*]\([^)]+\)/g;
+const MARKDOWN_LINK_RE = /\[([^\]]+)\]\([^)]+\)/g;
+const MARKDOWN_FORMATTING_RE = /[#>*_~|[\]()]+/g;
+
 export function countMarkdownWords(markdown: string): number {
-	const cleaned = String(markdown || "")
-		.replace(/```[\s\S]*?```/g, " ")
-		.replace(/`[^`]+`/g, " ")
-		.replace(/!\[[^\]]*]\([^)]+\)/g, " ")
-		.replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
-		.replace(/[#>*_~|[\]()]/g, " ")
-		.replace(/\s+/g, " ")
-		.trim();
-	if (!cleaned) return 0;
-	return cleaned.split(" ").filter(Boolean).length;
+	const text = String(markdown || "");
+	if (!text) return 0;
+
+	const cleaned = text
+		// Combine block code, inline code, and images into a single pass
+		.replace(MARKDOWN_BLOCK_INLINE_IMAGE_RE, " ")
+		// Keep link text
+		.replace(MARKDOWN_LINK_RE, "$1")
+		// Replace formatting characters and punctuation with space
+		.replace(MARKDOWN_FORMATTING_RE, " ");
+
+	let count = 0;
+	let inWord = false;
+	const len = cleaned.length;
+
+	for (let i = 0; i < len; i++) {
+		const code = cleaned.charCodeAt(i);
+		// Space, \t, \n, \r, \v, \f
+		if (code === 32 || (code >= 9 && code <= 13)) {
+			inWord = false;
+		} else {
+			if (!inWord) {
+				inWord = true;
+				count++;
+			}
+		}
+    }
+
+	return count;
 }
 
 export function formatDateIso(date: Date): string {
