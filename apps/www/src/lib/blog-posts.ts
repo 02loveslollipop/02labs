@@ -102,11 +102,14 @@ function getDisplayTagPriority(input: string): number {
 }
 
 export function orderDisplayTags(tags: string[]): string[] {
-	return [...tags].sort((a, b) => {
-		const priorityDiff = getDisplayTagPriority(a) - getDisplayTagPriority(b);
-		if (priorityDiff !== 0) return priorityDiff;
-		return 0;
-	});
+	return tags
+		.map(tag => ({ tag, priority: getDisplayTagPriority(tag) }))
+		.sort((a, b) => {
+			const priorityDiff = a.priority - b.priority;
+			if (priorityDiff !== 0) return priorityDiff;
+			return 0;
+		})
+		.map(item => item.tag);
 }
 
 function truncate(text: string, max = 190): string {
