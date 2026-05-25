@@ -136,15 +136,29 @@ export function stripMarkdownInline(line: string): string {
 
 export function countMarkdownWords(markdown: string): number {
 	const cleaned = String(markdown || "")
-		.replace(/```[\s\S]*?```/g, " ")
-		.replace(/`[^`]+`/g, " ")
-		.replace(/!\[[^\]]*]\([^)]+\)/g, " ")
+		.replace(/```[\s\S]*?```|`[^`]+`|!\[[^\]]*]\([^)]+\)/g, " ")
 		.replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
 		.replace(/[#>*_~|[\]()]/g, " ")
-		.replace(/\s+/g, " ")
 		.trim();
+
 	if (!cleaned) return 0;
-	return cleaned.split(" ").filter(Boolean).length;
+
+	let count = 0;
+	let inWord = false;
+
+	// We use the regular expression matcher on characters to handle all unicode whitespaces,
+	// avoiding string/array allocations for maximum efficiency.
+	const ws = /\s/;
+	for (let i = 0; i < cleaned.length; i++) {
+		const isSpace = ws.test(cleaned[i]);
+		if (isSpace) {
+			inWord = false;
+		} else if (!inWord) {
+			inWord = true;
+			count++;
+		}
+	}
+	return count;
 }
 
 export function formatDateIso(date: Date): string {
