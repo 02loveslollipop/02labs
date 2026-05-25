@@ -183,7 +183,13 @@ export function renderInlineMarkdown(input: string): string {
 		.replace(/`([^`]+)`/g, "<code>$1</code>");
 }
 
+const excerptCache = new Map<string, string>();
+
 export function getPostExcerpt(markdownBody: string, fallback: string): string {
+	const cacheKey = markdownBody + "|||" + fallback;
+	const cached = excerptCache.get(cacheKey);
+	if (cached !== undefined) return cached;
+
 	const lines = String(markdownBody || "").split(/\r?\n/);
 	for (const rawLine of lines) {
 		const line = rawLine.trim();
@@ -199,9 +205,15 @@ export function getPostExcerpt(markdownBody: string, fallback: string): string {
 			continue;
 		}
 		const cleaned = stripMarkdownInline(line);
-		if (cleaned.length >= 24) return truncate(cleaned);
+		if (cleaned.length >= 24) {
+			const result = truncate(cleaned);
+			excerptCache.set(cacheKey, result);
+			return result;
+		}
 	}
-	return truncate(fallback);
+	const result = truncate(fallback);
+	excerptCache.set(cacheKey, result);
+	return result;
 }
 
 export function resolvePostImageSrc(imagePath: string | null | undefined, slug: string): string | null {
