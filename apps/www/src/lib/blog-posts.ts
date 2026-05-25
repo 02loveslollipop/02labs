@@ -184,9 +184,23 @@ export function renderInlineMarkdown(input: string): string {
 }
 
 export function getPostExcerpt(markdownBody: string, fallback: string): string {
-	const lines = String(markdownBody || "").split(/\r?\n/);
-	for (const rawLine of lines) {
+	const text = String(markdownBody || "");
+	let startIndex = 0;
+
+	while (startIndex < text.length) {
+		let endIndex = text.indexOf("\n", startIndex);
+		if (endIndex === -1) {
+			endIndex = text.length;
+		}
+
+		let rawLine = text.substring(startIndex, endIndex);
+		if (rawLine.endsWith("\r")) {
+			rawLine = rawLine.slice(0, -1);
+		}
+
 		const line = rawLine.trim();
+		startIndex = endIndex + 1;
+
 		if (!line) continue;
 		if (
 			line.startsWith("#") ||
@@ -300,8 +314,23 @@ export function extractTocHeadings(markdownBody: string, depths = [1, 2, 3]): To
 	const headings: TocHeading[] = [];
 	let inFence = false;
 
-	for (const rawLine of String(markdownBody || "").split(/\r?\n/)) {
+	const textBody = String(markdownBody || "");
+	let startIndex = 0;
+
+	while (startIndex < textBody.length) {
+		let endIndex = textBody.indexOf("\n", startIndex);
+		if (endIndex === -1) {
+			endIndex = textBody.length;
+		}
+
+		let rawLine = textBody.substring(startIndex, endIndex);
+		if (rawLine.endsWith("\r")) {
+			rawLine = rawLine.slice(0, -1);
+		}
+
 		const line = rawLine.trim();
+		startIndex = endIndex + 1;
+
 		if (line.startsWith("```") || line.startsWith("~~~")) {
 			inFence = !inFence;
 			continue;
