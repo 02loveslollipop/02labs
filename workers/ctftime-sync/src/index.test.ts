@@ -84,7 +84,7 @@ describe("ctftime-sync worker — local E2E", () => {
 		const res = await SELF.fetch("https://api.02labs.me/", { method: "OPTIONS" });
 
 		expect(res.status).toBe(200);
-		expect(res.headers.get("Access-Control-Allow-Origin")).toBe("*");
+		expect(res.headers.get("Access-Control-Allow-Origin")).toBe("https://02labs.me");
 		expect(res.headers.get("Access-Control-Allow-Methods")).toContain("GET");
 	});
 
@@ -179,8 +179,8 @@ describe("ctftime-sync worker — local E2E", () => {
 	});
 
 	// ── CORS header present on data responses ─────────────────────────────────
-	it("GET / → response carries Access-Control-Allow-Origin: *", async () => {
+	it("GET / → response carries Access-Control-Allow-Origin: https://02labs.me", async () => {
 		const res = await SELF.fetch("https://api.02labs.me/");
-		expect(res.headers.get("Access-Control-Allow-Origin")).toBe("*");
+		expect(res.headers.get("Access-Control-Allow-Origin")).toBe("https://02labs.me");
 	});
 });
