@@ -184,8 +184,15 @@ export function renderInlineMarkdown(input: string): string {
 }
 
 export function getPostExcerpt(markdownBody: string, fallback: string): string {
-	const lines = String(markdownBody || "").split(/\r?\n/);
-	for (const rawLine of lines) {
+	const body = String(markdownBody || "");
+	let start = 0;
+	while (start < body.length) {
+		let end = body.indexOf('\n', start);
+		if (end === -1) end = body.length;
+
+		const rawLine = body.slice(start, end);
+		start = end + 1;
+
 		const line = rawLine.trim();
 		if (!line) continue;
 		if (
