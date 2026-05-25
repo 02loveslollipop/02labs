@@ -65,12 +65,20 @@ const DOCUMENT_TYPE_TAG_SLUGS = new Set([
 ]);
 
 
+const postSlugCache = new WeakMap<CollectionEntry<"blog">, string>();
+
 export function getPostSlug(entry: CollectionEntry<"blog">): string {
+	const cached = postSlugCache.get(entry);
+	if (cached !== undefined) return cached;
+
 	// Normalize "folder posts" like `my-post/index.md` to slug `my-post`.
 	const id = entry.id.replaceAll("\\", "/");
 	let slug = id.replace(/\.mdx?$/i, "");
 	slug = slug.replace(/\/index$/i, "");
-	return slug || entry.slug;
+	const result = slug || entry.slug;
+
+	postSlugCache.set(entry, result);
+	return result;
 }
 
 export function resolveSiteUrl(pathname: string, site?: URL): string {
