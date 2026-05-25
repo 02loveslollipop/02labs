@@ -184,8 +184,20 @@ export function renderInlineMarkdown(input: string): string {
 }
 
 export function getPostExcerpt(markdownBody: string, fallback: string): string {
-	const lines = String(markdownBody || "").split(/\r?\n/);
-	for (const rawLine of lines) {
+	const text = String(markdownBody || "");
+	let startIndex = 0;
+
+	while (startIndex <= text.length) {
+		let endIndex = text.indexOf("\n", startIndex);
+		if (endIndex === -1) {
+			endIndex = text.length;
+		}
+		let rawLine = text.slice(startIndex, endIndex);
+		if (rawLine.endsWith("\r")) {
+			rawLine = rawLine.slice(0, -1);
+		}
+		startIndex = endIndex + 1;
+
 		const line = rawLine.trim();
 		if (!line) continue;
 		if (
@@ -300,7 +312,20 @@ export function extractTocHeadings(markdownBody: string, depths = [1, 2, 3]): To
 	const headings: TocHeading[] = [];
 	let inFence = false;
 
-	for (const rawLine of String(markdownBody || "").split(/\r?\n/)) {
+	const text = String(markdownBody || "");
+	let startIndex = 0;
+
+	while (startIndex <= text.length) {
+		let endIndex = text.indexOf("\n", startIndex);
+		if (endIndex === -1) {
+			endIndex = text.length;
+		}
+		let rawLine = text.slice(startIndex, endIndex);
+		if (rawLine.endsWith("\r")) {
+			rawLine = rawLine.slice(0, -1);
+		}
+		startIndex = endIndex + 1;
+
 		const line = rawLine.trim();
 		if (line.startsWith("```") || line.startsWith("~~~")) {
 			inFence = !inFence;
@@ -314,16 +339,16 @@ export function extractTocHeadings(markdownBody: string, depths = [1, 2, 3]): To
 		const depth = match[1].length;
 		if (!allowedDepths.has(depth)) continue;
 
-		const text = stripMarkdownInline(match[2]);
-		if (!text) continue;
+		const text2 = stripMarkdownInline(match[2]);
+		if (!text2) continue;
 
-		const baseId = slugifyHeading(text) || "section";
+		const baseId = slugifyHeading(text2) || "section";
 		const count = seenIds.get(baseId) ?? 0;
 		seenIds.set(baseId, count + 1);
 		headings.push({
 			depth,
 			id: count === 0 ? baseId : `${baseId}-${count + 1}`,
-			text,
+			text: text2,
 		});
 	}
 
