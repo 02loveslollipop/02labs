@@ -158,6 +158,40 @@ describe("ctftime-sync worker — local E2E", () => {
 	});
 
 	// ── On-demand sync: GET /sync ─────────────────────────────────────────────
+	it("GET /sync → without SYNC_SECRET allows access", async () => {
+		const res = await SELF.fetch("https://api.02labs.me/sync");
+		expect(res.status).toBe(200);
+	});
+
+	it("GET /sync → with SYNC_SECRET rejects requests without authorization", async () => {
+		// Mock env to include SYNC_SECRET
+		const mockEnvWithSecret = { ...env, SYNC_SECRET: "secret-token" };
+
+		// Use a mock fetch event to pass the overridden env
+		const req = new Request("https://api.02labs.me/sync");
+
+		// Note: since we can't easily override env in the vitest runtime SELF.fetch,
+		// we test the handler directly.
+		const { default: worker } = await import("./index");
+		const res = await worker.fetch(req, mockEnvWithSecret as any);
+
+		expect(res.status).toBe(401);
+		const body = (await res.json()) as { error: string };
+		expect(body.error).toMatch(/unauthorized/i);
+	});
+
+	it("GET /sync → with SYNC_SECRET accepts valid authorization", async () => {
+		const mockEnvWithSecret = { ...env, SYNC_SECRET: "secret-token" };
+		const req = new Request("https://api.02labs.me/sync", {
+			headers: { Authorization: "Bearer secret-token" }
+		});
+
+		const { default: worker } = await import("./index");
+		const res = await worker.fetch(req, mockEnvWithSecret as any);
+
+		expect(res.status).toBe(200);
+	});
+
 	it("GET /sync → always calls CTFtime API, returns fresh data, and updates KV", async () => {
 		// Populate KV with stale data to confirm it is overwritten
 		await env.CTFTIME_KV.put(KV_KEY, JSON.stringify({ stale: true }));
