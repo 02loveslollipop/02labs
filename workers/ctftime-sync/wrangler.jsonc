@@ -30,6 +30,13 @@
 	"custom_domains": ["api.02labs.me"],
 
 	/*
+	 * Environment Variables for bindings.
+	 */
+	"vars": {
+		"SYNC_SECRET": "test-secret"
+	},
+
+	/*
 	 * Cron Triggers — runs the sync once a day at 00:05 UTC.
 	 */
 	"triggers": {
