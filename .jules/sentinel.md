@@ -1,0 +1,4 @@
+## 2025-06-03 - [Missing Authentication on Expensive Webhook Endpoint]
+**Vulnerability:** The `/sync` endpoint in the `ctftime-sync` Cloudflare Worker was exposed publicly without authentication. This endpoint performs synchronous backend HTTP requests to the CTFtime API to refresh data.
+**Learning:** Cloudflare Workers exposing webhook or sync endpoints must be protected, as unauthenticated access allows an attacker to trigger expensive operations (both in terms of compute and external API rate limits), essentially creating an unauthenticated SSRF-like or DoS vector.
+**Prevention:** Always require and validate a secret token (e.g., via `Authorization: Bearer <secret>` or a custom header) before processing on-demand synchronization logic. Ensure the secret is securely stored in environment variables (e.g., `env.SYNC_SECRET`) and fail securely if the environment is misconfigured.
