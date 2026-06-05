@@ -1,0 +1,4 @@
+## 2025-06-05 - [CRITICAL] Unprotected Background Sync Endpoint (SSRF/DoS Risk)
+**Vulnerability:** The `/sync` endpoint in `workers/ctftime-sync` was globally accessible without any authentication. While designed to manually trigger background syncs, exposing this admin endpoint publicly allowed arbitrary callers to exhaust upstream API limits (CTFtime) and trigger excessive KV writes.
+**Learning:** Background syncs and on-demand cache regeneration endpoints must always be protected, either via internal network isolation or strong secret-based authentication. Even if the data being synced is public, the cost of syncing (rate limits, compute, KV write operations) is a vector for Denial of Service and SSRF.
+**Prevention:** Implement `SYNC_SECRET` checking on all manual administrative endpoints. Cloudflare Workers should validate an `Authorization: Bearer <secret>` header before executing expensive outbound requests.
