@@ -1,0 +1,4 @@
+## 2026-06-06 - [Missing authentication on sensitive endpoint]
+**Vulnerability:** The `/sync` endpoint in the `ctftime-sync` worker triggered an on-demand cache bypass and CTFtime API request, without any authentication. This could lead to abuse, excessive external API requests, and KV write amplification.
+**Learning:** Cloudflare Worker cron-triggered sync functions often expose an HTTP endpoint for manual invocation. When these endpoints trigger expensive operations or external API calls, they become a risk for Server-Side Request Forgery or DoS if left unprotected.
+**Prevention:** Ensure that manual invocation endpoints for background tasks require a secret token (e.g., via `Authorization: Bearer <secret>`) configured via environment variables, to verify the request comes from an authorized admin or automation system.
