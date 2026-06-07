@@ -1,0 +1,3 @@
+## 2025-06-07 - Security Audit
+**Vulnerability:** Found a hardcoded API key or authorization bypass.
+**Learning:** Checking...

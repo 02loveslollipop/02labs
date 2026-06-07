@@ -11,6 +11,13 @@ import { SELF, env } from "cloudflare:test";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { CTFTimeData } from "./index";
 
+interface TypedEnv {
+	CTFTIME_KV: KVNamespace;
+    SYNC_SECRET?: string;
+}
+
+const typedEnv = env as unknown as TypedEnv;
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Mock fixtures
 // ─────────────────────────────────────────────────────────────────────────────
@@ -70,7 +77,7 @@ describe("ctftime-sync worker — local E2E", () => {
 
 	beforeEach(async () => {
 		// Fresh KV + fresh fetch mock for every test
-		await env.CTFTIME_KV.delete(KV_KEY);
+		await typedEnv.CTFTIME_KV.delete(KV_KEY);
 		fetchMock = makeFetchMock();
 		vi.stubGlobal("fetch", fetchMock);
 	});
@@ -120,7 +127,7 @@ describe("ctftime-sync worker — local E2E", () => {
 		expect(data.events[0].ctf_points).toBe("500.000");
 
 		// KV should now be populated
-		const cached = await env.CTFTIME_KV.get(KV_KEY);
+		const cached = await typedEnv.CTFTIME_KV.get(KV_KEY);
 		expect(cached).not.toBeNull();
 
 		// CTFtime API was called (team + results)
@@ -141,7 +148,7 @@ describe("ctftime-sync worker — local E2E", () => {
 			year: 2026,
 			updated_at: "2026-03-04T00:00:00.000Z",
 		};
-		await env.CTFTIME_KV.put(KV_KEY, JSON.stringify(preset));
+		await typedEnv.CTFTIME_KV.put(KV_KEY, JSON.stringify(preset));
 
 		// Replace fetch mock with a fresh spy so we can assert it was NOT called
 		const spy = makeFetchMock();
@@ -158,11 +165,22 @@ describe("ctftime-sync worker — local E2E", () => {
 	});
 
 	// ── On-demand sync: GET /sync ─────────────────────────────────────────────
-	it("GET /sync → always calls CTFtime API, returns fresh data, and updates KV", async () => {
-		// Populate KV with stale data to confirm it is overwritten
-		await env.CTFTIME_KV.put(KV_KEY, JSON.stringify({ stale: true }));
-
+	it("GET /sync → fails without authorization header", async () => {
 		const res = await SELF.fetch("https://api.02labs.me/sync");
+		expect(res.status).toBe(401);
+		const body = (await res.json()) as { error: string };
+		expect(body.error).toBe("Unauthorized");
+	});
+
+	it("GET /sync → always calls CTFtime API, returns fresh data, and updates KV with auth", async () => {
+		// Populate KV with stale data to confirm it is overwritten
+		await typedEnv.CTFTIME_KV.put(KV_KEY, JSON.stringify({ stale: true }));
+
+		const res = await SELF.fetch("https://api.02labs.me/sync", {
+            headers: {
+                "Authorization": `Bearer ${typedEnv.SYNC_SECRET}`
+            }
+        });
 
 		expect(res.status).toBe(200);
 		const data = (await res.json()) as CTFTimeData;
@@ -170,7 +188,7 @@ describe("ctftime-sync worker — local E2E", () => {
 		expect(data.events).toHaveLength(1);
 
 		// Verify KV was overwritten with fresh data
-		const stored = JSON.parse((await env.CTFTIME_KV.get(KV_KEY))!) as CTFTimeData;
+		const stored = JSON.parse((await typedEnv.CTFTIME_KV.get(KV_KEY))!) as CTFTimeData;
 		expect(stored.team.name).toBe("Ch0wn3rs");
 		expect(stored.events).toHaveLength(1);
 
