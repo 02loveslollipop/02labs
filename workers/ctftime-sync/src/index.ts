@@ -17,6 +17,7 @@ const KV_KEY = "ctftime_data";
 
 interface Env {
 	CTFTIME_KV: KVNamespace;
+	SYNC_SECRET?: string;
 }
 
 interface CTFTimeTeamRating {
@@ -169,7 +170,12 @@ export default {
 		const url = new URL(request.url);
 
 		if (url.pathname === "/sync") {
-			// On-demand sync (can be protected with a secret header if desired)
+			// Security Enhancement: Protect on-demand sync with a secret to prevent abuse
+			const authHeader = request.headers.get("Authorization");
+			const expectedSecret = env.SYNC_SECRET;
+			if (!expectedSecret || authHeader !== `Bearer ${expectedSecret}`) {
+				return jsonResponse({ error: "Unauthorized" }, 401);
+			}
 			const fresh = await syncData(env);
 			return jsonResponse(fresh);
 		}

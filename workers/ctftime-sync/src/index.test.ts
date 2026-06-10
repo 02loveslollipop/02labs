@@ -162,7 +162,9 @@ describe("ctftime-sync worker — local E2E", () => {
 		// Populate KV with stale data to confirm it is overwritten
 		await env.CTFTIME_KV.put(KV_KEY, JSON.stringify({ stale: true }));
 
-		const res = await SELF.fetch("https://api.02labs.me/sync");
+		const res = await SELF.fetch("https://api.02labs.me/sync", {
+			headers: { Authorization: "Bearer test-secret" },
+		});
 
 		expect(res.status).toBe(200);
 		const data = (await res.json()) as CTFTimeData;
@@ -176,6 +178,16 @@ describe("ctftime-sync worker — local E2E", () => {
 
 		// CTFtime API must have been fetched regardless of cached data
 		expect(fetchMock).toHaveBeenCalledTimes(2);
+	});
+
+	// ── On-demand sync: GET /sync requires auth ──────────────────────────────
+	it("GET /sync → 401 Unauthorized without auth", async () => {
+		const res = await SELF.fetch("https://api.02labs.me/sync");
+
+		expect(res.status).toBe(401);
+		const data = (await res.json()) as { error: string };
+		expect(data.error).toBe("Unauthorized");
+		expect(fetchMock).toHaveBeenCalledTimes(0);
 	});
 
 	// ── CORS header present on data responses ─────────────────────────────────
