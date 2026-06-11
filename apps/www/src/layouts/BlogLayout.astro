@@ -101,7 +101,7 @@ const resolvedTwitterCard = twitterCard ?? (ogImage ? "summary_large_image" : "s
 		<link rel="icon" type="image/png" href="/02loveslollipop.png" />
 		<link rel="apple-touch-icon" href="/02loveslollipop.png" />
 
-		{jsonLd ? <script type="application/ld+json" is:inline set:html={jsonLd} /> : null}
+		{jsonLd ? <script type="application/ld+json" is:inline set:html={jsonLd}></script> : null}
 	</head>
 	<body>
 		<a class="skip-link" href="#main">Skip to content</a>

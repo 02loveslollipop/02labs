@@ -5,6 +5,11 @@ export default defineWorkersConfig({
 		poolOptions: {
 			workers: {
 				wrangler: { configPath: "./wrangler.jsonc" },
+				miniflare: {
+					bindings: {
+						CTFTIME_SYNC_SECRET: "super-secret"
+					}
+				}
 			},
 		},
 	},
