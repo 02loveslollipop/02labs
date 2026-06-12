@@ -1,0 +1,4 @@
+## 2023-10-24 - Missing Authorization on Worker On-Demand Endpoints
+**Vulnerability:** Cloudflare Workers exposing administrative or on-demand trigger endpoints (like `/sync`) over HTTP without authorization checks allow arbitrary external callers to perform unintended actions or bypass scheduled execution limits, potentially leading to abuse or resource exhaustion.
+**Learning:** Even when the primary execution path is a secured cron trigger, manual override HTTP routes must be explicitly protected. Cloudflare Workers do not provide native route-level access control within standard fetch handlers, so custom authorization logic is required.
+**Prevention:** Always implement explicit authorization checks (e.g., verifying a secret from environment bindings against an `Authorization` header) for any Cloudflare Worker HTTP paths that perform administrative actions or manually trigger background tasks.
