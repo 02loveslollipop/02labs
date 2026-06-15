@@ -1,0 +1,4 @@
+## 2025-02-28 - [Add Authorization to CTFtime sync webhook trigger]
+**Vulnerability:** The on-demand `/sync` HTTP endpoint in the `ctftime-sync` Cloudflare Worker was exposed publicly without any authorization checks, allowing anyone to trigger expensive sync operations and bypass cached responses, creating a DoS/abuse vector via uncontrolled external API requests.
+**Learning:** Cloudflare Workers exposing administrative or on-demand trigger endpoints manually via HTTP paths must explicitly implement authorization checks (e.g., verifying a secret from environment bindings against an `Authorization` header), as they are public by default.
+**Prevention:** Always secure state-modifying or external-request-triggering HTTP endpoints in Workers using environment secrets and `Authorization` bearer token checks. Ensure secrets are mocked in `miniflare.bindings` inside `vitest.config.ts` during testing.
