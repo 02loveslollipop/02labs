@@ -1,0 +1,4 @@
+## 2024-05-15 - Missing Authorization on Manual Trigger Endpoint
+**Vulnerability:** The on-demand sync endpoint (`GET /sync`) in the Cloudflare Worker was missing authorization checks, allowing anyone to trigger the cron logic at will, potentially causing resource exhaustion or unexpected KV rewrites.
+**Learning:** Even though the endpoint was only reachable via a specific path, it lacked an explicit check for a secret. Background worker logic exposed via HTTP needs authentication just like any other API.
+**Prevention:** Cloudflare Workers exposing administrative or on-demand trigger endpoints manually via HTTP paths should explicitly implement authorization checks (e.g., verifying a secret from environment bindings against an `Authorization` header).
