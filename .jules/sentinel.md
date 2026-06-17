@@ -1,0 +1,4 @@
+## 2024-05-24 - Missing Authorization on Admin Endpoints in Cloudflare Workers
+**Vulnerability:** The `/sync` endpoint in `workers/ctftime-sync/src/index.ts`, which triggers an on-demand cache bypass and data sync, lacked authentication. Anyone could repeatedly hit the endpoint to force the worker to make external API calls, potentially leading to rate limiting on the external API (CTFtime) and unnecessary execution costs.
+**Learning:** Manual trigger endpoints that bypass cache or trigger expensive operations must be protected with an authentication mechanism, even if they aren't explicitly documented, to prevent abuse.
+**Prevention:** Always implement an authorization check using an environment secret (e.g., verifying a `Bearer` token in the `Authorization` header against a secret binding) for administrative or on-demand trigger endpoints in Cloudflare Workers.
