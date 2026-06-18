@@ -158,11 +158,28 @@ describe("ctftime-sync worker — local E2E", () => {
 	});
 
 	// ── On-demand sync: GET /sync ─────────────────────────────────────────────
-	it("GET /sync → always calls CTFtime API, returns fresh data, and updates KV", async () => {
+	it("GET /sync → without auth returns 401 Unauthorized", async () => {
+		const res = await SELF.fetch("https://api.02labs.me/sync");
+		expect(res.status).toBe(401);
+
+		const body = (await res.json()) as { error: string };
+		expect(body.error).toBe("Unauthorized");
+	});
+
+	it("GET /sync → with wrong auth returns 401 Unauthorized", async () => {
+		const res = await SELF.fetch("https://api.02labs.me/sync", {
+			headers: { Authorization: "Bearer wrong-token" },
+		});
+		expect(res.status).toBe(401);
+	});
+
+	it("GET /sync → with correct auth calls CTFtime API, returns fresh data, and updates KV", async () => {
 		// Populate KV with stale data to confirm it is overwritten
 		await env.CTFTIME_KV.put(KV_KEY, JSON.stringify({ stale: true }));
 
-		const res = await SELF.fetch("https://api.02labs.me/sync");
+		const res = await SELF.fetch("https://api.02labs.me/sync", {
+			headers: { Authorization: "Bearer test-secret-token" },
+		});
 
 		expect(res.status).toBe(200);
 		const data = (await res.json()) as CTFTimeData;

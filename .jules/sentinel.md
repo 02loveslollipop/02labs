@@ -1,0 +1,4 @@
+## 2025-05-18 - Missing Authorization on Admin Endpoint in Worker
+**Vulnerability:** The `/sync` endpoint in the `ctftime-sync` Cloudflare Worker was exposed publicly without authentication. Any user could trigger an on-demand sync, potentially leading to denial of service, unnecessary cost increases, or cache poisoning/overwrite by making repeated requests that exhausted API rate limits on upstream services.
+**Learning:** Administrative endpoints or webhook triggers that live on the same domain/worker as public routes must explicitly verify caller identity, even if they only perform internal tasks.
+**Prevention:** Use an environment binding (e.g., `SYNC_SECRET` in `wrangler.toml` / `wrangler.jsonc`) and verify it against an `Authorization` header on restricted paths to ensure only authorized callers can trigger administrative actions.
