@@ -1,0 +1,4 @@
+## 2025-06-21 - Missing Authorization on Sensitive Endpoint
+**Vulnerability:** The `/sync` endpoint in the `ctftime-sync` Cloudflare Worker allowed triggering an on-demand synchronization without any authentication or authorization. This could allow an attacker to repeatedly hit the endpoint, resulting in excessive API calls to CTFtime and potentially exhausting rate limits or incurring unnecessary costs, essentially a DoS via resource exhaustion.
+**Learning:** Cloudflare Workers exposing administrative or on-demand trigger endpoints manually via HTTP paths must explicitly implement authorization checks. It is not sufficient to merely rely on obscure paths or internal knowledge.
+**Prevention:** Always require and validate an authorization token (e.g., verifying a secret from environment bindings against an `Authorization` header) for any endpoint that triggers sensitive or resource-intensive operations.
