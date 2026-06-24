@@ -1,0 +1,4 @@
+## 2025-04-14 - Missing Authorization on On-Demand Sync Endpoint
+**Vulnerability:** The on-demand sync endpoint (`/sync`) in the `ctftime-sync` Cloudflare Worker was exposed without any authorization checks, allowing anyone to trigger an on-demand sync and potentially abuse the endpoint or exceed rate limits.
+**Learning:** Cloudflare Workers exposing administrative or on-demand trigger endpoints manually via HTTP paths must explicitly implement authorization checks (e.g., verifying a secret from environment bindings against an `Authorization` header), as they are public by default.
+**Prevention:** Always require and validate authorization headers (e.g., Bearer tokens) matching configured secrets in environment bindings when creating manual trigger or administrative HTTP endpoints in serverless workers.
