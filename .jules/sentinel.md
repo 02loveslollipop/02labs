@@ -1,0 +1,4 @@
+## 2025-03-04 - Missing Authorization on On-Demand Trigger Endpoint
+**Vulnerability:** The on-demand sync endpoint `/sync` in the Cloudflare Worker was exposed publicly without any form of authentication or authorization. This could lead to a Denial-of-Wallet (DoW) or resource exhaustion attack if maliciously triggered repeatedly, as it performs external API calls and KV writes.
+**Learning:** Cloudflare Workers exposing administrative or on-demand trigger endpoints manually via HTTP paths must explicitly implement authorization checks. The platform does not inherently protect these endpoints unless configured to do so (e.g., via Cloudflare Access).
+**Prevention:** Always implement an authorization check (e.g., verifying a secret from environment bindings against an `Authorization` header) for any endpoint that triggers resource-intensive operations or modifies state, rather than leaving it open to the public.
