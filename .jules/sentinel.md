@@ -1,0 +1,4 @@
+## 2024-11-20 - [Unprotected Administrative Endpoint]
+**Vulnerability:** The `/sync` endpoint in the `ctftime-sync` Cloudflare Worker was publicly accessible without any authorization, allowing anyone to trigger a heavy on-demand sync process that performs external API calls and updates internal KV state. This could be abused for denial-of-service, API rate limit exhaustion (on external service), and unnecessary compute/KV write costs.
+**Learning:** Cloudflare Workers exposing administrative or on-demand trigger endpoints manually via HTTP paths (instead of relying solely on cron triggers) must explicitly implement authorization checks. The default is public access.
+**Prevention:** Always require and verify an explicit secret (e.g., via `Authorization` header matched against a bound environment variable secret) for administrative or on-demand trigger endpoints in Cloudflare Workers.
