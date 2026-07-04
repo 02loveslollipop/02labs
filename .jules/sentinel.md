@@ -1,0 +1,4 @@
+## 2026-07-04 - Missing Authentication on Cloudflare Worker Administrative Endpoint
+**Vulnerability:** The on-demand synchronization endpoint (`/sync`) of the `ctftime-sync` Cloudflare Worker was exposed publicly without authentication, allowing any user to trigger expensive or rate-limited API calls repeatedly.
+**Learning:** Cloudflare Workers exposing administrative or on-demand trigger endpoints manually via HTTP paths must explicitly implement authorization checks. The default HTTP router handles all requests to the worker and it's easy to overlook access control on utility endpoints meant only for internal/admin use.
+**Prevention:** Always secure administrative routes by verifying a secret from environment bindings (e.g., `env.SYNC_SECRET`) against an `Authorization` header (e.g., Bearer token) and returning an appropriate HTTP 401 response when verification fails.
