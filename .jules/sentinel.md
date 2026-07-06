@@ -1,0 +1,4 @@
+## 2025-07-06 - [Missing Authorization on On-Demand Trigger Endpoint]
+**Vulnerability:** The on-demand sync endpoint (`/sync`) in the `ctftime-sync` Cloudflare Worker was missing authorization checks. Any unauthenticated user could trigger the endpoint, causing the Worker to make external API calls to CTFtime and write to Workers KV. This exposes the worker to potential abuse and excessive costs (e.g., if spammed).
+**Learning:** Cloudflare Workers exposing administrative or on-demand trigger endpoints manually via HTTP paths must explicitly implement authorization checks. The fact that an endpoint is not linked from a frontend does not mean it is secure.
+**Prevention:** Always verify a secret from environment bindings against an `Authorization` header when exposing sensitive trigger endpoints, such as `if (request.headers.get("Authorization") !== \`Bearer ${env.SECRET}\`) { return new Response("Unauthorized", { status: 401 }); }`.
