@@ -1,0 +1,4 @@
+## 2026-07-08 - [Missing Authorization on Manual Sync Endpoint]
+**Vulnerability:** The /sync endpoint on the ctftime-sync Cloudflare Worker was publicly accessible without any authentication, allowing anyone to repeatedly trigger upstream API requests and KV writes, potentially causing rate limiting or unexpected costs.
+**Learning:** Cloudflare Workers exposing administrative or on-demand trigger endpoints manually via HTTP paths must explicitly implement authorization checks. Even internal endpoints meant for occasional manual triggering by owners are exposed to the public internet by default.
+**Prevention:** Always require a secret token via Authorization headers and verify it against an environment binding (e.g., SYNC_SECRET) when exposing administrative or trigger functionality over HTTP.
