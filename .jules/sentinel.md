@@ -1,0 +1,4 @@
+## 2025-03-05 - [Missing Authorization on Administrative Trigger Endpoints]
+**Vulnerability:** The on-demand synchronization endpoint (`/sync`) in the `ctftime-sync` Cloudflare Worker was exposed without any authorization checks. This could allow unauthenticated attackers to repeatedly trigger the synchronization process, potentially leading to denial of service, abuse of third-party API limits (CTFtime), and increased operational costs.
+**Learning:** Administrative endpoints, even if they only trigger read operations and cache updates, must be protected against unauthorized access. In Cloudflare Workers, environment bindings provide a secure mechanism to inject secrets.
+**Prevention:** Always verify authorization (e.g., using a secret API key via the `Authorization` header against an environment variable) before executing business logic on administrative endpoints. In test environments (like `vitest-pool-workers`), use `miniflare` bindings to mock these secrets.
