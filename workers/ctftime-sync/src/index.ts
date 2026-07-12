@@ -17,6 +17,7 @@ const KV_KEY = "ctftime_data";
 
 interface Env {
 	CTFTIME_KV: KVNamespace;
+	SYNC_SECRET: string;
 }
 
 interface CTFTimeTeamRating {
@@ -141,7 +142,7 @@ async function syncData(env: Env): Promise<CTFTimeData> {
 const CORS_HEADERS: Record<string, string> = {
 	"Access-Control-Allow-Origin": "*",
 	"Access-Control-Allow-Methods": "GET, OPTIONS",
-	"Access-Control-Allow-Headers": "Content-Type",
+	"Access-Control-Allow-Headers": "Content-Type, Authorization",
 	"Cache-Control": "public, max-age=3600",
 };
 
@@ -169,7 +170,11 @@ export default {
 		const url = new URL(request.url);
 
 		if (url.pathname === "/sync") {
-			// On-demand sync (can be protected with a secret header if desired)
+			// On-demand sync protected with a secret header
+			const authHeader = request.headers.get("Authorization");
+			if (!env.SYNC_SECRET || authHeader !== `Bearer ${env.SYNC_SECRET}`) {
+				return jsonResponse({ error: "Unauthorized" }, 401);
+			}
 			const fresh = await syncData(env);
 			return jsonResponse(fresh);
 		}
