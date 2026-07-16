@@ -30,6 +30,7 @@ Systems, Data, Projects, and CTF Writeups.
                 status: 200,
                 headers: {
                     "Content-Type": "text/markdown",
+                    "X-Content-Type-Options": "nosniff",
                     "x-markdown-tokens": String(markdown.split(/\s+/).length),
                     "Content-Signal": "ai-train=yes, search=yes, ai-input=yes",
                     "Link": '<' + '/.well-known/api-catalog>; rel="api-catalog", <' + '/docs/api>; rel="service-doc"'
@@ -43,11 +44,19 @@ Systems, Data, Projects, and CTF Writeups.
             status: 200,
             headers: {
                 "Content-Type": "text/markdown",
+                "X-Content-Type-Options": "nosniff",
                 "x-markdown-tokens": String(markdown.split(/\s+/).length),
                 "Content-Signal": "ai-train=yes, search=yes, ai-input=yes"
             }
         });
     }
 
-    return response;
+    // Add security headers
+    const newResponse = new Response(response.body, response);
+    newResponse.headers.set("X-Content-Type-Options", "nosniff");
+    newResponse.headers.set("X-Frame-Options", "DENY");
+    newResponse.headers.set("X-XSS-Protection", "1; mode=block");
+    newResponse.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+
+    return newResponse;
 });
