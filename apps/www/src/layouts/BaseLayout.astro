@@ -31,6 +31,9 @@ const fullTitle = title === siteBrand ? title : `${title} | ${siteBrand}`;
 const resolvedOgImage = ogImage ?? (site ? new URL("/og-default.png", site).toString() : "/og-default.png");
 const resolvedOgImageAlt = ogImageAlt ?? "02Labs — Systems, Data, Security, and CTF Writeups";
 const resolvedTwitterCard = twitterCard ?? (ogImage ? "summary_large_image" : "summary_large_image");
+
+// Safely escape JSON-LD to prevent XSS breakouts from the <script> tag
+const safeJsonLd = jsonLd ? jsonLd.replace(/</g, "\\u003c").replace(/>/g, "\\u003e") : null;
 ---
 
 <html lang="en">
@@ -72,7 +75,7 @@ const resolvedTwitterCard = twitterCard ?? (ogImage ? "summary_large_image" : "s
 		<link rel="icon" type="image/png" href="/02loveslollipop.png" />
 		<link rel="apple-touch-icon" href="/02loveslollipop.png" />
 
-		{jsonLd ? <script type="application/ld+json" is:inline set:html={jsonLd} /> : null}
+		{safeJsonLd ? <script type="application/ld+json" is:inline set:html={safeJsonLd} /> : null}
 	</head>
 	<body>
 		<a class="skip-link" href="#main">

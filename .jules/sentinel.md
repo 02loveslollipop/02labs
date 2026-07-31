@@ -8,3 +8,8 @@
 **Learning:** This is a high-priority vulnerability because it allows any website to read data from the API endpoint. While this API might serve public data, it was intended to be used specifically by `02labs.me` according to comments in the code.
 **Prevention:** Explicitly restrict `Access-Control-Allow-Origin` to trusted origins instead of using the wildcard `*`.
 
+
+## 2025-05-30 - [Secured JSON-LD XSS Vulnerability]
+**Vulnerability:** Passing unsanitized strings (like JSON stringified data) directly into Astro's `set:html` inside a `<script>` tag can lead to XSS. If an attacker controls the data (e.g. user input in JSON-LD fields), they could inject `</script><script>alert(1)</script>`, which the browser will parse as a closing tag, executing the malicious payload.
+**Learning:** Even when serializing objects using `JSON.stringify`, output is not automatically HTML-safe. The `set:html` directive blindly injects the content, bypassing Astro's normal text escaping mechanisms, making it dangerous for script contents.
+**Prevention:** Always sanitize JSON structures before injecting them into HTML context via `set:html`. For `<script>` contexts, explicitly replace `<` and `>` characters with their unicode equivalents (`\u003c` and `\u003e`) to prevent script breakout attacks.
