@@ -42,6 +42,9 @@ const site = Astro.site;
 const canonicalUrl = site ? new URL(Astro.url.pathname, site).toString() : Astro.url.toString();
 const fullTitle = title === BLOG_NAME ? title : `${title} | ${BLOG_NAME}`;
 const resolvedTwitterCard = twitterCard ?? (ogImage ? "summary_large_image" : "summary");
+
+// Safely escape JSON-LD to prevent XSS breakouts from the <script> tag
+const safeJsonLd = jsonLd ? jsonLd.replace(/</g, "\\u003c").replace(/>/g, "\\u003e") : null;
 ---
 
 <html lang="en">
@@ -89,7 +92,7 @@ const resolvedTwitterCard = twitterCard ?? (ogImage ? "summary_large_image" : "s
 		<link rel="icon" type="image/png" href="/02loveslollipop.png" />
 		<link rel="apple-touch-icon" href="/02loveslollipop.png" />
 
-		{jsonLd ? <script type="application/ld+json" is:inline set:html={jsonLd} /> : null}
+		{safeJsonLd ? <script type="application/ld+json" is:inline set:html={safeJsonLd} /> : null}
 	</head>
 	<body>
 		<a class="skip-link" href="#main">Skip to content</a>
