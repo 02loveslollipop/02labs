@@ -154,6 +154,21 @@ function jsonResponse(data: unknown, status = 200): Response {
 }
 
 // --------------------------------------------------------------------------
+// Security helper
+// --------------------------------------------------------------------------
+
+function secureCompare(a: string, b: string): boolean {
+	const aBuf = new TextEncoder().encode(a);
+	const bBuf = new TextEncoder().encode(b);
+	if (aBuf.length !== bBuf.length) return false;
+	let mismatch = 0;
+	for (let i = 0; i < aBuf.length; i++) {
+		mismatch |= aBuf[i] ^ bBuf[i];
+	}
+	return mismatch === 0;
+}
+
+// --------------------------------------------------------------------------
 // Worker entry point
 // --------------------------------------------------------------------------
 
@@ -172,7 +187,7 @@ export default {
 		if (url.pathname === "/sync") {
 			// On-demand sync requires authorization
 			const authHeader = request.headers.get("Authorization");
-			if (!authHeader || authHeader !== `Bearer ${env.SYNC_SECRET}`) {
+			if (!authHeader || !secureCompare(authHeader, `Bearer ${env.SYNC_SECRET}`)) {
 				return jsonResponse({ error: "Unauthorized" }, 401);
 			}
 
