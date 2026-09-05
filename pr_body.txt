@@ -1,0 +1,5 @@
+🚨 Severity: HIGH
+💡 Vulnerability: The `/sync` endpoint in the `ctftime-sync` Cloudflare Worker used a simple string comparison (`!==`) to check the authorization header against the secret `SYNC_SECRET`. This simple string comparison can short-circuit upon finding the first mismatching character, potentially leaking the characters of the secret through a timing attack.
+🎯 Impact: If exploited successfully, an attacker could deduce the `SYNC_SECRET` by measuring the time taken to process requests with different guesses for the secret token.
+🔧 Fix: Implemented a custom `timingSafeEqual` function using `TextEncoder` and bitwise XOR operations to perform a constant-time comparison, as `crypto.timingSafeEqual` is not readily available in Cloudflare Workers. Replaced the vulnerable string comparison with this secure function.
+✅ Verification: Ensure the worker builds and tests pass via `npm test -w workers/ctftime-sync`. The custom `timingSafeEqual` returns `false` securely for different lengths and evaluates each byte of matching lengths without early exiting before returning a boolean.
