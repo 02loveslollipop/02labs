@@ -166,17 +166,22 @@ function jsonResponse(data: unknown, status = 200): Response {
  * Node's crypto.timingSafeEqual isn't readily available in CF Workers.
  */
 function timingSafeEqual(a: string, b: string): boolean {
-  if (a.length !== b.length) {
-    return false;
-  }
-
   const encoder = new TextEncoder();
   const aBytes = encoder.encode(a);
   const bBytes = encoder.encode(b);
 
+  // We want to avoid early return on length mismatch to prevent timing oracles.
+  // We'll iterate up to the length of bBytes (the expected secret).
   let result = 0;
-  for (let i = 0; i < aBytes.length; i++) {
-    result |= aBytes[i] ^ bBytes[i];
+  if (aBytes.length !== bBytes.length) {
+    result = 1; // Mark as failed
+  }
+
+  for (let i = 0; i < bBytes.length; i++) {
+    // If aBytes is shorter, we compare bBytes[i] with itself (resulting in 0),
+    // but result is already non-zero due to the length check above.
+    const aByte = i < aBytes.length ? aBytes[i] : bBytes[i];
+    result |= aByte ^ bBytes[i];
   }
 
   return result === 0;
