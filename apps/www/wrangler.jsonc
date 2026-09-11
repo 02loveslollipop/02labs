@@ -11,18 +11,9 @@
 	"main": "./dist/_worker.js/index.js",
 	"assets": {
 		"directory": "./dist",
-		"binding": "ASSETS"
-	},
-	/*
-	 * Same KV namespace as ctftime-sync worker.
-	 * Replace the id/preview_id with the values from:
-	 *   npx wrangler kv namespace create CTFTIME_KV
-	 */
-	"kv_namespaces": [
-		{
-			"binding": "CTFTIME_KV",
-			"id": "05bfeb57f67b44fdafefb7ecb4526e27",
-			"preview_id": "05bfeb57f67b44fdafefb7ecb4526e27"
-		}
-	]
+		"binding": "ASSETS",
+		// Invoke the worker for every request so host redirects and the
+		// Accept: text/markdown handling in src/worker.ts apply to all paths.
+		"run_worker_first": true
+	}
 }

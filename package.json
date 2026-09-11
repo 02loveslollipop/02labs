@@ -3,15 +3,14 @@
   "private": true,
   "type": "module",
   "workspaces": [
-    "apps/*",
-    "workers/*"
+    "apps/*"
   ],
   "scripts": {
     "build": "npm run build:blog",
     "dev:www": "npm -w apps/www run dev",
     "dev:blog": "npm -w apps/blog run dev",
-    "dev:ctftime-sync": "npm -w ctftime-sync run dev",
     "sync:blog": "./scripts/sync-blog.sh",
+    "sync:ctftime": "node scripts/sync-ctftime.mjs",
     "build:www": "npm -w apps/www run build",
     "build:blog": "npm -w apps/blog run build",
     "preview:www": "npm -w apps/www run preview",
@@ -19,7 +18,6 @@
     "check:www": "npm -w apps/www run astro check",
     "check:blog": "npm -w apps/blog run astro check",
     "deploy:www": "npm -w apps/www run build && cd apps/www && npx wrangler deploy",
-    "deploy:blog": "npm -w apps/blog run build && cd apps/blog && npx wrangler deploy",
-    "deploy:ctftime-sync": "npm -w ctftime-sync run deploy"
+    "deploy:blog": "npm -w apps/blog run build && cd apps/blog && npx wrangler deploy"
   }
 }

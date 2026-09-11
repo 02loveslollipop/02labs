@@ -1,7 +1,4 @@
 ---
-// Render on the server so CTFtime data is current in the HTML, not patched in by the client.
-export const prerender = false;
-
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Navbar from "../components/Navbar.astro";
 import Hero from "../components/Hero.astro";
@@ -9,10 +6,9 @@ import ProjectCard from "../components/ProjectCard.astro";
 import ProjectDetail from "../components/ProjectDetail.astro";
 import { getCollection } from "astro:content";
 import { fetchLatestBlogPosts } from "../lib/blog";
-import { getServerCTFTimeData, getTopCTFPerformances } from "../lib/ctftime";
+import { getCTFTimeData, getTopCTFPerformances } from "../lib/ctftime";
 
-const kv = Astro.locals?.runtime?.env?.CTFTIME_KV;
-const ctf = await getServerCTFTimeData(kv);
+const ctf = getCTFTimeData();
 const team = ctf.team;
 const topEvents = getTopCTFPerformances(ctf.events, 5);
 const ctfYear = ctf.year;
@@ -62,9 +58,11 @@ const jsonLd = JSON.stringify(
 
 // ---------- Blog RSS fetch ----------
 const blogPosts = await fetchLatestBlogPosts(4);
-
-// AI Agent Headers
-Astro.response.headers.set('Link', '<' + '/.well-known/api-catalog>; rel="api-catalog", <' + '/docs/api>; rel="service-doc"');
+if (import.meta.env.PROD && blogPosts.length === 0) {
+	throw new Error(
+		"Blog mirror returned 0 posts — aborting the build instead of deploying a homepage without posts."
+	);
+}
 
 ---
 

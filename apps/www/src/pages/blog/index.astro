@@ -1,6 +1,4 @@
 ---
-export const prerender = false;
-
 import blogArchiveSettings from "../../data/blog-archive-settings.json";
 import ArchiveTagBar from "../../components/blog/ArchiveTagBar.astro";
 import EmptyFeaturedMedia from "../../components/blog/EmptyFeaturedMedia.astro";
@@ -44,9 +42,12 @@ function getTagSummaries(posts: BlogArchivePost[]): BlogTagSummary[] {
 	});
 }
 
-Astro.response.headers.set("Cache-Control", "public, s-maxage=900, stale-while-revalidate=86400");
-
 const posts = await fetchBlogMirrorPosts();
+if (import.meta.env.PROD && posts.length === 0) {
+	throw new Error(
+		"Blog mirror returned 0 posts — aborting the build instead of deploying an empty archive."
+	);
+}
 const configuredFeaturedSlug = String(blogArchiveSettings.featuredSlug || "").trim();
 const featured =
 	posts.find((post) => post.slug === configuredFeaturedSlug) ??

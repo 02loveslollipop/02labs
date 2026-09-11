@@ -1,15 +1,11 @@
 import type { APIRoute } from "astro";
-import { getServerCTFTimeData } from "../../lib/ctftime";
+import { getCTFTimeData } from "../../lib/ctftime";
 
-export const prerender = false;
+// Prerendered to a static file at build time; refreshed by the weekly CI rebuild.
+export const GET: APIRoute = async () => {
+	const data = getCTFTimeData();
 
-export const GET: APIRoute = async ({ locals }) => {
-	const data = await getServerCTFTimeData(locals.runtime?.env?.CTFTIME_KV);
-
-	return new Response(JSON.stringify(data), {
-		headers: {
-			"Content-Type": "application/json",
-			"Cache-Control": "public, max-age=60, stale-while-revalidate=60",
-		},
+	return new Response(JSON.stringify(data, null, "\t"), {
+		headers: { "Content-Type": "application/json" },
 	});
 };

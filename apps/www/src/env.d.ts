@@ -2,7 +2,6 @@
 /// <reference types="@cloudflare/workers-types" />
 
 interface Env {
-	CTFTIME_KV: KVNamespace;
 	ASSETS: Fetcher;
 }
 
