@@ -1,0 +1,265 @@
+{
+	"team": {
+		"name": "Ch0wn3rs",
+		"country": "CO",
+		"rating_place": 35,
+		"rating_points": 509.449,
+		"country_place": 1
+	},
+	"events": [
+		{
+			"event_id": "3110",
+			"title": "DiceCTF 2026 Quals",
+			"place": 24,
+			"ctf_points": "2072.0000",
+			"rating_points": 80.371154,
+			"weight": 100,
+			"time": 1772902800
+		},
+		{
+			"event_id": "3095",
+			"title": "TAMUctf 2026",
+			"place": 19,
+			"ctf_points": "2018.0000",
+			"rating_points": 80.231579,
+			"weight": 76.22,
+			"time": 1774044000
+		},
+		{
+			"event_id": "3324",
+			"title": "ENOWARS 10",
+			"place": 17,
+			"ctf_points": "30665.0000",
+			"rating_points": 58.545871,
+			"weight": 83.5,
+			"time": 1784376000
+		},
+		{
+			"event_id": "3102",
+			"title": "DawgCTF 2026",
+			"place": 52,
+			"ctf_points": "9910.0000",
+			"rating_points": 54.712153,
+			"weight": 66.64,
+			"time": 1775836800
+		},
+		{
+			"event_id": "3235",
+			"title": "BlueHens CTF 2026",
+			"place": 5,
+			"ctf_points": "4050.0000",
+			"rating_points": 49.157659,
+			"weight": 44.77,
+			"time": 1776445200
+		},
+		{
+			"event_id": "3056",
+			"title": "UMDCTF 2026",
+			"place": 36,
+			"ctf_points": "1915.0000",
+			"rating_points": 42.436657,
+			"weight": 85.48,
+			"time": 1777068000
+		},
+		{
+			"event_id": "3153",
+			"title": "b01lers CTF 2026",
+			"place": 29,
+			"ctf_points": "6720.0000",
+			"rating_points": 40.883104,
+			"weight": 66,
+			"time": 1776470400
+		},
+		{
+			"event_id": "3133",
+			"title": "UTCTF 2026",
+			"place": 14,
+			"ctf_points": "6580.0000",
+			"rating_points": 37.714286,
+			"weight": 35.2,
+			"time": 1773361380
+		},
+		{
+			"event_id": "2937",
+			"title": "UMassCTF 2026",
+			"place": 91,
+			"ctf_points": "2600.0000",
+			"rating_points": 35.955874,
+			"weight": 65.95,
+			"time": 1775858400
+		},
+		{
+			"event_id": "2987",
+			"title": "Undutmaning 2026",
+			"place": 21,
+			"ctf_points": "2580.0000",
+			"rating_points": 29.440496,
+			"weight": 33,
+			"time": 1774090800
+		},
+		{
+			"event_id": "3066",
+			"title": "Nullcon Goa HackIM 2026 CTF",
+			"place": 12,
+			"ctf_points": "5262.0000",
+			"rating_points": 24.753064,
+			"weight": 24.72,
+			"time": 1770453000
+		},
+		{
+			"event_id": "2983",
+			"title": "KalmarCTF 2026",
+			"place": 17,
+			"ctf_points": "3017.0000",
+			"rating_points": 24.418182,
+			"weight": 49.97,
+			"time": 1774630800
+		},
+		{
+			"event_id": "3098",
+			"title": "Batman's Kitchen CTF 2026",
+			"place": 10,
+			"ctf_points": "10689.0000",
+			"rating_points": 21.468569,
+			"weight": 24.24,
+			"time": 1771637400
+		},
+		{
+			"event_id": "2767",
+			"title": "PascalCTF 2026",
+			"place": 63,
+			"ctf_points": "6413.0000",
+			"rating_points": 21.144978,
+			"weight": 23.97,
+			"time": 1769846400
+		},
+		{
+			"event_id": "3122",
+			"title": "BITSCTF 2026",
+			"place": 31,
+			"ctf_points": "2672.0000",
+			"rating_points": 19.582222,
+			"weight": 25.54,
+			"time": 1771565400
+		},
+		{
+			"event_id": "3105",
+			"title": "Midnight Flag CTF - EXECUTION",
+			"place": 47,
+			"ctf_points": "2882.0000",
+			"rating_points": 16.247112,
+			"weight": 24.5,
+			"time": 1773432000
+		},
+		{
+			"event_id": "3086",
+			"title": "TaipanByte’s Chart CTF",
+			"place": 34,
+			"ctf_points": "5730.0000",
+			"rating_points": 15.793686,
+			"weight": 24.29,
+			"time": 1771063200
+		},
+		{
+			"event_id": "3127",
+			"title": "EHAX CTF 2026",
+			"place": 24,
+			"ctf_points": "5312.0000",
+			"rating_points": 14.111327,
+			"weight": 22.67,
+			"time": 1772217000
+		},
+		{
+			"event_id": "3091",
+			"title": "tkbctf5",
+			"place": 17,
+			"ctf_points": "2496.0000",
+			"rating_points": 13.140684,
+			"weight": 25,
+			"time": 1773464400
+		},
+		{
+			"event_id": "3171",
+			"title": "ApoorvCTF 2026",
+			"place": 75,
+			"ctf_points": "3371.0000",
+			"rating_points": 9.18271,
+			"weight": 24.1,
+			"time": 1772830800
+		},
+		{
+			"event_id": "3162",
+			"title": "MIPT CTF Quals 2026",
+			"place": 21,
+			"ctf_points": "2638.0000",
+			"rating_points": 9.058802,
+			"weight": 24.58,
+			"time": 1773478800
+		},
+		{
+			"event_id": "3147",
+			"title": "pingCTF 2026",
+			"place": 47,
+			"ctf_points": "373.0000",
+			"rating_points": 5.954877,
+			"weight": 46.2,
+			"time": 1776506400
+		},
+		{
+			"event_id": "3349",
+			"title": "BDSec CTF 2026",
+			"place": 78,
+			"ctf_points": "1335.0000",
+			"rating_points": 4.670289,
+			"weight": 15.62,
+			"time": 1784559600
+		},
+		{
+			"event_id": "3043",
+			"title": "Srdnlen CTF 2026 Quals",
+			"place": 131,
+			"ctf_points": "250.0000",
+			"rating_points": 2.817473,
+			"weight": 34.76,
+			"time": 1772301600
+		},
+		{
+			"event_id": "3081",
+			"title": "0xFUN CTF 2026",
+			"place": 291,
+			"ctf_points": "1903.0000",
+			"rating_points": 1.81487,
+			"weight": 17.74,
+			"time": 1770919200
+		},
+		{
+			"event_id": "3130",
+			"title": "TexSAW 2026",
+			"place": 400,
+			"ctf_points": "100.0000",
+			"rating_points": 0.871743,
+			"weight": 41.59,
+			"time": 1774612800
+		},
+		{
+			"event_id": "3177",
+			"title": "KubSTU CTF",
+			"place": 540,
+			"ctf_points": "550.0000",
+			"rating_points": 0.445341,
+			"weight": 24.83,
+			"time": 1777618800
+		},
+		{
+			"event_id": "3108",
+			"title": "BSidesSF CTF 2026",
+			"place": 642,
+			"ctf_points": "100.0000",
+			"rating_points": 0.439325,
+			"weight": 25,
+			"time": 1774047600
+		}
+	],
+	"year": 2026,
+	"updated_at": "2026-09-11T06:21:41.257Z"
+}
