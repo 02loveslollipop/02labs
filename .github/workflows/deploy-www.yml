@@ -5,25 +5,33 @@ on:
     branches: [main]
     paths:
       - "apps/www/**"
+      - "scripts/sync-ctftime.mjs"
       - ".github/workflows/deploy-www.yml"
-  # Also re-deploy www whenever the sync worker changes (KV schema may evolve)
+  # Weekly rebuild so the CTFtime data baked into the static site stays current
+  schedule:
+    - cron: "0 6 * * 1" # Mondays 06:00 UTC
+  workflow_dispatch:
+  # Re-deploy www after a successful blog deploy so the mirrored post list stays current
   workflow_run:
-    workflows: ["Deploy ctftime-sync worker"]
+    workflows: ["Deploy blog site"]
     types: [completed]
     branches: [main]
-  workflow_dispatch:
+
+concurrency:
+  group: deploy-www
+  cancel-in-progress: false
+
+permissions:
+  contents: read
 
 jobs:
   deploy:
-    name: Build & deploy to Cloudflare Workers
+    name: Build & deploy to Cloudflare Pages
     runs-on: ubuntu-latest
-    # Skip if triggered by a failed ctftime-sync deploy
+    # Skip if triggered by a failed blog deploy
     if: >
       github.event_name != 'workflow_run' ||
       github.event.workflow_run.conclusion == 'success'
-    permissions:
-      contents: read
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -37,13 +45,42 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Restore last good CTFtime snapshot
+        uses: actions/cache/restore@v4
+        with:
+          path: apps/www/src/data/ctftime-snapshot.json
+          key: ctftime-snapshot-${{ github.run_id }}
+          restore-keys: |
+            ctftime-snapshot-
+
+      # Fetches fresh CTFtime data into apps/www/src/data/ctftime-snapshot.json.
+      # On fetch failure it keeps the restored snapshot and exits 0; it only
+      # fails the job when no snapshot exists at all.
+      - name: Fetch fresh CTFtime data
+        id: sync_ctftime
+        run: npm run sync:ctftime
+
       - name: Build Astro site
         working-directory: apps/www
         run: npx astro build
 
-      - name: Deploy worker
+      # Advanced-mode _worker.js is installed by the astro build hook
+      # (pages-worker.js); wrangler must NOT be given a config with
+      # pages_build_output_dir or a _routes.json, both of which disable it.
+      # Requires CLOUDFLARE_API_TOKEN with "Cloudflare Pages: Edit".
+      - name: Deploy to Cloudflare Pages
         working-directory: apps/www
-        run: npx wrangler deploy
+        run: npx wrangler pages deploy ./dist --project-name 02labs-www
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      # Persist the snapshot only when the fetch succeeded, so the cache always
+      # holds the data from the last correct execution (GitHub caches expire
+      # after 7 days without access; the weekly run keeps it refreshed).
+      - name: Save CTFtime snapshot for future fallback
+        if: steps.sync_ctftime.outputs.fetched == 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: apps/www/src/data/ctftime-snapshot.json
+          key: ctftime-snapshot-${{ github.run_id }}
