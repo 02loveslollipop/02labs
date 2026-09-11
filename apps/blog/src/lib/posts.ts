@@ -65,12 +65,20 @@ const DOCUMENT_TYPE_TAG_SLUGS = new Set([
 ]);
 
 
+const postSlugCache = new WeakMap<CollectionEntry<"blog">, string>();
+const tagSlugCache = new Map<string, string>();
+const excerptCache = new WeakMap<CollectionEntry<"blog">, string>();
+
 export function getPostSlug(entry: CollectionEntry<"blog">): string {
+	const cached = postSlugCache.get(entry);
+	if (cached) return cached;
 	// Normalize "folder posts" like `my-post/index.md` to slug `my-post`.
 	const id = entry.id.replaceAll("\\", "/");
 	let slug = id.replace(/\.mdx?$/i, "");
 	slug = slug.replace(/\/index$/i, "");
-	return slug || entry.slug;
+	const result = slug || entry.slug;
+	postSlugCache.set(entry, result);
+	return result;
 }
 
 export function resolveSiteUrl(pathname: string, site?: URL): string {
@@ -82,7 +90,9 @@ export function sortBlogEntries(entries: CollectionEntry<"blog">[]): CollectionE
 }
 
 export function slugifyTag(input: string): string {
-	return String(input || "")
+	const cached = tagSlugCache.get(input);
+	if (cached !== undefined) return cached;
+	const slug = String(input || "")
 		.normalize("NFKD")
 		.replace(/[\u0300-\u036f]/g, "")
 		.toLowerCase()
@@ -91,6 +101,8 @@ export function slugifyTag(input: string): string {
 		.replace(/[\s_]+/g, "-")
 		.replace(/-+/g, "-")
 		.replace(/^-|-$/g, "");
+	tagSlugCache.set(input, slug);
+	return slug;
 }
 
 function getDisplayTagPriority(input: string): number {
@@ -102,11 +114,14 @@ function getDisplayTagPriority(input: string): number {
 }
 
 export function orderDisplayTags(tags: string[]): string[] {
-	return [...tags].sort((a, b) => {
-		const priorityDiff = getDisplayTagPriority(a) - getDisplayTagPriority(b);
-		if (priorityDiff !== 0) return priorityDiff;
-		return 0;
-	});
+	return tags
+		.map(tag => ({ tag, priority: getDisplayTagPriority(tag) }))
+		.sort((a, b) => {
+			const priorityDiff = a.priority - b.priority;
+			if (priorityDiff !== 0) return priorityDiff;
+			return 0;
+		})
+		.map(item => item.tag);
 }
 
 function truncate(text: string, max = 190): string {
@@ -115,6 +130,7 @@ function truncate(text: string, max = 190): string {
 	return `${cleaned.slice(0, max).trimEnd()}...`;
 }
 
+// Keep escapeHtml internal function
 function escapeHtml(input: string): string {
 	return String(input || "")
 		.replaceAll("&", "&amp;")
@@ -184,9 +200,23 @@ export function renderInlineMarkdown(input: string): string {
 }
 
 export function getPostExcerpt(markdownBody: string, fallback: string): string {
-	const lines = String(markdownBody || "").split(/\r?\n/);
-	for (const rawLine of lines) {
+	const text = String(markdownBody || "");
+	let startIndex = 0;
+
+	while (startIndex < text.length) {
+		let endIndex = text.indexOf("\n", startIndex);
+		if (endIndex === -1) {
+			endIndex = text.length;
+		}
+
+		let rawLine = text.substring(startIndex, endIndex);
+		if (rawLine.endsWith("\r")) {
+			rawLine = rawLine.slice(0, -1);
+		}
+
 		const line = rawLine.trim();
+		startIndex = endIndex + 1;
+
 		if (!line) continue;
 		if (
 			line.startsWith("#") ||
@@ -248,12 +278,19 @@ export function getRelatedPosts(
 
 	const source = withSharedTags.length > 0 ? withSharedTags : scored;
 
-	return source.slice(0, limit).map(({ entry }) => ({
-		slug: getPostSlug(entry),
-		title: stripMarkdownInline(entry.data.title),
-		excerpt: getPostExcerpt(entry.body, stripMarkdownInline(entry.data.description)),
-		pubDate: entry.data.pubDate,
-	}));
+	return source.slice(0, limit).map(({ entry }) => {
+		let excerpt = excerptCache.get(entry);
+		if (!excerpt) {
+			excerpt = getPostExcerpt(entry.body, stripMarkdownInline(entry.data.description));
+			excerptCache.set(entry, excerpt);
+		}
+		return {
+			slug: getPostSlug(entry),
+			title: stripMarkdownInline(entry.data.title),
+			excerpt,
+			pubDate: entry.data.pubDate,
+		};
+	});
 }
 
 export function getTagSummaries(entries: CollectionEntry<"blog">[]): BlogTagSummary[] {
@@ -300,8 +337,23 @@ export function extractTocHeadings(markdownBody: string, depths = [1, 2, 3]): To
 	const headings: TocHeading[] = [];
 	let inFence = false;
 
-	for (const rawLine of String(markdownBody || "").split(/\r?\n/)) {
+	const textBody = String(markdownBody || "");
+	let startIndex = 0;
+
+	while (startIndex < textBody.length) {
+		let endIndex = textBody.indexOf("\n", startIndex);
+		if (endIndex === -1) {
+			endIndex = textBody.length;
+		}
+
+		let rawLine = textBody.substring(startIndex, endIndex);
+		if (rawLine.endsWith("\r")) {
+			rawLine = rawLine.slice(0, -1);
+		}
+
 		const line = rawLine.trim();
+		startIndex = endIndex + 1;
+
 		if (line.startsWith("```") || line.startsWith("~~~")) {
 			inFence = !inFence;
 			continue;

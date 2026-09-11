@@ -44,6 +44,7 @@ function getMarkdownResponse(request: Request): Response | null {
 
 	const headers: Record<string, string> = {
 		"Content-Type": "text/markdown",
+		"X-Content-Type-Options": "nosniff",
 		"x-markdown-tokens": String(markdown.split(/\s+/).length),
 		"Content-Signal": "ai-train=yes, search=yes, ai-input=yes",
 	};
@@ -53,13 +54,19 @@ function getMarkdownResponse(request: Request): Response | null {
 	return new Response(markdown, { status: 200, headers });
 }
 
-// Formerly set via Astro.response in index.astro, which is prerendered now.
-function withAgentLinkHeader(url: URL, response: Response): Response {
-	if (url.hostname !== PRIMARY_HOST || url.pathname !== "/" || !(response.headers.get("Content-Type") ?? "").includes("text/html")) {
-		return response;
-	}
+// Security headers (parity with apps/blog/src/worker.ts and the former
+// middleware.ts) plus the homepage agent Link header, formerly set via
+// Astro.response when index.astro was server-rendered.
+function withResponseHeaders(url: URL, response: Response): Response {
 	const headers = new Headers(response.headers);
-	headers.set("Link", '</.well-known/api-catalog>; rel="api-catalog", </docs/api>; rel="service-doc"');
+	headers.set("X-Content-Type-Options", "nosniff");
+	headers.set("X-Frame-Options", "DENY");
+	headers.set("X-XSS-Protection", "1; mode=block");
+	headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+
+	if (url.hostname === PRIMARY_HOST && url.pathname === "/" && (headers.get("Content-Type") ?? "").includes("text/html")) {
+		headers.set("Link", '</.well-known/api-catalog>; rel="api-catalog", </docs/api>; rel="service-doc"');
+	}
 	return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
 }
 
@@ -89,7 +96,7 @@ export function createExports(manifest: SSRManifest) {
 				if (markdownResponse) return markdownResponse;
 
 				const response = await astroFetch(request as unknown as AstroRequest, env, context);
-				return withAgentLinkHeader(new URL(request.url), response);
+				return withResponseHeaders(new URL(request.url), response);
 			},
 		},
 	};

@@ -6,7 +6,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "test": "vitest run"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^12.6.12",
@@ -20,6 +21,7 @@
   "devDependencies": {
     "@astrojs/check": "^0.9.6",
     "@cloudflare/workers-types": "^4.20260301.1",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4"
   }
 }

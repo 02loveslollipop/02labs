@@ -31,7 +31,17 @@ export function createExports(manifest: SSRManifest) {
 		default: {
 			...astroExports.default,
 			fetch(request: Request, env: Env, context: ExecutionContext) {
-				return getRedirectResponse(request) ?? astroFetch(request as unknown as AstroRequest, env, context);
+				const responsePromise = getRedirectResponse(request) ?? astroFetch(request as unknown as AstroRequest, env, context);
+				return Promise.resolve(responsePromise).then(response => {
+					if (!response) return response;
+					// Add security headers to the default HTML responses
+					const newResponse = new Response(response.body, response);
+					newResponse.headers.set("X-Content-Type-Options", "nosniff");
+					newResponse.headers.set("X-Frame-Options", "DENY");
+					newResponse.headers.set("X-XSS-Protection", "1; mode=block");
+					newResponse.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+					return newResponse;
+				});
 			},
 		},
 	};
