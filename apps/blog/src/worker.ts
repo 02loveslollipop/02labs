@@ -3,46 +3,55 @@ import type { SSRManifest } from "astro";
 import type { ExecutionContext } from "@cloudflare/workers-types";
 
 type Env = {
-	[key: string]: unknown;
-	ASSETS: {
-		fetch: (req: Request | string) => Promise<Response>;
-	};
+  [key: string]: unknown;
+  ASSETS: {
+    fetch: (req: Request | string) => Promise<Response>;
+  };
 };
 
 const PRIMARY_HOST = "blog.02labs.me";
 const REDIRECT_HOSTS = new Set(["blog.02loveslollipop.uk"]);
 
 function getRedirectResponse(request: Request): Response | null {
-	const url = new URL(request.url);
-	if (!REDIRECT_HOSTS.has(url.hostname)) return null;
+  const url = new URL(request.url);
+  if (!REDIRECT_HOSTS.has(url.hostname)) return null;
 
-	url.protocol = "https:";
-	url.host = PRIMARY_HOST;
-	return Response.redirect(url.toString(), 301);
+  url.protocol = "https:";
+  url.host = PRIMARY_HOST;
+  return Response.redirect(url.toString(), 301);
 }
 
 export function createExports(manifest: SSRManifest) {
-	const astroExports = createAstroExports(manifest);
-	const astroFetch = astroExports.default.fetch;
-	type AstroRequest = Parameters<typeof astroFetch>[0];
+  const astroExports = createAstroExports(manifest);
+  const astroFetch = astroExports.default.fetch;
+  type AstroRequest = Parameters<typeof astroFetch>[0];
 
-	return {
-		...astroExports,
-		default: {
-			...astroExports.default,
-			fetch(request: Request, env: Env, context: ExecutionContext) {
-				const responsePromise = getRedirectResponse(request) ?? astroFetch(request as unknown as AstroRequest, env, context);
-				return Promise.resolve(responsePromise).then(response => {
-					if (!response) return response;
-					// Add security headers to the default HTML responses
-					const newResponse = new Response(response.body, response);
-					newResponse.headers.set("X-Content-Type-Options", "nosniff");
-					newResponse.headers.set("X-Frame-Options", "DENY");
-					newResponse.headers.set("X-XSS-Protection", "1; mode=block");
-					newResponse.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
-					return newResponse;
-				});
-			},
-		},
-	};
+  return {
+    ...astroExports,
+    default: {
+      ...astroExports.default,
+      fetch(request: Request, env: Env, context: ExecutionContext) {
+        const responsePromise =
+          getRedirectResponse(request) ??
+          astroFetch(request as unknown as AstroRequest, env, context);
+        return Promise.resolve(responsePromise).then((response) => {
+          if (!response) return response;
+          // Add security headers to the default HTML responses
+          const newResponse = new Response(response.body, response);
+          newResponse.headers.set("X-Content-Type-Options", "nosniff");
+          newResponse.headers.set("X-Frame-Options", "DENY");
+          newResponse.headers.set("X-XSS-Protection", "1; mode=block");
+          newResponse.headers.set(
+            "Referrer-Policy",
+            "strict-origin-when-cross-origin",
+          );
+          newResponse.headers.set(
+            "Strict-Transport-Security",
+            "max-age=31536000; includeSubDomains; preload",
+          );
+          return newResponse;
+        });
+      },
+    },
+  };
 }
