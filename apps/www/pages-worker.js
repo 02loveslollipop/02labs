@@ -10,7 +10,11 @@
 // binding that Pages provides to advanced-mode Workers.
 
 const PRIMARY_HOST = "02labs.me";
-const REDIRECT_HOSTS = new Set(["02loveslollipop.uk", "www.02labs.me", "www.02loveslollipop.uk"]);
+const REDIRECT_HOSTS = new Set([
+  "02loveslollipop.uk",
+  "www.02labs.me",
+  "www.02loveslollipop.uk",
+]);
 
 const HOMEPAGE_MARKDOWN = `# 02Labs
 Systems, Data, Projects, and CTF Writeups.
@@ -30,54 +34,62 @@ Systems, Data, Projects, and CTF Writeups.
 `;
 
 export default {
-	async fetch(request, env) {
-		const url = new URL(request.url);
+  async fetch(request, env) {
+    const url = new URL(request.url);
 
-		// Legacy host redirects, preserving path and query.
-		if (REDIRECT_HOSTS.has(url.hostname)) {
-			url.protocol = "https:";
-			url.host = PRIMARY_HOST;
-			return Response.redirect(url.toString(), 301);
-		}
+    // Legacy host redirects, preserving path and query.
+    if (REDIRECT_HOSTS.has(url.hostname)) {
+      url.protocol = "https:";
+      url.host = PRIMARY_HOST;
+      return Response.redirect(url.toString(), 301);
+    }
 
-		// Markdown-for-agents negotiation before touching the static assets.
-		const accept = request.headers.get("Accept");
-		if (accept && accept.includes("text/markdown")) {
-			const isHomepage = url.pathname === "/";
-			const body = isHomepage
-				? HOMEPAGE_MARKDOWN
-				: `# ${url.pathname}\n\nContent available in HTML.`;
+    // Markdown-for-agents negotiation before touching the static assets.
+    const accept = request.headers.get("Accept");
+    if (accept && accept.includes("text/markdown")) {
+      const isHomepage = url.pathname === "/";
+      const body = isHomepage
+        ? HOMEPAGE_MARKDOWN
+        : `# ${url.pathname}\n\nContent available in HTML.`;
 
-			const headers = {
-				"Content-Type": "text/markdown",
-				"X-Content-Type-Options": "nosniff",
-				"x-markdown-tokens": String(body.split(/\s+/).length),
-				"Content-Signal": "ai-train=yes, search=yes, ai-input=yes",
-			};
-			if (isHomepage) {
-				headers["Link"] = '</.well-known/api-catalog>; rel="api-catalog", </docs/api>; rel="service-doc"';
-			}
-			return new Response(body, { status: 200, headers });
-		}
+      const headers = {
+        "Content-Type": "text/markdown",
+        "X-Content-Type-Options": "nosniff",
+        "x-markdown-tokens": String(body.split(/\s+/).length),
+        "Content-Signal": "ai-train=yes, search=yes, ai-input=yes",
+      };
+      if (isHomepage) {
+        headers["Link"] =
+          '</.well-known/api-catalog>; rel="api-catalog", </docs/api>; rel="service-doc"';
+      }
+      return new Response(body, { status: 200, headers });
+    }
 
-		// Serve the static site, then add security headers (+ homepage Link).
-		const response = await env.ASSETS.fetch(request);
-		const newResponse = new Response(response.body, response);
-		newResponse.headers.set("X-Content-Type-Options", "nosniff");
-		newResponse.headers.set("X-Frame-Options", "DENY");
-		newResponse.headers.set("X-XSS-Protection", "1; mode=block");
-		newResponse.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+    // Serve the static site, then add security headers (+ homepage Link).
+    const response = await env.ASSETS.fetch(request);
+    const newResponse = new Response(response.body, response);
+    newResponse.headers.set("X-Content-Type-Options", "nosniff");
+    newResponse.headers.set("X-Frame-Options", "DENY");
+    newResponse.headers.set("X-XSS-Protection", "1; mode=block");
+    newResponse.headers.set(
+      "Referrer-Policy",
+      "strict-origin-when-cross-origin",
+    );
+    newResponse.headers.set(
+      "Strict-Transport-Security",
+      "max-age=31536000; includeSubDomains; preload",
+    );
 
-		if (
-			url.hostname === PRIMARY_HOST &&
-			url.pathname === "/" &&
-			(response.headers.get("Content-Type") ?? "").includes("text/html")
-		) {
-			newResponse.headers.set(
-				"Link",
-				'</.well-known/api-catalog>; rel="api-catalog", </docs/api>; rel="service-doc"'
-			);
-		}
-		return newResponse;
-	},
+    if (
+      url.hostname === PRIMARY_HOST &&
+      url.pathname === "/" &&
+      (response.headers.get("Content-Type") ?? "").includes("text/html")
+    ) {
+      newResponse.headers.set(
+        "Link",
+        '</.well-known/api-catalog>; rel="api-catalog", </docs/api>; rel="service-doc"',
+      );
+    }
+    return newResponse;
+  },
 };
