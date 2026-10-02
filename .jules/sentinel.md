@@ -17,3 +17,8 @@
 **Vulnerability:** The `/sync` endpoint in the `ctftime-sync` Cloudflare Worker used a simple string comparison (`!==`) to check the authorization header against the secret `SYNC_SECRET`. This string comparison can short-circuit, potentially leaking the secret's characters through a timing attack.
 **Learning:** In environments where Node's `crypto.timingSafeEqual` or `crypto.subtle.timingSafeEqual` are not available for simple string comparison (like Cloudflare Workers), we need to manually perform a constant-time comparison.
 **Prevention:** Implement a custom `timingSafeEqual` function using `TextEncoder` and bitwise XOR (`^`), and use it to compare string secrets in authorization checks.
+
+## 2024-05-18 - [MEDIUM] Missing Strict-Transport-Security header in Cloudflare worker response
+**Vulnerability:** The `Strict-Transport-Security` header was missing from the response headers in the Cloudflare workers used in the project (`apps/blog/src/worker.ts` and `apps/www/pages-worker.js`).
+**Learning:** This project uses custom Cloudflare worker scripts to intercept responses (sometimes just standard Astro SSR responses) and manually add security headers. As these bypass standard CDN header configurations, any newly recommended security headers, such as HSTS, must be manually injected into the response headers within the custom workers.
+**Prevention:** Ensure any new Cloudflare workers configuring response headers include `Strict-Transport-Security` (e.g., `"max-age=31536000; includeSubDomains; preload"`).
