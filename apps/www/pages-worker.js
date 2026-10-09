@@ -51,6 +51,7 @@ export default {
 			const headers = {
 				"Content-Type": "text/markdown",
 				"X-Content-Type-Options": "nosniff",
+				"Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
 				"x-markdown-tokens": String(body.split(/\s+/).length),
 				"Content-Signal": "ai-train=yes, search=yes, ai-input=yes",
 			};
@@ -67,6 +68,7 @@ export default {
 		newResponse.headers.set("X-Frame-Options", "DENY");
 		newResponse.headers.set("X-XSS-Protection", "1; mode=block");
 		newResponse.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+		newResponse.headers.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload");
 
 		if (
 			url.hostname === PRIMARY_HOST &&

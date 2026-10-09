@@ -40,6 +40,7 @@ export function createExports(manifest: SSRManifest) {
 					newResponse.headers.set("X-Frame-Options", "DENY");
 					newResponse.headers.set("X-XSS-Protection", "1; mode=block");
 					newResponse.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+					newResponse.headers.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload");
 					return newResponse;
 				});
 			},
