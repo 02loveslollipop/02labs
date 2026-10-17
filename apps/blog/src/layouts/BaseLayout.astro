@@ -19,6 +19,7 @@ export interface Props {
 	ogLocale?: string;
 	twitterSite?: string;
 	twitterCreator?: string;
+	robots?: string;
 }
 
 const {
@@ -36,6 +37,7 @@ const {
 	ogLocale = BLOG_LOCALE,
 	twitterSite,
 	twitterCreator,
+	robots = "index,follow",
 } = Astro.props;
 
 const site = Astro.site;
@@ -58,7 +60,7 @@ const safeJsonLd = jsonLd ? jsonLd.replace(/</g, "\\u003c").replace(/>/g, "\\u00
 		{authorName ? <meta name="author" content={authorName} /> : null}
 		<link rel="canonical" href={canonicalUrl} />
 
-		<meta name="robots" content="index,follow" />
+		<meta name="robots" content={robots} />
 		<meta name="theme-color" content="#0b0b10" />
 
 		<meta property="og:site_name" content={BLOG_NAME} />

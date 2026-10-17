@@ -1,6 +1,6 @@
 ---
 title: "Daily AlpacaHack: Permission Denied 2 Writeup"
-description: "At this point I don't know what to put here part 2"
+description: "Overcoming install -m 400 flag creation using advanced Linux file descriptor and environment exploitation."
 pubDate: 2026-05-01
 tags: ["alpacahack", "misc", "unix permissions"]
 ---

@@ -23,12 +23,14 @@ export async function GET(context: { site: URL }) {
 	const posts = sortBlogEntries((await getCollection("blog")).filter((entry) => !entry.data.draft));
 	const newestPostDate = posts[0] ? (posts[0].data.updatedDate ?? posts[0].data.pubDate) : new Date();
 	const tagLatest = new Map<string, { label: string; lastmod: Date }>();
+	const tagCounts = new Map<string, number>();
 
 	for (const post of posts) {
 		const postDate = post.data.updatedDate ?? post.data.pubDate;
 		for (const tag of post.data.tags) {
 			const slug = slugifyTag(tag);
 			if (!slug) continue;
+			tagCounts.set(slug, (tagCounts.get(slug) ?? 0) + 1);
 			const current = tagLatest.get(slug);
 			if (!current || postDate > current.lastmod) {
 				tagLatest.set(slug, { label: tag, lastmod: postDate });
@@ -46,6 +48,7 @@ export async function GET(context: { site: URL }) {
 			lastmod: toLastmod(post.data.updatedDate ?? post.data.pubDate),
 		})),
 		...Array.from(tagLatest.entries())
+			.filter(([slug]) => (tagCounts.get(slug) ?? 0) >= 2)
 			.sort((a, b) => a[0].localeCompare(b[0]))
 			.map(([slug, value]) => ({
 				url: new URL(`/tags/${slug}/`, context.site).toString(),

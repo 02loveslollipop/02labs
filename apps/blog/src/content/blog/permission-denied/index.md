@@ -1,6 +1,6 @@
 ---
 title: "Daily AlpacaHack: Permission Denied Writeup"
-description: "At this point I don't know what to put here."
+description: "Exploiting a race condition during root container file creation to read a mode 0400 flag in Daily AlpacaHack."
 pubDate: 2026-04-30
 tags: ["alpacahack", "misc", "unix permissions"]
 ---

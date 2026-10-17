@@ -9,6 +9,7 @@ import {
 	countMarkdownWords,
 	extractTocHeadings,
 	formatReadTime,
+	getPostChronologicalNeighbors,
 	getPostFirstImageSrc,
 	getPostSlug,
 	getReadingMinutes,
@@ -32,7 +33,9 @@ const { Content } = await entry.render();
 const slug = getPostSlug(entry);
 const titlePlain = stripMarkdownInline(entry.data.title);
 const descriptionPlain = stripMarkdownInline(entry.data.description);
-const relatedPosts = getRelatedPosts(entry, await getCollection("blog"));
+const allBlogEntries = await getCollection("blog");
+const relatedPosts = getRelatedPosts(entry, allBlogEntries);
+const { prev: prevPost, next: nextPost } = getPostChronologicalNeighbors(entry, allBlogEntries);
 const heroImageSrc = resolvePostImageSrc(entry.data.featuredImage, slug) ?? undefined;
 const imageSrc =
 	resolvePostImageSrc(entry.data.featuredImage, slug) ??
@@ -121,6 +124,8 @@ const jsonLd = JSON.stringify([articleJsonLd, breadcrumbJsonLd], null, 0);
 	heroImageAlt={heroImageSrc ? `${titlePlain} featured image` : undefined}
 	jsonLd={jsonLd}
 	relatedPosts={relatedPosts}
+	prevPost={prevPost}
+	nextPost={nextPost}
 	readTimeLabel={readTimeLabel}
 	tocItems={tocItems}
 >

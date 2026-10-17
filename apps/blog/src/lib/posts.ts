@@ -51,6 +51,11 @@ export interface TocHeading {
 	text: string;
 }
 
+export interface PostPaginationLink {
+	slug: string;
+	title: string;
+}
+
 const DOCUMENT_TYPE_TAG_SLUGS = new Set([
 	"writeup",
 	"post",
@@ -291,6 +296,36 @@ export function getRelatedPosts(
 			pubDate: entry.data.pubDate,
 		};
 	});
+}
+
+export function getPostChronologicalNeighbors(
+	currentEntry: CollectionEntry<"blog">,
+	entries: CollectionEntry<"blog">[]
+): { prev: PostPaginationLink | null; next: PostPaginationLink | null } {
+	const sorted = sortBlogEntries(entries.filter((entry) => !entry.data.draft));
+	const currentSlug = getPostSlug(currentEntry);
+	const index = sorted.findIndex((entry) => getPostSlug(entry) === currentSlug);
+	if (index === -1) return { prev: null, next: null };
+
+	// sorted is newest first (index 0 is newest)
+	// next is newer (index - 1), prev is older (index + 1)
+	const newer = index > 0 ? sorted[index - 1] : null;
+	const older = index < sorted.length - 1 ? sorted[index + 1] : null;
+
+	return {
+		prev: older
+			? {
+					slug: getPostSlug(older),
+					title: stripMarkdownInline(older.data.title),
+			  }
+			: null,
+		next: newer
+			? {
+					slug: getPostSlug(newer),
+					title: stripMarkdownInline(newer.data.title),
+			  }
+			: null,
+	};
 }
 
 export function getTagSummaries(entries: CollectionEntry<"blog">[]): BlogTagSummary[] {

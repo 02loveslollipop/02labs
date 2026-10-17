@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - "apps/blog/**"
+      - "blog/**"
       - ".github/workflows/deploy-blog.yml"
   workflow_dispatch:
 
@@ -34,7 +35,7 @@ jobs:
 
       - name: Build Astro site
         working-directory: apps/blog
-        run: npx astro build
+        run: npm run build
 
       - name: Deploy worker
         working-directory: apps/blog

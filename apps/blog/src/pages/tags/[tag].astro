@@ -79,9 +79,11 @@ const jsonLd = JSON.stringify(
 	null,
 	0
 );
+const shouldIndex = posts.length >= 2;
+const robots = shouldIndex ? "index,follow" : "noindex,follow";
 ---
 
-<BaseLayout title={title} description={summary} ogType="website" jsonLd={jsonLd}>
+<BaseLayout title={title} description={summary} ogType="website" jsonLd={jsonLd} robots={robots}>
 	<SiteHeader />
 
 	<main class="wrap" id="main">

@@ -8,6 +8,7 @@ import {
 	orderDisplayTags,
 	renderInlineMarkdown,
 	slugifyTag,
+	type PostPaginationLink,
 	type RelatedPostPreview,
 	type TocHeading,
 } from "../lib/posts";
@@ -22,6 +23,8 @@ export interface Props {
 	ogImageAlt?: string;
 	jsonLd?: string;
 	relatedPosts?: RelatedPostPreview[];
+	prevPost?: PostPaginationLink | null;
+	nextPost?: PostPaginationLink | null;
 	readTimeLabel: string;
 	heroImageSrc?: string;
 	heroImageAlt?: string;
@@ -38,6 +41,8 @@ const {
 	ogImageAlt,
 	jsonLd,
 	relatedPosts = [],
+	prevPost = null,
+	nextPost = null,
 	readTimeLabel,
 	heroImageSrc,
 	heroImageAlt,
@@ -144,6 +149,23 @@ const articleNavLinks = relatedPosts.slice(0, 2).map((post, index) => ({
 
 			<article class="prose" id="articleContent">
 				<slot />
+
+				{(prevPost || nextPost) ? (
+					<nav class="article-foot" aria-label="Chronological navigation">
+						{prevPost ? (
+							<a class="nav-link" href={`/posts/${prevPost.slug}/`}>
+								<span class="k">← PREVIOUS POST</span>
+								<span class="t">{prevPost.title}</span>
+							</a>
+						) : <div aria-hidden="true" />}
+						{nextPost ? (
+							<a class="nav-link" href={`/posts/${nextPost.slug}/`}>
+								<span class="k">NEXT POST →</span>
+								<span class="t">{nextPost.title}</span>
+							</a>
+						) : null}
+					</nav>
+				) : null}
 
 				{articleNavLinks.length > 0 ? (
 					<section class="article-foot" aria-label="Further reading">
