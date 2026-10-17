@@ -1,0 +1,49 @@
+---
+/**
+ * 02Labs Design System: DataTable Component
+ *
+ * Mapped to:
+ * - GitHub Primer: Table / Markdown Table
+ * - AWS Cloudscape: Table (@cloudscape-design/components)
+ */
+export interface Props {
+	headers: string[];
+	rows: Array<Array<string | number>>;
+	colWidths?: string[];
+	class?: string;
+}
+
+const {
+	headers,
+	rows,
+	colWidths,
+	class: extraClass = "",
+} = Astro.props;
+---
+
+<div class={`ch0wn3rs-table-wrap ${extraClass}`}>
+	<table class="ch0wn3rs-table">
+		<thead>
+			<tr>
+				{
+					headers.map((header, idx) => (
+						<th style={colWidths?.[idx] ? `width: ${colWidths[idx]}` : undefined}>
+							{header}
+						</th>
+					))
+				}
+			</tr>
+		</thead>
+		<tbody>
+			{
+				rows.map((row) => (
+					<tr>
+						{row.map((cell) => (
+							<td>{cell}</td>
+						))}
+					</tr>
+				))
+			}
+		</tbody>
+	</table>
+</div>

@@ -1,0 +1,38 @@
+---
+/**
+ * 02Labs Design System: Breadcrumb Component
+ *
+ * Mapped to:
+ * - GitHub Primer: Breadcrumbs / Breadcrumbs.Item (@primer/react)
+ * - AWS Cloudscape: BreadcrumbGroup (@cloudscape-design/components)
+ */
+export interface BreadcrumbItem {
+	label: string;
+	href?: string;
+}
+
+export interface Props {
+	items: BreadcrumbItem[];
+	class?: string;
+}
+
+const { items, class: extraClass = "" } = Astro.props;
+---
+
+<nav class={`project-page__breadcrumb ${extraClass}`} aria-label="Breadcrumb">
+	{
+		items.map((item, index) => {
+			const isLast = index === items.length - 1;
+			return (
+				<>
+					{item.href && !isLast ? (
+						<a href={item.href}>{item.label}</a>
+					) : (
+						<span aria-current={isLast ? "page" : undefined}>{item.label}</span>
+					)}
+					{!isLast && <span aria-hidden="true"> / </span>}
+				</>
+			);
+		})
+	}
+</nav>

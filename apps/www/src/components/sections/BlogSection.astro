@@ -1,0 +1,71 @@
+---
+import Button from "../ds/Button.astro";
+import SectionHeader from "../ds/SectionHeader.astro";
+
+/**
+ * 02Labs Design System: BlogSection Component
+ *
+ * Mapped to:
+ * - GitHub Primer: Box + ActionList / Article Cards
+ * - AWS Cloudscape: Container + Cards (variant="container")
+ */
+export interface BlogPostItem {
+	title: string;
+	description: string;
+	link: string;
+	pubDate?: string | Date;
+}
+
+export interface Props {
+	posts: BlogPostItem[];
+	id?: string;
+}
+
+const { posts, id = "blog" } = Astro.props;
+---
+
+<section class="snap-section" id={id} data-snap-section>
+	<div class="panel panel--centered">
+		<div class="panel__body">
+			<SectionHeader
+				title="Blog"
+				description="Writeups, notes, and long-form breakdowns."
+				actionHref="/blog/"
+				actionLabel="All posts"
+			/>
+
+			{
+				posts.length > 0 ? (
+					<div class="blog-row" aria-label="Latest posts">
+						{posts.map((post) => (
+							<article class="blog-card">
+								<div class="blog-card__text">
+									<div class="blog-card__badge">
+										{post.pubDate
+											? new Date(post.pubDate).toLocaleDateString("en-US", {
+													year: "numeric",
+													month: "short",
+													day: "numeric",
+													timeZone: "UTC",
+												})
+											: "Post"}
+									</div>
+									<h3 class="blog-card__title">{post.title}</h3>
+									<p class="blog-card__summary">{post.description}</p>
+								</div>
+								<div class="btn-row">
+									<Button href={post.link} target="_blank">Read post</Button>
+								</div>
+							</article>
+						))}
+					</div>
+				) : (
+					<div class="cta">
+						<p>The canonical blog lives at <strong>blog.02labs.me</strong>.</p>
+						<p><Button href="/blog/">Open the blog</Button></p>
+					</div>
+				)
+			}
+		</div>
+	</div>
+</section>

@@ -2,6 +2,8 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Navbar from "../../components/Navbar.astro";
 import ProjectDetail from "../../components/ProjectDetail.astro";
+import Breadcrumb from "../../components/ds/Breadcrumb.astro";
+import Footer from "../../components/sections/Footer.astro";
 import { getCollection } from "astro:content";
 
 export async function getStaticPaths() {
@@ -84,35 +86,26 @@ const jsonLd = JSON.stringify(
 ---
 
 <BaseLayout
-        title={project.title}
-        description={project.summary}
-        ogType="website"
-        jsonLd={jsonLd}
+	title={project.title}
+	description={project.summary}
+	ogType="website"
+	jsonLd={jsonLd}
 >
-        <Navbar forceScrolled />
+	<Navbar forceScrolled />
 
-        <main id="main" class="project-page">
-                <div class="project-page__shell panel">
-                        <nav class="project-page__breadcrumb" aria-label="Breadcrumb">
-                                <a href="/">Home</a>
-                                <span aria-hidden="true"> / </span>
-                                <a href="/projects/">Projects</a>
-                                <span aria-hidden="true"> / </span>
-                                <span>{project.title}</span>
-                        </nav>
+	<main id="main" class="project-page">
+		<div class="project-page__shell panel">
+			<Breadcrumb
+				items={[
+					{ label: "Home", href: "/" },
+					{ label: "Projects", href: "/projects/" },
+					{ label: project.title },
+				]}
+			/>
 
-                        <ProjectDetail project={project} headingTag="h1" />
-                </div>
-        </main>
+			<ProjectDetail project={project} headingTag="h1" />
+		</div>
+	</main>
 
-        <footer class="site-footer" aria-label="Footer">
-                <div class="site-footer__inner">
-                        <p class="site-footer__copy">
-                                © {new Date().getFullYear()} 02Labs. Built with Astro.
-                        </p>
-                        <p class="site-footer__meta">
-                                <a href="/projects/">Back to projects</a>
-                        </p>
-                </div>
-        </footer>
+	<Footer backToTopHref="/projects/" />
 </BaseLayout>

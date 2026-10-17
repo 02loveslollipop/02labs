@@ -1,0 +1,67 @@
+---
+/**
+ * 02Labs Design System: Badge Component
+ *
+ * Mapped to:
+ * - GitHub Primer: Label / CounterLabel (@primer/react)
+ * - AWS Cloudscape: Badge / TokenGroup (@cloudscape-design/components)
+ */
+export interface Props {
+	variant?: "default" | "accent" | "solid" | "ghost" | "counter";
+	as?: "span" | "a";
+	href?: string;
+	id?: string;
+	class?: string;
+	ariaLabel?: string;
+}
+
+const {
+	variant = "default",
+	as = "span",
+	href,
+	id,
+	class: extraClass = "",
+	ariaLabel,
+	...rest
+} = Astro.props;
+
+const Tag = href ? "a" : as;
+const classes = [
+	"badge",
+	`badge--${variant}`,
+	variant === "accent" || variant === "solid" ? "badge--accent" : "",
+	extraClass,
+]
+	.filter(Boolean)
+	.join(" ");
+---
+
+<Tag
+	id={id}
+	class={classes}
+	href={href}
+	aria-label={ariaLabel}
+	{...rest}
+>
+	<slot />
+</Tag>
+
+<style>
+	.badge--accent {
+		background: var(--ds-accent);
+		border-color: var(--ds-accent);
+		color: #ffffff;
+	}
+
+	.badge--ghost {
+		background: transparent;
+		border-color: var(--ds-border-default);
+		color: var(--ds-text-dim);
+	}
+
+	.badge--counter {
+		border-radius: var(--ds-radius-full);
+		padding: 0 8px;
+		font-variant-numeric: tabular-nums;
+	}
+</style>

@@ -1,0 +1,47 @@
+---
+/**
+ * 02Labs Design System: Card / Panel / Container Component
+ *
+ * Mapped to:
+ * - GitHub Primer: Box / BorderBox (@primer/react)
+ * - AWS Cloudscape: Container (@cloudscape-design/components)
+ */
+export interface Props {
+	as?: "div" | "article" | "section";
+	variant?: "default" | "centered" | "elevated" | "interactive";
+	id?: string;
+	class?: string;
+	dataSnapSection?: boolean;
+	dataState?: string;
+}
+
+const {
+	as = "div",
+	variant = "default",
+	id,
+	class: extraClass = "",
+	dataSnapSection = false,
+	dataState,
+	...rest
+} = Astro.props;
+
+const Tag = as;
+const classes = [
+	"panel",
+	variant === "centered" ? "panel--centered" : "",
+	variant === "elevated" ? "panel--elevated" : "",
+	extraClass,
+]
+	.filter(Boolean)
+	.join(" ");
+---
+
+<Tag
+	id={id}
+	class={classes}
+	data-snap-section={dataSnapSection ? "" : undefined}
+	data-state={dataState}
+	{...rest}
+>
+	<slot />
+</Tag>

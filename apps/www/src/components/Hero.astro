@@ -1,14 +1,48 @@
-<section class="hero snap-section" id="top" aria-label="Hero" data-snap-section data-state="active">
+---
+/**
+ * 02Labs Design System: Hero Section Component
+ *
+ * Mapped to:
+ * - GitHub Primer: Hero / Showcase Container
+ * - AWS Cloudscape: Header Container with custom hero canvas
+ *
+ * Preserves the exact DOM structure, wave canvas, WAAPI animation hooks,
+ * sentinel scroll triggers, and snap-section controller attributes.
+ */
+export interface Props {
+	kickerLeft?: string;
+	kickerRight?: string;
+	title?: string;
+	subtitle?: string;
+	id?: string;
+}
+
+const {
+	kickerLeft = "02loveslollipop",
+	kickerRight = "Systems / Data / Security",
+	title = "02Labs",
+	subtitle = "02Labs is my portfolio for systems engineering, data work, security experiments, and technical writeups.",
+	id = "top",
+} = Astro.props;
+---
+
+<section
+	class="hero snap-section"
+	id={id}
+	aria-label="Hero"
+	data-snap-section
+	data-state="active"
+>
 	<canvas class="hero__wave" data-hero-wave aria-hidden="true"></canvas>
 	<div class="hero__inner">
 		<div class="eyebrow hero__eyebrow" data-animate="hero-kicker">
-			<span>02loveslollipop</span>
+			<span>{kickerLeft}</span>
 			<span class="dot"></span>
-			<span>Systems / Data / Security</span>
+			<span>{kickerRight}</span>
 		</div>
-		<h1 data-animate="hero-title">02Labs</h1>
+		<h1 data-animate="hero-title">{title}</h1>
 		<p data-animate="hero-sub">
-			02Labs is my portfolio for systems engineering, data work, security experiments, and technical writeups.
+			{subtitle}
 		</p>
 	</div>
 	<div id="heroSentinel" class="hero__sentinel" aria-hidden="true"></div>

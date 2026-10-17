@@ -1,0 +1,129 @@
+---
+/**
+ * 02Labs Design System: Button Component
+ *
+ * Mapped to:
+ * - GitHub Primer: Button (@primer/react variant="default" | "primary" | "invisible")
+ * - AWS Cloudscape: Button (@cloudscape-design/components variant="normal" | "primary" | "link")
+ */
+export interface Props {
+	variant?: "default" | "primary" | "outline" | "ghost" | "icon";
+	href?: string;
+	target?: string;
+	rel?: string;
+	type?: "button" | "submit" | "reset";
+	id?: string;
+	class?: string;
+	ariaLabel?: string;
+}
+
+const {
+	variant = "default",
+	href,
+	target,
+	rel,
+	type = "button",
+	id,
+	class: extraClass = "",
+	ariaLabel,
+	...rest
+} = Astro.props;
+
+const isLink = Boolean(href);
+const resolvedRel = target === "_blank" ? (rel ?? "noopener noreferrer") : rel;
+
+const classes = [
+	"btn",
+	variant !== "default" ? `btn--${variant}` : "",
+	extraClass,
+]
+	.filter(Boolean)
+	.join(" ");
+---
+
+{
+	isLink ? (
+		<a
+			id={id}
+			class={classes}
+			href={href}
+			target={target}
+			rel={resolvedRel}
+			aria-label={ariaLabel}
+			{...rest}
+		>
+			<slot />
+		</a>
+	) : (
+		<button
+			id={id}
+			class={classes}
+			type={type}
+			aria-label={ariaLabel}
+			{...rest}
+		>
+			<slot />
+		</button>
+	)
+}
+
+<style>
+	.btn {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		height: 46px;
+		gap: 10px;
+		padding: 0 14px;
+		border: 1px solid var(--ds-border-strong);
+		background: transparent;
+		color: var(--ds-text-primary);
+		font-family: var(--ds-font-mono);
+		font-size: 12px;
+		letter-spacing: 0.12em;
+		text-decoration: none;
+		text-transform: uppercase;
+		box-sizing: border-box;
+		cursor: pointer;
+		transition:
+			border-color var(--ds-transition-fast),
+			color var(--ds-transition-fast),
+			background var(--ds-transition-fast),
+			transform var(--ds-transition-fast);
+	}
+
+	.btn:hover,
+	.btn:focus-visible {
+		border-color: var(--ds-accent);
+		color: var(--ds-accent);
+		background: var(--ds-accent-wash);
+	}
+
+	.btn:active {
+		transform: translateY(1px);
+	}
+
+	.btn--primary {
+		background: var(--ds-accent);
+		border-color: var(--ds-accent);
+		color: #ffffff;
+	}
+
+	.btn--primary:hover,
+	.btn--primary:focus-visible {
+		background: var(--ds-accent-hover);
+		border-color: var(--ds-accent-hover);
+		color: #ffffff;
+	}
+
+	.btn--ghost {
+		border-color: transparent;
+		background: transparent;
+	}
+
+	.btn--ghost:hover,
+	.btn--ghost:focus-visible {
+		background: var(--ds-accent-wash);
+		border-color: transparent;
+	}
+</style>

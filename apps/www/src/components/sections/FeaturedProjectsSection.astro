@@ -1,0 +1,54 @@
+---
+import ProjectCard, { type Project } from "../ProjectCard.astro";
+import SectionHeader from "../ds/SectionHeader.astro";
+
+/**
+ * 02Labs Design System: FeaturedProjectsSection Component
+ *
+ * Mapped to:
+ * - GitHub Primer: Showcase Box + Repository Cards
+ * - AWS Cloudscape: Container + Cards with horizontal scroll
+ */
+export interface Props {
+	featured: Project[];
+	id?: string;
+}
+
+const { featured, id = "featured" } = Astro.props;
+---
+
+<section class="snap-section" id={id} data-snap-section>
+	<div class="panel panel--centered">
+		<div class="panel__body">
+			<SectionHeader
+				title="Featured projects"
+				description="Five highlights. Static pages, crawlable links, and details below."
+				actionHref="/projects/"
+				actionLabel="All projects"
+			/>
+
+			<div class="carousel-wrapper">
+				<button class="carousel-btn prev-btn" aria-label="Previous project" type="button">
+					<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+						<path d="M15 18l-6-6 6-6" />
+					</svg>
+				</button>
+				<div class="featured-row" aria-label="Featured projects">
+					{
+						featured.map((project) => (
+							<ProjectCard
+								project={project}
+								detailsHref={`/projects/${project.slug}/`}
+							/>
+						))
+					}
+				</div>
+				<button class="carousel-btn next-btn" aria-label="Next project" type="button">
+					<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+						<path d="M9 18l6-6-6-6" />
+					</svg>
+				</button>
+			</div>
+		</div>
+	</div>
+</section>

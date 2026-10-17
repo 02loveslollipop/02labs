@@ -1,5 +1,6 @@
 ---
 import type { Project } from "./ProjectCard.astro";
+import Button from "./ds/Button.astro";
 
 export interface Props {
 	project: Project;
@@ -43,18 +44,18 @@ const HeadingTag = headingTag;
 			</div>
 
 			<div class="btn-row">
-				<a class="btn" href={project.links.repo} target="_blank" rel="noopener noreferrer">
+				<Button href={project.links.repo} target="_blank">
 					GitHub repo
-				</a>
+				</Button>
 				{project.links.cta ? (
-					<a class="btn" href={project.links.cta.href} target="_blank" rel="noopener noreferrer">
+					<Button href={project.links.cta.href} target="_blank">
 						{project.links.cta.label}
-					</a>
+					</Button>
 				) : null}
 				{project.links.live ? (
-					<a class="btn" href={project.links.live} target="_blank" rel="noopener noreferrer">
+					<Button href={project.links.live} target="_blank">
 						Live
-					</a>
+					</Button>
 				) : null}
 			</div>
 		</div>
