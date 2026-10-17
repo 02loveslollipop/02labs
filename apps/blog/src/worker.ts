@@ -37,6 +37,7 @@ export function createExports(manifest: SSRManifest) {
 					// Add security headers to the default HTML responses
 					const newResponse = new Response(response.body, response);
 					newResponse.headers.set("X-Content-Type-Options", "nosniff");
+					newResponse.headers.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload");
 					newResponse.headers.set("X-Frame-Options", "DENY");
 					newResponse.headers.set("X-XSS-Protection", "1; mode=block");
 					newResponse.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
