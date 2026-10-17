@@ -48,7 +48,6 @@ const formatCTFPoints = (points: string) => {
 };
 
 const tableHeaders = ["Rank pts", "Place", "Event", "CTF pts"];
-const tableColWidths = ["18%", "12%", "48%", "22%"];
 const tableRows = topEvents.map((ev) => [
 	formatRatingPoints(ev.rating_points),
 	String(ev.place),
@@ -104,7 +103,6 @@ const tableRows = topEvents.map((ev) => [
 				<DataTable
 					headers={tableHeaders}
 					rows={tableRows}
-					colWidths={tableColWidths}
 				/>
 			</div>
 		</div>
