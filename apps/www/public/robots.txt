@@ -1,5 +1,7 @@
 User-agent: *
 Allow: /
+Disallow: /mockups/
 
+Sitemap: https://02labs.me/sitemap.xml
 Sitemap: https://02labs.me/sitemap-index.xml
 Content-Signal: ai-train=yes, search=yes, ai-input=yes

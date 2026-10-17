@@ -1,5 +1,5 @@
 // @ts-check
-import { rmSync, readFileSync, writeFileSync } from 'node:fs';
+import { rmSync, readFileSync, writeFileSync, copyFileSync } from 'node:fs';
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import cloudflare from '@astrojs/cloudflare';
@@ -32,6 +32,12 @@ const installPagesWorker = () => ({
 				new URL('./dist/_worker.js', import.meta.url),
 				readFileSync(new URL('./pages-worker.js', import.meta.url)),
 			);
+			try {
+				copyFileSync(
+					new URL('./dist/sitemap-0.xml', import.meta.url),
+					new URL('./dist/sitemap.xml', import.meta.url),
+				);
+			} catch {}
 		},
 	},
 });
@@ -47,7 +53,7 @@ export default defineConfig({
 	trailingSlash: 'always',
 	integrations: [
 		sitemap({
-			customPages: ['https://02labs.me/'],
+			filter: (page) => !page.includes('/mockups/') && !page.includes('/blog/'),
 		}),
 		installPagesWorker(),
 	],

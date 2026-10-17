@@ -11,6 +11,7 @@ export interface Props {
 	twitterCard?: "summary" | "summary_large_image";
 	jsonLd?: string;
 	canonical?: string;
+	robots?: string;
 }
 
 const siteBrand = "02Labs";
@@ -23,6 +24,7 @@ const {
 	twitterCard,
 	jsonLd,
 	canonical,
+	robots = "index,follow",
 } = Astro.props;
 
 const site = Astro.site;
@@ -46,7 +48,7 @@ const safeJsonLd = jsonLd ? jsonLd.replace(/</g, "\\u003c").replace(/>/g, "\\u00
 		<meta name="description" content={description} />
 		<link rel="canonical" href={canonicalUrl} />
 
-		<meta name="robots" content="index,follow" />
+		<meta name="robots" content={robots} />
 		<meta name="theme-color" content="#0b0b10" />
 
 		<meta property="og:site_name" content={siteBrand} />
