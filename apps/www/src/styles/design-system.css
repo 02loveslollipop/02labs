@@ -1,0 +1,133 @@
+/**
+ * 02Labs Design System Tokens & Adapters
+ *
+ * Provides a canonical semantic token contract (--ds-*) that maps cleanly
+ * to GitHub Primer (@primer/css) or AWS Cloudscape Design System (@cloudscape-design).
+ */
+
+:root {
+	/* Surface / Background Tokens */
+	--ds-surface-canvas: #0b0b10;
+	--ds-surface-ink: #07070b;
+	--ds-surface-elevated: #101016;
+	--ds-surface-overlay: rgba(16, 16, 22, 0.76);
+	--ds-surface-wash: rgba(45, 108, 255, 0.06);
+	--ds-surface-media: #ffffff;
+	--ds-surface-media-ink: rgba(0, 0, 0, 0.45);
+
+	/* Text / Foreground Tokens */
+	--ds-text-primary: rgba(255, 255, 255, 0.92);
+	--ds-text-secondary: rgba(255, 255, 255, 0.72);
+	--ds-text-muted: rgba(255, 255, 255, 0.62);
+	--ds-text-dim: rgba(255, 255, 255, 0.42);
+	--ds-text-faint: rgba(255, 255, 255, 0.22);
+	--ds-text-accent: #2d6cff;
+
+	/* Border / Hairline Tokens */
+	--ds-border-default: rgba(255, 255, 255, 0.10);
+	--ds-border-strong: rgba(255, 255, 255, 0.18);
+	--ds-border-accent: rgba(45, 108, 255, 0.55);
+
+	/* Accent & Interaction Tokens */
+	--ds-accent: #2d6cff;
+	--ds-accent-hover: #4d85ff;
+	--ds-accent-soft: rgba(45, 108, 255, 0.10);
+	--ds-accent-wash: rgba(45, 108, 255, 0.06);
+	--ds-accent-selection: rgba(45, 108, 255, 0.28);
+
+	/* Typography Tokens */
+	--ds-font-display: "Archivo Black", "Arial Black", sans-serif;
+	--ds-font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
+	--ds-font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+	/* Spacing Scale Tokens */
+	--ds-space-xxs: 2px;
+	--ds-space-xs: 4px;
+	--ds-space-sm: 8px;
+	--ds-space-md: 16px;
+	--ds-space-lg: 24px;
+	--ds-space-xl: 32px;
+	--ds-space-xxl: 48px;
+
+	/* Border Radius Tokens */
+	--ds-radius-none: 0px;
+	--ds-radius-sm: 2px;
+	--ds-radius-md: 4px;
+	--ds-radius-lg: 8px;
+	--ds-radius-full: 9999px;
+
+	/* Layout & Motion Tokens */
+	--ds-page-max: 1400px;
+	--ds-content-max: 1160px;
+	--ds-nav-height: 72px;
+	--ds-page-pad: clamp(18px, 3.5vw, 46px);
+	--ds-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+	--ds-transition-fast: 140ms var(--ds-ease);
+	--ds-transition-normal: 180ms var(--ds-ease);
+}
+
+/* ==========================================================================
+   GitHub Primer Design System Adapter Mode
+   Activated when [data-design-system="primer"] or .theme-primer is applied
+   ========================================================================== */
+[data-design-system="primer"],
+.theme-primer {
+	--ds-surface-canvas: var(--color-canvas-default, #0d1117);
+	--ds-surface-ink: var(--color-canvas-inset, #010409);
+	--ds-surface-elevated: var(--color-canvas-subtle, #161b22);
+	--ds-surface-overlay: var(--color-canvas-overlay, rgba(22, 27, 34, 0.85));
+	--ds-surface-wash: var(--color-accent-subtle, rgba(56, 139, 253, 0.1));
+
+	--ds-text-primary: var(--color-fg-default, #f0f6fc);
+	--ds-text-secondary: var(--color-fg-muted, #9198a1);
+	--ds-text-muted: var(--color-fg-muted, #9198a1);
+	--ds-text-dim: var(--color-fg-subtle, #7d8590);
+	--ds-text-faint: var(--color-fg-on-emphasis, #6e7681);
+	--ds-text-accent: var(--color-accent-fg, #4493f8);
+
+	--ds-border-default: var(--color-border-default, #30363d);
+	--ds-border-strong: var(--color-border-muted, #3d444d);
+	--ds-border-accent: var(--color-accent-emphasis, #1f6feb);
+
+	--ds-accent: var(--color-accent-fg, #2f81f7);
+	--ds-accent-hover: var(--color-accent-emphasis, #388bfd);
+	--ds-accent-soft: var(--color-accent-subtle, rgba(56, 139, 253, 0.15));
+	--ds-accent-wash: var(--color-accent-subtle, rgba(56, 139, 253, 0.08));
+
+	--ds-radius-sm: var(--primer-borderRadius-small, 3px);
+	--ds-radius-md: var(--primer-borderRadius-medium, 6px);
+	--ds-radius-lg: var(--primer-borderRadius-large, 12px);
+}
+
+/* ==========================================================================
+   AWS Cloudscape Design System Adapter Mode
+   Activated when [data-design-system="cloudscape"] or .theme-cloudscape is applied
+   ========================================================================== */
+[data-design-system="cloudscape"],
+.theme-cloudscape {
+	--ds-surface-canvas: var(--color-background-layout-main, #0f141c);
+	--ds-surface-ink: var(--color-background-container-content, #141b24);
+	--ds-surface-elevated: var(--color-background-container-header, #1b232e);
+	--ds-surface-overlay: var(--color-background-dropdown-item-hover, rgba(20, 27, 36, 0.88));
+	--ds-surface-wash: var(--color-background-item-selected, rgba(83, 159, 229, 0.1));
+
+	--ds-text-primary: var(--color-text-body-default, #fbfbfb);
+	--ds-text-secondary: var(--color-text-body-secondary, #b6bec9);
+	--ds-text-muted: var(--color-text-body-secondary, #9ba7b6);
+	--ds-text-dim: var(--color-text-label, #879596);
+	--ds-text-faint: var(--color-text-disabled, #5f6b7a);
+	--ds-text-accent: var(--color-text-accent, #539fe5);
+
+	--ds-border-default: var(--color-border-divider-default, #2a3442);
+	--ds-border-strong: var(--color-border-control-default, #414d5c);
+	--ds-border-accent: var(--color-border-item-focused, #539fe5);
+
+	--ds-accent: var(--color-text-accent, #539fe5);
+	--ds-accent-hover: var(--color-border-item-focused, #68b2f8);
+	--ds-accent-soft: var(--color-background-control-checked, rgba(83, 159, 229, 0.16));
+	--ds-accent-wash: var(--color-background-item-selected, rgba(83, 159, 229, 0.08));
+
+	--ds-radius-sm: var(--border-radius-badge, 2px);
+	--ds-radius-md: var(--border-radius-container, 8px);
+	--ds-radius-lg: var(--border-radius-container, 12px);
+}

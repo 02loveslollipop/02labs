@@ -1,0 +1,112 @@
+---
+import Badge from "../ds/Badge.astro";
+import Button from "../ds/Button.astro";
+import DataTable from "../ds/DataTable.astro";
+
+/**
+ * 02Labs Design System: Ch0wn3rs CTF Section Component
+ *
+ * Mapped to:
+ * - GitHub Primer: Organization/Team Box + DataTable + Labels
+ * - AWS Cloudscape: Container + Key-Value + Table
+ */
+export interface CTFTeam {
+	country_place?: number | null;
+	rating_place?: number | string | null;
+	rating_points?: number | null;
+}
+
+export interface CTFEvent {
+	rating_points: number | null;
+	place: number | string;
+	title: string;
+	ctf_points: string;
+}
+
+export interface Props {
+	team: CTFTeam;
+	year: number;
+	topEvents: CTFEvent[];
+	id?: string;
+}
+
+const {
+	team,
+	year,
+	topEvents,
+	id = "ch0wn3rs",
+} = Astro.props;
+
+const formatRatingPoints = (points: number | null) =>
+	points != null ? points.toFixed(3) : "—";
+
+const formatCTFPoints = (points: string) => {
+	const parsed = Number.parseFloat(points);
+	return Number.isNaN(parsed)
+		? points
+		: parsed.toLocaleString("en-US", { maximumFractionDigits: 1 });
+};
+
+const tableHeaders = ["Rank pts", "Place", "Event", "CTF pts"];
+const tableColWidths = ["18%", "12%", "48%", "22%"];
+const tableRows = topEvents.map((ev) => [
+	formatRatingPoints(ev.rating_points),
+	String(ev.place),
+	ev.title,
+	formatCTFPoints(ev.ctf_points),
+]);
+---
+
+<section class="snap-section" id={id} data-snap-section>
+	<div class="panel panel--centered">
+		<div class="panel__body">
+			<div class="ch0wn3rs-header">
+				<img
+					class="ch0wn3rs-logo"
+					src="/ch0wn3rs-logo.jpeg"
+					alt="Ch0wn3rs team logo"
+					width="80"
+					height="80"
+					loading="lazy"
+				/>
+				<div class="ch0wn3rs-meta">
+					<h2>Ch0wn3rs</h2>
+					<p class="ch0wn3rs-role">
+						Co-founder &amp; Infrastructure lead&mdash;
+						<a href="https://ch0wn3rs.ninja" target="_blank" rel="noopener noreferrer">ch0wn3rs.ninja</a>
+					</p>
+					<p class="ch0wn3rs-desc">
+						Elite cybersecurity CTF team. I manage the core infrastructure: web apps, CTF platforms, workshops, and instances.
+					</p>
+					<div class="ch0wn3rs-badges">
+						<Badge id="ctf-badge-country" variant="accent">Colombia #{team.country_place ?? 1}</Badge>
+						<Badge id="ctf-badge-world">World #{team.rating_place ?? "—"}</Badge>
+						<Badge id="ctf-badge-pts">
+							{team.rating_points != null ? `${team.rating_points.toFixed(3)} pts` : "— pts"}
+						</Badge>
+					</div>
+				</div>
+			</div>
+
+			<div class="ch0wn3rs-events">
+				<div class="section-head ch0wn3rs-events-head">
+					<div>
+						<h3>{year} Top 5 CTF Performances</h3>
+						<p id="ctf-rating-summary">
+							Overall rating place: {team.rating_place ?? "—"} &mdash; {team.rating_points != null ? team.rating_points.toFixed(3) : "—"} pts
+						</p>
+					</div>
+					<Button href="https://ctftime.org/team/408704" target="_blank">
+						CTFtime profile
+					</Button>
+				</div>
+
+				<DataTable
+					headers={tableHeaders}
+					rows={tableRows}
+					colWidths={tableColWidths}
+				/>
+			</div>
+		</div>
+	</div>
+</section>

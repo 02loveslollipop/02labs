@@ -2,7 +2,11 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Navbar from "../components/Navbar.astro";
 import Hero from "../components/Hero.astro";
-import ProjectCard from "../components/ProjectCard.astro";
+import IntroSection from "../components/sections/IntroSection.astro";
+import Ch0wn3rsSection from "../components/sections/Ch0wn3rsSection.astro";
+import BlogSection from "../components/sections/BlogSection.astro";
+import FeaturedProjectsSection from "../components/sections/FeaturedProjectsSection.astro";
+import Footer from "../components/sections/Footer.astro";
 import ProjectDetail from "../components/ProjectDetail.astro";
 import { getCollection } from "astro:content";
 import { fetchLatestBlogPosts } from "../lib/blog";
@@ -12,14 +16,6 @@ const ctf = getCTFTimeData();
 const team = ctf.team;
 const topEvents = getTopCTFPerformances(ctf.events, 5);
 const ctfYear = ctf.year;
-const formatRatingPoints = (points: number | null) =>
-	points != null ? points.toFixed(3) : "—";
-const formatCTFPoints = (points: string) => {
-	const parsed = Number.parseFloat(points);
-	return Number.isNaN(parsed)
-		? points
-		: parsed.toLocaleString("en-US", { maximumFractionDigits: 1 });
-};
 
 const entries = await getCollection("projects");
 const projects = entries.map((e) => e.data).sort((a, b) => a.order - b.order);
@@ -63,7 +59,6 @@ if (import.meta.env.PROD && blogPosts.length === 0) {
 		"Blog mirror returned 0 posts — aborting the build instead of deploying a homepage without posts."
 	);
 }
-
 ---
 
 <BaseLayout
@@ -76,214 +71,49 @@ if (import.meta.env.PROD && blogPosts.length === 0) {
 	<Navbar />
 	<main id="main" class="home-main">
 		<div class="card-stack">
+			<Hero />
+			<IntroSection />
+			<Ch0wn3rsSection team={team} year={ctfYear} topEvents={topEvents} />
+			<BlogSection posts={blogPosts} />
+			<FeaturedProjectsSection featured={featured} />
 
-		<Hero />
-
-		<section class="snap-section" id="intro" data-snap-section>
-			<div class="panel intro">
-				<div class="intro-grid">
-						<div>
-							<h2>Introduction</h2>
-							<p>
-								Hi, I'm 02loveslollipop. 02Labs is my personal portfolio and lab, where I share projects, writeups, and experiments across systems engineering, data, security, and the other technical areas I like to explore deeply.
-							</p>
-						</div>
-					<div class="intro-divider" aria-hidden="true"></div>
-					<div>
-						<h2>Focus (Or lack thereof)</h2>
-						<p>
-							I love lot's of things as you will see in my projects and blog. I think the best way to understand the world is by building, but something shouldn't be built just for the sake of building. I like to build things that are interesting, that solve problems, or that are just fun to me. But also I don't like to be superficial in what I learn whatever the topic is, for me that's a way to show respect to that thing and to myself.
-						</p>
-					</div>
-				</div>
-			</div>
-		</section>
-
-		<section class="snap-section" id="ch0wn3rs" data-snap-section>
-			<div class="panel panel--centered">
-				<div class="panel__body">
-					<div class="ch0wn3rs-header">
-						<img
-							class="ch0wn3rs-logo"
-							src="/ch0wn3rs-logo.jpeg"
-							alt="Ch0wn3rs team logo"
-							width="80"
-							height="80"
-							loading="lazy"
-						/>
-						<div class="ch0wn3rs-meta">
-							<h2>Ch0wn3rs</h2>
-							<p class="ch0wn3rs-role">
-								Co-founder &amp; Infrastructure lead&mdash;
-								<a href="https://ch0wn3rs.ninja" target="_blank" rel="noopener noreferrer">ch0wn3rs.ninja</a>
-							</p>
-							<p class="ch0wn3rs-desc">
-								Elite cybersecurity CTF team. I manage the core infrastructure: web apps, CTF platforms, workshops, and instances.
-							</p>
-							<div class="ch0wn3rs-badges">
-								<span class="badge" id="ctf-badge-country">Colombia #{team.country_place ?? 1}</span>
-								<span class="badge" id="ctf-badge-world">World #{team.rating_place ?? "—"}</span>
-								<span class="badge" id="ctf-badge-pts">{team.rating_points != null ? `${team.rating_points.toFixed(3)} pts` : "— pts"}</span>
+			{
+				featured.map((project) => (
+					<section
+						class="snap-section"
+						id={`project-${project.slug}`}
+						data-snap-section
+					>
+						<div class="panel panel--centered">
+							<div class="panel__body">
+								<ProjectDetail project={project} />
 							</div>
 						</div>
-					</div>
-
-					<div class="ch0wn3rs-events">
-						<div class="section-head ch0wn3rs-events-head">
-							<div>
-								<h3>{ctfYear} Top 5 CTF Performances</h3>
-								<p id="ctf-rating-summary">
-									Overall rating place: {team.rating_place ?? "—"} &mdash; {team.rating_points != null ? team.rating_points.toFixed(3) : "—"} pts
-								</p>
-							</div>
-							<a class="btn" href="https://ctftime.org/team/408704" target="_blank" rel="noopener noreferrer">CTFtime profile</a>
-						</div>
-						<div class="ch0wn3rs-table-wrap">
-							<table class="ch0wn3rs-table">
-								<thead>
-									<tr>
-										<th>Rank pts</th>
-										<th>Place</th>
-										<th>Event</th>
-										<th>CTF pts</th>
-									</tr>
-								</thead>
-								<tbody>
-									{topEvents.map((ev) => (
-										<tr>
-											<td>{formatRatingPoints(ev.rating_points)}</td>
-											<td>{ev.place}</td>
-											<td>{ev.title}</td>
-											<td>{formatCTFPoints(ev.ctf_points)}</td>
-										</tr>
-									))}
-								</tbody>
-							</table>
-						</div>
-					</div>
-				</div>
-			</div>
-		</section>
-
-		<section class="snap-section" id="blog" data-snap-section>
-			<div class="panel panel--centered">
-				<div class="panel__body">
-					<div class="section-head">
-						<div>
-							<h2>Blog</h2>
-							<p>Writeups, notes, and long-form breakdowns.</p>
-						</div>
-						<a class="btn" href="/blog/">All posts</a>
-					</div>
-					{blogPosts.length > 0 ? (
-						<div class="blog-row" aria-label="Latest posts">
-							{blogPosts.map((post) => (
-								<article class="blog-card">
-									<div class="blog-card__text">
-										<div class="blog-card__badge">
-											{post.pubDate
-												? new Date(post.pubDate).toLocaleDateString("en-US", {
-														year: "numeric",
-														month: "short",
-														day: "numeric",
-														timeZone: "UTC",
-													})
-												: "Post"}
-										</div>
-										<h3 class="blog-card__title">{post.title}</h3>
-										<p class="blog-card__summary">{post.description}</p>
-									</div>
-									<div class="btn-row">
-										<a class="btn" href={post.link} target="_blank" rel="noopener">Read post</a>
-									</div>
-								</article>
-							))}
-						</div>
-					) : (
-						<div class="cta">
-							<p>The canonical blog lives at <strong>blog.02labs.me</strong>.</p>
-							<p><a class="btn" href="/blog/">Open the blog</a></p>
-						</div>
-					)}
-				</div>
-			</div>
-		</section>
-
-		<section class="snap-section" id="featured" data-snap-section>
-			<div class="panel panel--centered">
-				<div class="panel__body">
-					<div class="section-head">
-						<div>
-							<h2>Featured projects</h2>
-							<p>Five highlights. Static pages, crawlable links, and details below.</p>
-						</div>
-						<p>
-							<a class="btn" href="/projects/">All projects</a>
-						</p>
-					</div>
-
-					<div class="carousel-wrapper">
-						<button class="carousel-btn prev-btn" aria-label="Previous project">
-							<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
-						</button>
-						<div class="featured-row" aria-label="Featured projects">
-							{featured.map((project) => (
-								<ProjectCard project={project} detailsHref={`/projects/${project.slug}/`} />
-							))}
-						</div>
-						<button class="carousel-btn next-btn" aria-label="Next project">
-							<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
-						</button>
-					</div>
-				</div>
-			</div>
-		</section>
-
-		{featured.map((project) => (
-			<section
-				class="snap-section"
-				id={`project-${project.slug}`}
-				data-snap-section
-			>
-				<div class="panel panel--centered">
-					<div class="panel__body">
-						<ProjectDetail project={project} />
-					</div>
-				</div>
-			</section>
-		))}
-
+					</section>
+				))
+			}
 		</div><!-- .card-stack -->
 	</main>
 
-	<footer class="site-footer" aria-label="Footer">
-		<div class="site-footer__inner">
-			<p class="site-footer__copy">
-				© {new Date().getFullYear()} 02Labs. Built with Astro.
-			</p>
-			<p class="site-footer__meta">
-				<a href="/#top">Back to top</a>
-			</p>
-		</div>
-	</footer>
+	<Footer />
 
 	<script>
 		import "../scripts/home";
 
 		// Carousel logic for featured projects
-		const rows = document.querySelectorAll('.featured-row');
-		const prevBtns = document.querySelectorAll('.prev-btn');
-		const nextBtns = document.querySelectorAll('.next-btn');
+		const rows = document.querySelectorAll(".featured-row");
+		const prevBtns = document.querySelectorAll(".prev-btn");
+		const nextBtns = document.querySelectorAll(".next-btn");
 
 		rows.forEach((row, index) => {
 			const prev = prevBtns[index];
 			const next = nextBtns[index];
 			if (row && prev && next) {
-				prev.addEventListener('click', () => {
-					row.scrollBy({ left: -row.clientWidth * 0.8, behavior: 'smooth' });
+				prev.addEventListener("click", () => {
+					row.scrollBy({ left: -row.clientWidth * 0.8, behavior: "smooth" });
 				});
-				next.addEventListener('click', () => {
-					row.scrollBy({ left: row.clientWidth * 0.8, behavior: 'smooth' });
+				next.addEventListener("click", () => {
+					row.scrollBy({ left: row.clientWidth * 0.8, behavior: "smooth" });
 				});
 			}
 		});

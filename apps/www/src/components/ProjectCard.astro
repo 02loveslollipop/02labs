@@ -1,4 +1,7 @@
 ---
+import Button from "./ds/Button.astro";
+import Badge from "./ds/Badge.astro";
+
 export type ProjectCardLayout = "minimal" | "dense";
 
 export interface ProjectImage {
@@ -75,16 +78,14 @@ const secondaryIsExternal = Boolean(project.links.cta);
 	</div>
 
 	<div class="btn-row">
-		<a class="btn" href={repoHref} target="_blank" rel="noopener noreferrer">
+		<Button href={repoHref} target="_blank">
 			GitHub repo
-		</a>
-		<a
-			class="btn"
+		</Button>
+		<Button
 			href={secondaryHref}
 			target={secondaryIsExternal ? "_blank" : undefined}
-			rel={secondaryIsExternal ? "noopener noreferrer" : undefined}
 		>
 			{secondaryLabel}
-		</a>
+		</Button>
 	</div>
 </article>

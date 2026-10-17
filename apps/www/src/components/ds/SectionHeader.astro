@@ -1,0 +1,56 @@
+---
+import Button from "./Button.astro";
+
+/**
+ * 02Labs Design System: SectionHeader Component
+ *
+ * Mapped to:
+ * - GitHub Primer: Subhead / Pagehead (@primer/react)
+ * - AWS Cloudscape: Header (@cloudscape-design/components)
+ */
+export interface Props {
+	title: string;
+	description?: string;
+	level?: "h1" | "h2" | "h3";
+	actionHref?: string;
+	actionLabel?: string;
+	actionExternal?: boolean;
+	kicker?: string;
+	class?: string;
+}
+
+const {
+	title,
+	description,
+	level = "h2",
+	actionHref,
+	actionLabel,
+	actionExternal = false,
+	kicker,
+	class: extraClass = "",
+} = Astro.props;
+
+const HeadingTag = level;
+---
+
+<div class={`section-head ${extraClass}`}>
+	<div>
+		{kicker ? <span class="eyebrow">{kicker}</span> : null}
+		<HeadingTag>{title}</HeadingTag>
+		{description ? <p>{description}</p> : null}
+		<slot name="description" />
+	</div>
+
+	{
+		actionHref && actionLabel ? (
+			<Button
+				href={actionHref}
+				target={actionExternal ? "_blank" : undefined}
+			>
+				{actionLabel}
+			</Button>
+		) : (
+			<slot name="actions" />
+		)
+	}
+</div>

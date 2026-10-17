@@ -1,5 +1,46 @@
-🚨 Severity: HIGH
-💡 Vulnerability: The `/sync` endpoint in the `ctftime-sync` Cloudflare Worker used a simple string comparison (`!==`) to check the authorization header against the secret `SYNC_SECRET`. This simple string comparison can short-circuit upon finding the first mismatching character, potentially leaking the characters of the secret through a timing attack.
-🎯 Impact: If exploited successfully, an attacker could deduce the `SYNC_SECRET` by measuring the time taken to process requests with different guesses for the secret token.
-🔧 Fix: Implemented a custom `timingSafeEqual` function using `TextEncoder` and bitwise XOR operations to perform a constant-time comparison, as `crypto.timingSafeEqual` is not readily available in Cloudflare Workers. Replaced the vulnerable string comparison with this secure function.
-✅ Verification: Ensure the worker builds and tests pass via `npm test -w workers/ctftime-sync`. The custom `timingSafeEqual` returns `false` securely for different lengths and evaluates each byte of matching lengths without early exiting before returning a boolean.
+### Summary of Changes
+
+This PR plans and implements the component mapping and architectural refactoring for the redesign of the **02labs web page** (`apps/www`) and **02labs blog** (`apps/blog`) to **GitHub Primer Design System** (with parallel support for AWS Cloudscape), preserving 100% of the section ordering, interactive animations, and responsive card-stack mechanics.
+
+---
+
+### Key Architectural Updates
+
+1. **Design System Token Foundation (`--ds-*`)**:
+   - Added `apps/www/src/styles/design-system.css` and `apps/blog/src/styles/design-system.css`.
+   - Mapped semantic surface, text, border, accent, spacing, radius, and typography tokens.
+   - Built native GitHub Primer adapter: `[data-design-system="primer"]` / `.theme-primer` maps directly to `@primer/primitives` (`--color-canvas-default`, `--color-accent-fg`, `--color-border-default`, etc.).
+   - Bridged legacy CSS variables (`--bg`, `--fg`, `--accent`, etc.) to `--ds-*` to guarantee zero visual or layout regressions.
+
+2. **Atomic Component Primitives (`src/components/ds/`)**:
+   - `Badge.astro`: Mapped to Primer `Label` / `CounterLabel`.
+   - `Button.astro`: Mapped to Primer `Button` (`variant="default" | "primary" | "ghost"`).
+   - `Card.astro`: Mapped to Primer `Box` / `BorderBox`.
+   - `SectionHeader.astro`: Mapped to Primer `Subhead` / `Pagehead`.
+   - `DataTable.astro`: Mapped to Primer `Table`.
+   - `Breadcrumb.astro`: Mapped to Primer `Breadcrumbs` (`Breadcrumbs.Item`).
+
+3. **Domain Section Decoupling (`src/components/sections/`)**:
+   - `Hero.astro`: Preserves 100% of the interactive wave canvas (`data-hero-wave`), eyebrow kicker, WAAPI animation hooks (`data-animate="hero-title"`), sentinel scroll trigger (`#heroSentinel`), while exposing customizable props.
+   - `IntroSection.astro`: Clean 2-column introduction and focus card.
+   - `Ch0wn3rsSection.astro`: Standings table, team identity, and CTF rating badges.
+   - `BlogSection.astro`: Latest 4 technical writeups with date badge and read CTAs.
+   - `FeaturedProjectsSection.astro`: Project highlight carousel with navigation controls.
+   - `Footer.astro`: Reusable site footer.
+
+4. **Page Refactoring**:
+   - `apps/www/src/pages/index.astro`: Deconstructed monolithic 180-line inline HTML into clean, high-level semantic components.
+   - `apps/www/src/pages/projects/[slug].astro`: Integrated `Breadcrumb` and `Footer`.
+   - `apps/www/src/pages/projects/index.astro`: Integrated `SectionHeader` and `Footer`.
+   - `apps/blog/src/components/EmptyFeaturedMedia.astro`: Fixed TypeScript diagnostics in canvas rendering loop.
+
+5. **Design System Documentation**:
+   - Added comprehensive mapping catalog in `docs/DESIGN_SYSTEM_MAPPING.md`.
+
+---
+
+### Verification & Testing
+
+- ✅ **Unit Tests**: `npm -w apps/www run test` (38/38 vitest tests passed).
+- ✅ **Type Checking**: `npm run check:www` and `npm run check:blog` passed with 0 errors.
+- ✅ **Static Site Builds**: `npm run build:www` and `npm run build:blog` completed successfully.

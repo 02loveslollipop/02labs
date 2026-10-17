@@ -1,26 +1,28 @@
+@import "./design-system.css";
+
 :root {
-	--bg: #0b0b10;
-	--bg-ink: #07070b;
-	--bg-elevated: #101016;
-	--fg: rgba(255, 255, 255, 0.92);
-	--fg-mute: rgba(255, 255, 255, 0.62);
-	--fg-dim: rgba(255, 255, 255, 0.42);
-	--fg-faint: rgba(255, 255, 255, 0.22);
-	--line: rgba(255, 255, 255, 0.1);
-	--line-strong: rgba(255, 255, 255, 0.18);
-	--line-accent: rgba(45, 108, 255, 0.55);
-	--accent: #2d6cff;
-	--accent-soft: rgba(45, 108, 255, 0.1);
-	--accent-wash: rgba(45, 108, 255, 0.06);
-	--media-bg: #fff;
-	--media-ink: rgba(0, 0, 0, 0.45);
-	--pad: clamp(18px, 3.5vw, 46px);
-	--max: 1400px;
-	--nav-h: 72px;
-	--ease: cubic-bezier(0.2, 0.8, 0.2, 1);
-	--f-display: "Archivo Black", "Arial Black", sans-serif;
-	--f-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
-	--f-mono: "JetBrains Mono", ui-monospace, monospace;
+	--bg: var(--ds-surface-canvas);
+	--bg-ink: var(--ds-surface-ink);
+	--bg-elevated: var(--ds-surface-elevated);
+	--fg: var(--ds-text-primary);
+	--fg-mute: var(--ds-text-muted);
+	--fg-dim: var(--ds-text-dim);
+	--fg-faint: var(--ds-text-faint);
+	--line: var(--ds-border-default);
+	--line-strong: var(--ds-border-strong);
+	--line-accent: var(--ds-border-accent);
+	--accent: var(--ds-accent);
+	--accent-soft: var(--ds-accent-soft);
+	--accent-wash: var(--ds-accent-wash);
+	--media-bg: var(--ds-surface-media);
+	--media-ink: var(--ds-surface-media-ink);
+	--pad: var(--ds-page-pad);
+	--max: var(--ds-page-max);
+	--nav-h: var(--ds-nav-height);
+	--ease: var(--ds-ease);
+	--f-display: var(--ds-font-display);
+	--f-sans: var(--ds-font-sans);
+	--f-mono: var(--ds-font-mono);
 }
 
 *,
