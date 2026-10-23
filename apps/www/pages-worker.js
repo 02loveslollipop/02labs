@@ -53,6 +53,7 @@ export default {
 				"X-Content-Type-Options": "nosniff",
 				"x-markdown-tokens": String(body.split(/\s+/).length),
 				"Content-Signal": "ai-train=yes, search=yes, ai-input=yes",
+				"Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
 			};
 			if (isHomepage) {
 				headers["Link"] = '</.well-known/api-catalog>; rel="api-catalog", </docs/api>; rel="service-doc"';
@@ -67,6 +68,7 @@ export default {
 		newResponse.headers.set("X-Frame-Options", "DENY");
 		newResponse.headers.set("X-XSS-Protection", "1; mode=block");
 		newResponse.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+		newResponse.headers.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload");
 
 		if (
 			url.hostname === PRIMARY_HOST &&
